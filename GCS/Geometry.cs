@@ -11,12 +11,12 @@ namespace GCS
     {
         public static Vector2[] GetIntersect((Vector2, Vector2) line1, (Vector2, Vector2) line2)
         {
-
+            throw new NotImplementedException();
         }
 
         public static Vector2[] GetIntersect((Vector2, float) circle, (Vector2, Vector2) line)
         {
-
+            throw new NotImplementedException();
         }
 
         public static Vector2[] GetIntersect((Vector2, float) circle1, (Vector2, float) circle2)
@@ -27,6 +27,7 @@ namespace GCS
             else if (circle1.Item2 + circle2.Item2 == dist)
                 return new Vector2[] {  };
 
+            throw new NotImplementedException();
         }
     }
 }
