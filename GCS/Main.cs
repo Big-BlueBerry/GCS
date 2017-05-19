@@ -71,7 +71,7 @@ namespace GCS
             foreach (var s in _shapes)
             {
                 var ints = Geometry.GetIntersect(shape, s);
-                if (ints.Length != 1)
+                if (ints.Length != 0)
                     _keypoints.AddRange(ints.Where(i => !_keypoints.Contains(i)));
             }
             _shapes.Add(shape);
