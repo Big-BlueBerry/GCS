@@ -9,24 +9,36 @@ namespace GCS
 {
     public static class Geometry
     {
-        public static Vector2[] GetIntersect((Vector2, Vector2) line1, (Vector2, Vector2) line2)
+        public static Vector2[] GetIntersect(Shape shape1, Shape shape2)
+        {
+            if(shape1 is Line)
+            {
+                if (shape2 is Line)
+                    return getIntersect(shape1 as Line, shape2 as Line);
+                else if (shape2 is Circle)
+                    return getIntersect(shape1 as Line, shape2 as Circle);
+            }
+            else if(shape1 is Circle)
+            {
+                if (shape2 is Line)
+                    return getIntersect(shape2 as Line, shape1 as Circle);
+                else if (shape2 is Circle)
+                    return getIntersect(shape1 as Circle, shape2 as Circle);
+            }
+            throw new Exception("뀨;;");
+        }
+        private static Vector2[] getIntersect(Line line1, Line line2)
         {
             throw new NotImplementedException();
         }
 
-        public static Vector2[] GetIntersect((Vector2, float) circle, (Vector2, Vector2) line)
+        private static Vector2[] getIntersect(Line line, Circle circle)
         {
             throw new NotImplementedException();
         }
 
-        public static Vector2[] GetIntersect((Vector2, float) circle1, (Vector2, float) circle2)
+        private static Vector2[] getIntersect(Circle circle1, Circle circle2)
         {
-            float dist = Vector2.Distance(circle1.Item1, circle2.Item1);
-            if (circle1.Item2 + circle2.Item2 < dist)
-                return new Vector2[] { };
-            else if (circle1.Item2 + circle2.Item2 == dist)
-                return new Vector2[] {  };
-
             throw new NotImplementedException();
         }
     }
