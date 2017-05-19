@@ -7,6 +7,7 @@ namespace GCS
 {
     public abstract class Shape
     {
+        public string Name { get; set; }
         public abstract void Draw(SpriteBatch sb, float border, Color color);
     }
 

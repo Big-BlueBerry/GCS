@@ -18,6 +18,7 @@ namespace GCS
         private bool _wasDrawing = false;
         private Vector2 _lastPoint = new Vector2();
         private List<Shape> _shapes;
+        private List<Vector2> _keypoints;
 
         protected override void InitSize()
         {
@@ -38,6 +39,7 @@ namespace GCS
             guiManagerComponent.GUIs.Add(_clearBtn);
 
             _shapes = new List<Shape>();
+            _keypoints = new List<Vector2>();
         }
 
         private void UpdateDrawState()
@@ -58,6 +60,21 @@ namespace GCS
             {
                 s.Draw(_spriteBatch, 2, Color.Black);
             }
+            foreach(var k in _keypoints)
+            {
+                GUI.DrawPoint(_spriteBatch, k, 2, Color.Red);
+            }
+        }
+
+        private void AddShape(Shape shape)
+        {
+            foreach (var s in _shapes)
+            {
+                var ints = Geometry.GetIntersect(shape, s);
+                if (ints.Length != 1)
+                    _keypoints.AddRange(ints.Where(i => !_keypoints.Contains(i)));
+            }
+            _shapes.Add(shape);
         }
 
         protected override void Update(GameTime gameTime)
@@ -79,11 +96,11 @@ namespace GCS
                 if (_drawState == DrawState.CIRCLE)
                 {
                     float radius = Vector2.Distance(Mouse.GetState().Position.ToVector2(), _lastPoint);
-                    _shapes.Add(new Circle(_lastPoint, radius));
+                    AddShape(new Circle(_lastPoint, radius));
                 }
                 else if (_drawState == DrawState.LINE)
                 {
-                    _shapes.Add(new Line(_lastPoint, Mouse.GetState().Position.ToVector2()));
+                    AddShape(new Line(_lastPoint, Mouse.GetState().Position.ToVector2()));
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
@@ -94,7 +111,6 @@ namespace GCS
 
         protected override void Draw(GameTime gameTime)
         {
-            base.Draw(gameTime);
             _spriteBatch.Begin();
             if (_wasDrawing && _drawState == DrawState.CIRCLE)
             {
@@ -108,6 +124,7 @@ namespace GCS
 
             UpdateLists();
             _spriteBatch.End();
+            base.Draw(gameTime);
         }
     }
 }
