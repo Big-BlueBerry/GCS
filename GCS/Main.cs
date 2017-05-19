@@ -13,7 +13,7 @@ namespace GCS
 {
     public class Main : Scene
     {
-        private Button _compassBtn, _rulerBtn;
+        private Button _compassBtn, _rulerBtn, _clearBtn;
         private DrawState _drawState = DrawState.NONE;
         private bool _wasDrawing = false;
         private Point _lastPoint = new Point();
@@ -33,8 +33,10 @@ namespace GCS
             GUIManager.DefaultFont = LoadContent<SpriteFont>("basicfont");
             _compassBtn = new Button(10, 10, 120, 80, "Compass");
             _rulerBtn = new Button(140, 10, 120, 80, "Ruler");
+            _clearBtn = new Button(270, 10, 120, 80, "Clear") { Color = Color.Azure };
             guiManagerComponent.GUIs.Add(_compassBtn);
             guiManagerComponent.GUIs.Add(_rulerBtn);
+            guiManagerComponent.GUIs.Add(_clearBtn);
 
             _circles = new List<(Point, float)>();
             _lines = new List<(Point p1, Point p2)>();
@@ -50,6 +52,11 @@ namespace GCS
 
         private void UpdateLists()
         {
+            if(_clearBtn.IsMouseUp)
+            {
+                _circles.Clear();
+                _lines.Clear();
+            }
             foreach(var c in _circles)
             {
                 GUI.DrawCircle(_spriteBatch, c.center, c.radius, 2, Color.Black, 100);
@@ -72,7 +79,6 @@ namespace GCS
                         _lastPoint = Mouse.GetState().Position;
                         _wasDrawing = true;
                     }
-
                 }
             }
             if(_wasDrawing && Mouse.GetState().LeftButton == ButtonState.Released)
