@@ -18,6 +18,8 @@ namespace GCS
         private bool _wasDrawing = false;
         private Point _lastPoint = new Point();
         private List<(Point center, float radius)> _circles;
+        private List<(Point p1, Point p2)> _lines;
+
         protected override void InitSize()
         {
             base.InitSize();
@@ -35,6 +37,7 @@ namespace GCS
             guiManagerComponent.GUIs.Add(_rulerBtn);
 
             _circles = new List<(Point, float)>();
+            _lines = new List<(Point p1, Point p2)>();
         }
 
         private void UpdateDrawState()
@@ -49,7 +52,11 @@ namespace GCS
         {
             foreach(var c in _circles)
             {
-                GUI.DrawCircle(_spriteBatch, c.center, c.radius, 2f, Color.Black, 100);
+                GUI.DrawCircle(_spriteBatch, c.center, c.radius, 2, Color.Black, 100);
+            }
+            foreach(var l in _lines)
+            {
+                GUI.DrawLine(_spriteBatch, l.p1, l.p2, 2, Color.Black);
             }
         }
 
@@ -58,7 +65,7 @@ namespace GCS
             base.Update(gameTime);
             if(Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                if(_drawState == DrawState.CIRCLE)
+                if(_drawState == DrawState.CIRCLE || _drawState == DrawState.LINE)
                 {
                     if (!_wasDrawing)
                     {
@@ -67,16 +74,20 @@ namespace GCS
                     }
 
                 }
-                else if(_drawState == DrawState.LINE)
-                {
-                    _wasDrawing = true;
-                }
             }
             if(_wasDrawing && Mouse.GetState().LeftButton == ButtonState.Released)
             {
-                float radius = Vector2.Distance(Mouse.GetState().Position.ToVector2(), _lastPoint.ToVector2());
+                if (_drawState == DrawState.CIRCLE)
+                {
+                    float radius = Vector2.Distance(Mouse.GetState().Position.ToVector2(), _lastPoint.ToVector2());
+                    _circles.Add((_lastPoint, radius));
+                }
+                else if (_drawState == DrawState.LINE)
+                {
+                    _lines.Add((_lastPoint, Mouse.GetState().Position));
+                }
                 _wasDrawing = false;
-                _circles.Add((_lastPoint, radius));
+                _drawState = DrawState.NONE;
             }
 
             UpdateDrawState();
@@ -90,6 +101,10 @@ namespace GCS
             {
                 float radius = (Mouse.GetState().Position.ToVector2() - _lastPoint.ToVector2()).Length();
                 GUI.DrawCircle(_spriteBatch, _lastPoint, radius, 2, Color.DarkGray, 100);
+            }
+            else if(_wasDrawing && _drawState == DrawState.LINE)
+            {
+                GUI.DrawLine(_spriteBatch, _lastPoint, Mouse.GetState().Position, 2, Color.DarkGray);
             }
 
             UpdateLists();
