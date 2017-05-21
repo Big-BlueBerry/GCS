@@ -41,6 +41,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ConstructComponent.cs" />
     <Compile Include="DrawState.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="Main.cs" />
