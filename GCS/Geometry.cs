@@ -43,16 +43,28 @@ namespace GCS
 
         private static Vector2[] getIntersect(Line line, Circle circle)
         {
-            float[] result = solve2Eq((float)Math.Pow(line.Grad, 2) + 1,
-                2 * line.Grad * (line.Yint - circle.Center.Y) - 2 * circle.Center.X,
-                (float)(Math.Pow(circle.Center.X, 2) + Math.Pow(line.Yint - circle.Center.Y, 2) - Math.Pow(circle.Radius, 2)));
+            Vector2 d = line.Point2 - line.Point1;
+            float dr = d.Length();
+            float D = (line.Point1.X - circle.Center.X) * (line.Point2.Y - circle.Center.Y) 
+                - (line.Point2.X - circle.Center.X) * (line.Point1.Y - circle.Center.Y);
+            float discriminant = circle.Radius * circle.Radius * dr * dr - D * D;
 
-            if (result.Length == 0) { return new Vector2[] { }; }
-            else if (result.Length == 1) { return new Vector2[] { new Vector2(result[0], line.Grad * result[0] + line.Yint) }; }
+            if (discriminant < 0)
+                return new Vector2[] { };
+            else if (discriminant == 0)
+                return new [] { new Vector2(D * d.Y / (dr * dr) + circle.Center.X, -D * d.X / (dr * dr) + circle.Center.Y) };
             else
             {
-                return new Vector2[] {new Vector2(result[0],line.Grad*result[0]+line.Yint),
-                new Vector2(result[1],line.Grad*result[1]+line.Yint)};
+                float x = D * d.Y / (dr * dr) + circle.Center.X;
+                float y = -D * d.X / (dr * dr) + circle.Center.Y;
+                float sgnDy = d.Y < 0 ? -1 : 1;
+                float xd = sgnDy * d.X * (float)Math.Sqrt(discriminant) / (dr * dr);
+                float yd = Math.Abs(d.Y) * (float)Math.Sqrt(discriminant) / (dr * dr);
+                return new[]
+                {
+                    new Vector2(x + xd, y + yd),
+                    new Vector2(x - xd, y - yd)
+                };
             }
         }
 
@@ -83,8 +95,9 @@ namespace GCS
                     (cos.Item2 * circle2.Radius) / distance
                     );
 
-                Line intersectline = new Line(subgrad, subpoint);
-                return getIntersect(intersectline, circle1);
+                throw new NotImplementedException();
+                //Line intersectline = new Line(subgrad, subpoint);
+                //return getIntersect(intersectline, circle1);
             }
         }
 

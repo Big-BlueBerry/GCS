@@ -45,6 +45,8 @@ namespace GCS
                 _construct.ChangeState(DrawState.CIRCLE);
             if (_rulerBtn.IsMouseUp)
                 _construct.ChangeState(DrawState.LINE);
+            if (_clearBtn.IsMouseUp)
+                _construct.Clear();
         }
 
         protected override void Update(GameTime gameTime)

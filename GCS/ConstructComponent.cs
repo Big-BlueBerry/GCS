@@ -39,7 +39,7 @@ namespace GCS
             }
             foreach (var k in _keypoints)
             {
-                GUI.DrawPoint(sb, k, 2, Color.Red);
+                GUI.DrawPoint(sb, k, 5, Color.Red);
             }
         }
 
