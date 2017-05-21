@@ -33,11 +33,23 @@ namespace GCS
     {
         public Vector2 Point1;
         public Vector2 Point2;
-
+        public float grad;
+        public float yint;
+ 
+        
         public Line(Vector2 p1, Vector2 p2)
         {
             Point1 = p1;
             Point2 = p2;
+            grad =(p2-p1).Y/(p2-p1).X;
+            yint = p1.Y -grad*p1.X;
+        }
+        public Line(float grad, Vector2 point)
+        {
+            Point1 = point;
+            Point2 = new Vector2(Point1.X + 1, point.Y + grad);//나머지 한 점은 x좌표가 입력된 점보다 1 오른쪽에 있는 점.
+            this.grad = grad;
+            yint = point.Y - grad * point.X;
         }
 
         public override void Draw(SpriteBatch sb, float border, Color color)
