@@ -35,6 +35,7 @@ namespace GCS
         public Vector2 Point2;
         public float Grad { get => (Point2 - Point1).Y / (Point2 - Point1).X; }
         public float Yint => (Point1.Y) - Grad * Point1.X;
+        
  
         public Line(Vector2 p1, Vector2 p2)
         {
