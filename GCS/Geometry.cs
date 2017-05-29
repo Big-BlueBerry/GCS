@@ -70,65 +70,17 @@ namespace GCS
 
         private static Vector2[] getIntersect(Circle circle1, Circle circle2)
         {
-            float distance = (float)Math.Sqrt(Math.Pow(circle2.Center.X - circle1.Center.X, 2) + Math.Pow(circle2.Center.Y - circle1.Center.Y, 2));
+            float d = (circle1.Center - circle2.Center).Length();
+            float r1 = circle1.Radius;
+            float r2 = circle2.Radius;
 
-            if (distance == 0) { throw new NotFiniteNumberException("일치"); }
-            else if (distance > circle1.Radius + circle2.Radius)//두 원이 밖에 있으면서 만나지 않음.
-            {
-                return new Vector2[] { };
+            float x = (d * d + r1 * r1 - r2 * r2) / (2 * d);
 
-            }
-            else if ((float)Math.Abs(circle1.Radius - circle2.Radius) > distance)// 두 원 중 하나가 서로를 포함.
-            {
-                return new Vector2[] { };
-            }
-            else
-            {
-                Line Centerline = new Line(circle1.Center, circle2.Center);
-                float subgrad = -1 / (Centerline.Grad);
-
-                var cos = cosThm(circle1.Radius, distance, circle2.Radius);
-                Vector2 subpoint = divpoint(
-                    circle1.Center,
-                    circle2.Center,
-                    (cos.Item1 * circle1.Radius) / distance,
-                    (cos.Item2 * circle2.Radius) / distance
-                    );
-
-                throw new NotImplementedException();
-                //Line intersectline = new Line(subgrad, subpoint);
-                //return getIntersect(intersectline, circle1);
-            }
-        }
-
-        private static float[] solve2Eq(float a, float b, float c)
-        {
-            if (a == 0) throw new ArgumentException("a는 0이 아님 ㅅㄱ");
-            else
-            {
-                float discriminant = b * b - 4 * a * c;
-                if (discriminant < 0) return new float[] { };
-                else if (discriminant == 0) { return new float[] { -b / 2 * a }; }
-                else
-                {
-                    return new float[] { (-b + (float)Math.Sqrt(discriminant)) / 2 * a,
-                        (-b - (float)Math.Sqrt(discriminant)) / 2 * a };
-                }
-            }
-        }
-
-        private static (float, float) cosThm(float a, float b, float c)
-        {
-            return ((float)(Math.Pow(c, 2) - Math.Pow(a, 2) - Math.Pow(b, 2)) / 2 * a * b,
-            (float)(Math.Pow(a, 2) - Math.Pow(b, 2) - Math.Pow(a, 2)) / 2 * b * c);
-        }
-
-        /// <summary>
-        /// p1과 p2를 m:n으로 내분하는 점의 좌표 리턴
-        /// </summary>
-        private static Vector2 divpoint(Vector2 p1, Vector2 p2, float m, float n)
-        {
-            return new Vector2((m * p2.X + n * p1.X) / (m + n), (m * p2.Y + n * p1.Y) / (m + n));
+            Vector2 p1 = circle1.Center + (circle2.Center - circle1.Center) * x / d;
+            Vector2 v1 = circle1.Center - circle2.Center;
+            v1 = new Vector2(-v1.Y, v1.X);
+            Vector2 p2 = p1 + v1;
+            return getIntersect(new Line(p1, p2), circle1);
         }
     }
 }
