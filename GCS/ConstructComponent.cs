@@ -15,17 +15,18 @@ namespace GCS
         private Vector2 _lastPoint = new Vector2();
         private List<Shape> _shapes;
         private List<Vector2> _keypoints;
+        private Vector2 _pos;
 
         public ConstructComponent()
         {
             _shapes = new List<Shape>();
             _keypoints = new List<Vector2>();
-            OnCamera = false;
         }
 
         public void Clear()
         {
             _shapes.Clear();
+            _keypoints.Clear();
         }
 
         public void ChangeState(DrawState state)
@@ -57,13 +58,14 @@ namespace GCS
         public override void Update()
         {
             base.Update();
+            _pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 if (_drawState == DrawState.CIRCLE || _drawState == DrawState.LINE)
                 {
                     if (!_wasDrawing)
                     {
-                        _lastPoint = Mouse.GetState().Position.ToVector2();
+                        _lastPoint = _pos;
                         _wasDrawing = true;
                     }
                 }
@@ -72,12 +74,12 @@ namespace GCS
             {
                 if (_drawState == DrawState.CIRCLE)
                 {
-                    float radius = Vector2.Distance(Mouse.GetState().Position.ToVector2(), _lastPoint);
+                    float radius = Vector2.Distance(_pos, _lastPoint);
                     AddShape(new Circle(_lastPoint, radius));
                 }
                 else if (_drawState == DrawState.LINE)
                 {
-                    AddShape(new Line(_lastPoint, Mouse.GetState().Position.ToVector2()));
+                    AddShape(new Line(_lastPoint, _pos));
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
@@ -86,19 +88,18 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
-            sb.Begin();
+            _pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
             if (_wasDrawing && _drawState == DrawState.CIRCLE)
             {
-                float radius = (Mouse.GetState().Position.ToVector2() - _lastPoint).Length();
+                float radius = (_pos - _lastPoint).Length();
                 GUI.DrawCircle(sb, _lastPoint, radius, 2, Color.DarkGray, 100);
             }
             else if (_wasDrawing && _drawState == DrawState.LINE)
             {
-                GUI.DrawLine(sb, _lastPoint, Mouse.GetState().Position.ToVector2(), 2, Color.DarkGray);
+                GUI.DrawLine(sb, _lastPoint, _pos, 2, Color.DarkGray);
             }
 
             UpdateLists(sb);
-            sb.End();
         }
     }
 }

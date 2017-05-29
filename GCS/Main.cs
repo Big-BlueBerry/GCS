@@ -37,6 +37,8 @@ namespace GCS
             guiManagerComponent.GUIs.Add(_compassBtn);
             guiManagerComponent.GUIs.Add(_rulerBtn);
             guiManagerComponent.GUIs.Add(_clearBtn);
+
+            MainCamera.AddComponent<Grid.Framework.Components.Movable2DCamera>();
         }
 
         private void UpdateDrawState()
