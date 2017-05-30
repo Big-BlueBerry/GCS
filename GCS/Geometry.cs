@@ -28,7 +28,6 @@ namespace GCS
             }
             if (shape1 is Dot || shape2 is Dot) return new Vector2[] { };
             throw new Exception("뀨;;");
-
         }
 
         private static Vector2[] getIntersect(Line line1, Line line2, bool isSegment=true)
@@ -125,7 +124,24 @@ namespace GCS
                 Vector2 p2 = p1 + v1;
                 return getIntersect(new Line(p1, p2), circle1, false);
             }
+        }
 
+        public static Vector2 GetNearest(Shape shape)
+        {
+            if (shape is Line) return getNearest(shape as Line);
+            if (shape is Circle) return getNearest(shape as Circle);
+            if (shape is Dot) return (shape as Dot).Coord;
+            throw new Exception("뀨우;");
+        }
+
+        private static Vector2 getNearest(Line line)
+        {
+            throw new WorkWoorimException();
+        }
+
+        private static Vector2 getNearest(Circle circle)
+        {
+            throw new WorkWoorimException();
         }
     }
 }
