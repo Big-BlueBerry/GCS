@@ -136,12 +136,12 @@ namespace GCS
 
         private static Vector2 getNearest(Line line)
         {
-            throw new WorkWoorimException();
+            throw new WorkWoorimException("이거 하루만에 안하면 평생 장하경 노예");
         }
 
         private static Vector2 getNearest(Circle circle)
         {
-            throw new WorkWoorimException();
+            throw new WorkWoorimException("이거 하루만에 안하면 평생 장하경 도구");
         }
     }
 }

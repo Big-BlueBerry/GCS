@@ -4,6 +4,6 @@ namespace GCS
 {
     public class WorkWoorimException : NotImplementedException
     {
-        public override string Message => "일해라 우림!!";
+        public WorkWoorimException(string message) : base(message) { }
     }
 }
