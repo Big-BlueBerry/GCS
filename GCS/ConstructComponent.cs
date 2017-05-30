@@ -35,7 +35,7 @@ namespace GCS
             foreach (var s in _shapes)
             {
                 s.Draw(sb);
-                GUI.DrawPoint(sb, Geometry.GetNearest(s, _pos), 5, Color.Blue);
+                //GUI.DrawPoint(sb, Geometry.GetNearest(s, _pos), 5, Color.Blue);
             }
         }
 
@@ -88,7 +88,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
-            sb.Begin();
+            sb.BeginAA();
             _pos = Mouse.GetState().Position.ToVector2();
             if (_wasDrawing && _drawState == DrawState.CIRCLE)
             {

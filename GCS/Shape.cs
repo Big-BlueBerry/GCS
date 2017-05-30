@@ -93,7 +93,7 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
-            GUI.DrawCircle(sb, Coord, 3f, Border, Color, 10);
+            GUI.DrawCircle(sb, Coord, 4f, Border, Color, 20);
             // GUI.DrawPoint(sb, Coord, Border, Color);
         }
     }

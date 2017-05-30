@@ -139,9 +139,8 @@ namespace GCS
             Vector2 temppoint = point + new Vector2(0, line.Yint);
             Segment templine = new Segment(line.Point1 + new Vector2(0, line.Yint), line.Point2 + new Vector2(0, line.Yint));
             Segment orthogonal = new Segment(point, new Vector2(point.X + templine.Grad, point.Y - 1));
-            Vector2 result= getIntersect(templine, orthogonal, false)[0] + new Vector2(0, -line.Yint);
+            Vector2 result = getIntersect(templine, orthogonal, false)[0] + new Vector2(0, -line.Yint);
             return Vector2.Clamp(result, Vector2.Min(line.Point1, line.Point2), Vector2.Max(line.Point1, line.Point2));
-                
         }
 
         private static Vector2 getNearest(Circle circle, Vector2 point)
