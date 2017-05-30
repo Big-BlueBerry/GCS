@@ -8,7 +8,9 @@ namespace GCS
     public abstract class Shape
     {
         public string Name { get; set; }
-        public abstract void Draw(SpriteBatch sb, float border, Color color);
+        public float Border { get; set; } = 2f;
+        public Color Color { get; set; } = Color.Black;
+        public abstract void Draw(SpriteBatch sb);
     }
 
     public class Circle : Shape
@@ -23,9 +25,9 @@ namespace GCS
             Radius = radius;
         }
 
-        public override void Draw(SpriteBatch sb, float border, Color color)
+        public override void Draw(SpriteBatch sb)
         {
-            GUI.DrawCircle(sb, Center, Radius, border, color, Sides);
+            GUI.DrawCircle(sb, Center, Radius, Border, Color, Sides);
         }
     }
 
@@ -43,9 +45,9 @@ namespace GCS
             Point2 = p2;
         }
 
-        public override void Draw(SpriteBatch sb, float border, Color color)
+        public override void Draw(SpriteBatch sb)
         {
-            GUI.DrawLine(sb, Point1, Point2, border, color);
+            GUI.DrawLine(sb, Point1, Point2, Border, Color);
         }
     }
 
@@ -56,11 +58,22 @@ namespace GCS
         public Dot(Vector2 coord)
         {
             Coord = coord;
+            Color = Color.Red;
         }
 
-        public override void Draw(SpriteBatch sb, float border, Color color)
+        public override bool Equals(object obj)
         {
-            GUI.DrawPoint(sb, Coord, border, color);
+            var o = obj as Dot;
+            return o == null ? false : Coord.Equals(o.Coord);
+        }
+
+        public override int GetHashCode()
+            => Coord.GetHashCode();
+
+        public override void Draw(SpriteBatch sb)
+        {
+            GUI.DrawCircle(sb, Coord, 3f, Border, Color, 10);
+            // GUI.DrawPoint(sb, Coord, Border, Color);
         }
     }
 }

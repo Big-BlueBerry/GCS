@@ -26,6 +26,7 @@ namespace GCS
                 else if (shape2 is Circle)
                     return getIntersect(shape1 as Circle, shape2 as Circle);
             }
+            if (shape1 is Dot || shape2 is Dot) return new Vector2[] { };
             throw new Exception("뀨;;");
 
         }

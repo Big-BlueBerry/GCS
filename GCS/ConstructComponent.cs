@@ -14,19 +14,16 @@ namespace GCS
         private bool _wasDrawing = false;
         private Vector2 _lastPoint = new Vector2();
         private List<Shape> _shapes;
-        private List<Vector2> _keypoints;
         private Vector2 _pos;
 
         public ConstructComponent()
         {
             _shapes = new List<Shape>();
-            _keypoints = new List<Vector2>();
         }
 
         public void Clear()
         {
             _shapes.Clear();
-            _keypoints.Clear();
         }
 
         public void ChangeState(DrawState state)
@@ -36,23 +33,22 @@ namespace GCS
         {
             foreach (var s in _shapes)
             {
-                s.Draw(sb, 2, Color.Black);
-            }
-            foreach (var k in _keypoints)
-            {
-                GUI.DrawPoint(sb, k, 5, Color.Red);
+                s.Draw(sb);
             }
         }
 
         private void AddShape(Shape shape)
         {
+            var keypoints = new List<Shape>();
             foreach (var s in _shapes)
             {
-                var ints = Geometry.GetIntersect(shape, s);
-                if (ints.Length != 0)
-                    _keypoints.AddRange(ints.Where(i => !_keypoints.Contains(i)));
+                var dots = from d in Geometry.GetIntersect(shape, s)
+                           select new Dot(d);
+                if (dots.Count() != 0)
+                    keypoints.AddRange(dots.Where(d => !_shapes.Contains(d)));
             }
             _shapes.Add(shape);
+            _shapes.AddRange(keypoints);
         }
 
         public override void Update()
