@@ -34,6 +34,7 @@ namespace GCS
             foreach (var s in _shapes)
             {
                 s.Draw(sb);
+                GUI.DrawPoint(sb, Geometry.GetNearest(s, _pos), 5, Color.Blue);
             }
         }
 

@@ -140,10 +140,7 @@ namespace GCS
             Segment templine = new Segment(line.Point1 + new Vector2(0, line.Yint), line.Point2 + new Vector2(0, line.Yint));
             Segment orthogonal = new Segment(point, new Vector2(point.X + templine.Grad, point.Y - 1));
             Vector2 result= getIntersect(templine, orthogonal, false)[0] + new Vector2(0, -line.Yint);
-            if (Vector2.Distance(line.Point1, result) < Vector2.Distance(line.Point1, line.Point2) &&
-                Vector2.Distance(line.Point2, result) < Vector2.Distance(line.Point1, line.Point2)) return result;
-            //선분 범위 밖에 최단점이 있으면 일단  0,0 으로 리턴하도록 했음 
-            else return new Vector2(0,0);
+            return Vector2.Clamp(result, Vector2.Min(line.Point1, line.Point2), Vector2.Max(line.Point1, line.Point2));
                 
         }
 
@@ -154,7 +151,7 @@ namespace GCS
                 Vector2[] res = getIntersect(new Segment(circle.Center, point), circle,false);
                 return Vector2.Distance(res[0], point) < Vector2.Distance(res[1], point) ? res[0] : res[1];
             }
-            else return getIntersect(new Segment(point, circle.Center), circle)[0];
+            else return getIntersect(new Segment(point, circle.Center), circle, false)[0];
         }
 
         private static float GetNearestDistance(Shape shape, Vector2 point)
