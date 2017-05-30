@@ -75,7 +75,7 @@ namespace GCS
                 }
                 else if (_drawState == DrawState.LINE)
                 {
-                    AddShape(new Line(_lastPoint, _pos));
+                    AddShape(new Segment(_lastPoint, _pos));
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;

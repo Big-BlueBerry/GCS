@@ -12,17 +12,17 @@ namespace GCS
     {
         public static Vector2[] GetIntersect(Shape shape1, Shape shape2)
         {
-            if (shape1 is Line)
+            if (shape1 is Segment)
             {
-                if (shape2 is Line)
-                    return getIntersect(shape1 as Line, shape2 as Line);
+                if (shape2 is Segment)
+                    return getIntersect(shape1 as Segment, shape2 as Segment);
                 else if (shape2 is Circle)
-                    return getIntersect(shape1 as Line, shape2 as Circle);
+                    return getIntersect(shape1 as Segment, shape2 as Circle);
             }
             else if (shape1 is Circle)
             {
-                if (shape2 is Line)
-                    return getIntersect(shape2 as Line, shape1 as Circle);
+                if (shape2 is Segment)
+                    return getIntersect(shape2 as Segment, shape1 as Circle);
                 else if (shape2 is Circle)
                     return getIntersect(shape1 as Circle, shape2 as Circle);
             }
@@ -30,7 +30,7 @@ namespace GCS
             throw new Exception("뀨;;");
         }
 
-        private static Vector2[] getIntersect(Line line1, Line line2, bool isSegment=true)
+        private static Vector2[] getIntersect(Segment line1, Segment line2, bool isSegment=true)
         {
 
             if (line1.Grad == line2.Grad && line1.Yint == line2.Yint) { throw new NotFiniteNumberException("일치"); }
@@ -53,7 +53,7 @@ namespace GCS
             else return new Vector2[] { };
         }
 
-        private static Vector2[] getIntersect(Line line, Circle circle, bool isSegment = true)
+        private static Vector2[] getIntersect(Segment line, Circle circle, bool isSegment = true)
         {
 
             Vector2 d = line.Point2 - line.Point1;
@@ -122,26 +122,52 @@ namespace GCS
                 Vector2 v1 = circle1.Center - circle2.Center;
                 v1 = new Vector2(-v1.Y, v1.X);
                 Vector2 p2 = p1 + v1;
-                return getIntersect(new Line(p1, p2), circle1, false);
+                return getIntersect(new Segment(p1, p2), circle1, false);
             }
         }
 
-        public static Vector2 GetNearest(Shape shape)
+        public static Vector2 GetNearest(Shape shape, Vector2 point)
         {
-            if (shape is Line) return getNearest(shape as Line);
-            if (shape is Circle) return getNearest(shape as Circle);
+            if (shape is Segment) return getNearest(shape as Segment, point);
+            if (shape is Circle) return getNearest(shape as Circle, point);
             if (shape is Dot) return (shape as Dot).Coord;
             throw new Exception("뀨우;");
         }
 
-        private static Vector2 getNearest(Line line)
+        private static Vector2 getNearest(Segment line, Vector2 point)
         {
-            throw new WorkWoorimException("이거 하루만에 안하면 평생 장하경 노예");
+            Vector2 temppoint = point + new Vector2(0, line.Yint);
+            Segment templine = new Segment(line.Point1 + new Vector2(0, line.Yint), line.Point2 + new Vector2(0, line.Yint));
+            Segment orthogonal = new Segment(point, new Vector2(point.X + templine.Grad, point.Y - 1));
+            Vector2 result= getIntersect(templine, orthogonal, false)[0] + new Vector2(0, -line.Yint);
+            if (Vector2.Distance(line.Point1, result) < Vector2.Distance(line.Point1, line.Point2) &&
+                Vector2.Distance(line.Point2, result) < Vector2.Distance(line.Point1, line.Point2)) return result;
+            //선분 범위 밖에 최단점이 있으면 일단  0,0 으로 리턴하도록 했음 
+            else return new Vector2(0,0);
+                
         }
 
-        private static Vector2 getNearest(Circle circle)
+        private static Vector2 getNearest(Circle circle, Vector2 point)
         {
-            throw new WorkWoorimException("이거 하루만에 안하면 평생 장하경 도구");
+            if (Vector2.Distance(point, circle.Center) < circle.Radius)
+            {
+                Vector2[] res = getIntersect(new Segment(circle.Center, point), circle,false);
+                return Vector2.Distance(res[0], point) < Vector2.Distance(res[1], point) ? res[0] : res[1];
+            }
+            else return getIntersect(new Segment(point, circle.Center), circle)[0];
+        }
+
+        private static float GetNearestDistance(Shape shape, Vector2 point)
+        {
+            if (shape is Segment)
+            {
+                Segment line = (Segment)shape;
+                return (float) (Math.Abs(line.Grad * point.X - point.Y + line.Yint) /Math.Sqrt(line.Grad*line.Grad+1)) ;
+            }
+            if (shape is Circle) return Vector2.Distance(((Circle)shape).Center,point) - ((Circle)shape).Radius;
+            if (shape is Dot) return Vector2.Distance(point, ((Dot)shape).Coord);
+      
+            throw new ArgumentException("뀨우;;;");
         }
     }
 }

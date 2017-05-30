@@ -37,9 +37,30 @@ namespace GCS
         public Vector2 Point2;
         public float Grad { get => (Point2 - Point1).Y / (Point2 - Point1).X; }
         public float Yint => (Point1.Y) - Grad * Point1.X;
+
+
+        public Line(Vector2 p1, Vector2 p2)
+        {
+            Point1 = p1;
+            Point2 = p2;
+        }
+
+        public override void Draw(SpriteBatch sb)
+        {
+            GUI.DrawLine(sb, Point1, Point2, Border, Color);
+        }
+    }
+
+
+    public class Segment : Shape
+    {
+        public Vector2 Point1;
+        public Vector2 Point2;
+        public float Grad { get => (Point2 - Point1).Y / (Point2 - Point1).X; }
+        public float Yint => (Point1.Y) - Grad * Point1.X;
         
  
-        public Line(Vector2 p1, Vector2 p2)
+        public Segment(Vector2 p1, Vector2 p2)
         {
             Point1 = p1;
             Point2 = p2;

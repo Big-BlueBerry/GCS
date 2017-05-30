@@ -16,6 +16,7 @@ namespace GCS
         {
             using (var game = new Main())
                 game.Run();
+               
         }
     }
 #endif
