@@ -13,12 +13,14 @@ namespace GCS
     {
         public override void Draw(SpriteBatch sb)
         {
-            var v1 = new Circle(new Vector2(100, 100), 350);
-            //var v1 = new Segment(new Vector2(120,120), new Vector2(50, 50));
+            var v1 = new Circle(new Vector2(30, 30), 200);
+            var v2 = new Segment(new Vector2(100,200), new Vector2(-50, 230));
             v1.Draw(sb);
-            Vector2 v2 = (Camera.Current as Camera2D).GetRay(Mouse.GetState().Position.ToVector2());
+            v2.Draw(sb);
+            Vector2 v3 = (Camera.Current as Camera2D).GetRay(Mouse.GetState().Position.ToVector2());
 
-            GUI.DrawPoint(sb, Geometry.GetNearest(v1, v2), 10f, Color.Blue);
+            GUI.DrawPoint(sb, Geometry.GetNearest(v1, v3), 10f, Color.Blue);
+            GUI.DrawPoint(sb, Geometry.GetNearest(v2, v3), 10f, Color.Red);
         }
     }
 }

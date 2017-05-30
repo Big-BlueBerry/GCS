@@ -19,6 +19,7 @@ namespace GCS
         public ConstructComponent()
         {
             _shapes = new List<Shape>();
+            OnCamera = false;
         }
 
         public void Clear()
@@ -55,7 +56,8 @@ namespace GCS
         public override void Update()
         {
             base.Update();
-            _pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
+            //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
+            _pos = Mouse.GetState().Position.ToVector2();
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 if (_drawState == DrawState.CIRCLE || _drawState == DrawState.LINE)
@@ -85,7 +87,9 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
-            _pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
+            //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
+            sb.Begin();
+            _pos = Mouse.GetState().Position.ToVector2();
             if (_wasDrawing && _drawState == DrawState.CIRCLE)
             {
                 float radius = (_pos - _lastPoint).Length();
@@ -97,6 +101,7 @@ namespace GCS
             }
 
             UpdateLists(sb);
+            sb.End();
         }
     }
 }
