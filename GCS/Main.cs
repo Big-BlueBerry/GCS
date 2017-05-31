@@ -54,10 +54,10 @@ namespace GCS
             Instantiate(con);
 
             GUIManager.DefaultFont = LoadContent<SpriteFont>("basicfont");
-            _compassBtn = new Button(10, 10, 120, 80, "Compass");
-            _segmentBtn = new Button(140, 10, 120, 40, "Segment");
-            _lineBtn = new Button(140, 50, 120, 40, "Line");
-            _clearBtn = new Button(270, 10, 120, 80, "Clear") { Color = Color.Azure };
+            _compassBtn = new ImageButton(10, 10, 80, 80, LoadContent<Texture2D>("icon\\circle"));
+            _segmentBtn = new ImageButton(100, 10, 80, 80, LoadContent<Texture2D>("icon\\segment"));
+            _lineBtn = new ImageButton(190, 10, 80, 80, LoadContent<Texture2D>("icon\\line"));
+            _clearBtn = new Button(280, 10, 80, 80, "Clear") { Color = Color.Azure };
             guiManagerComponent.GUIs.Add(_compassBtn);
             guiManagerComponent.GUIs.Add(_segmentBtn);
             guiManagerComponent.GUIs.Add(_lineBtn);
