@@ -82,16 +82,14 @@ namespace GCS
             GUI.DrawLine(sb, Point1, Point2, Border, Color);
         }
     }
-
-
+    
     public class Segment : Shape
     {
-        public Vector2 Point1;
-        public Vector2 Point2;
+        public Vector2 Point1 { get; set; }
+        public Vector2 Point2 { get; set; }
         public float Grad { get => (Point2 - Point1).Y / (Point2 - Point1).X; }
         public float Yint => (Point1.Y) - Grad * Point1.X;
         
- 
         public Segment(Vector2 p1, Vector2 p2)
         {
             Point1 = p1;
@@ -101,6 +99,11 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             GUI.DrawLine(sb, Point1, Point2, Border, Color);
+        }
+
+        public Line ToLine()
+        {
+            return new Line(Grad, Yint);
         }
     }
 
