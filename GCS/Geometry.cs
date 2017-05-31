@@ -16,13 +16,26 @@ namespace GCS
             {
                 if (shape2 is Segment)
                     return getIntersect(shape1 as Segment, shape2 as Segment);
+                else if (shape2 is Line)
+                    return getIntersect(shape2 as Line, shape1 as Segment);
                 else if (shape2 is Circle)
                     return getIntersect(shape1 as Segment, shape2 as Circle);
+            }
+            else if (shape1 is Line)
+            {
+                if (shape2 is Segment)
+                    return getIntersect(shape2 as Line, shape1 as Segment);
+                else if (shape2 is Line)
+                    return getIntersect(shape1 as Line, shape2 as Line);
+                else if (shape2 is Circle)
+                    return getIntersect(shape1 as Line, shape2 as Circle);
             }
             else if (shape1 is Circle)
             {
                 if (shape2 is Segment)
                     return getIntersect(shape2 as Segment, shape1 as Circle);
+                else if (shape2 is Line)
+                    return getIntersect(shape2 as Line, shape1 as Circle);
                 else if (shape2 is Circle)
                     return getIntersect(shape1 as Circle, shape2 as Circle);
             }
@@ -30,19 +43,14 @@ namespace GCS
             throw new Exception("뀨;;");
         }
 
-        private static Vector2[] getIntersect(Segment line1, Segment line2, bool isSegment=true)
+        private static Vector2[] getIntersect(Segment line1, Segment line2)
         {
-
             if (line1.Grad == line2.Grad && line1.Yint == line2.Yint) { throw new NotFiniteNumberException("일치"); }
-
             else if (line1.Grad == line2.Grad) { return new Vector2[] { }; }
 
             float intersectx = (line2.Yint - line1.Yint) / (line1.Grad - line2.Grad);
-            if (!isSegment)
-                return new Vector2[] { new Vector2(intersectx, intersectx * line1.Grad + line1.Yint) };
 
             Vector2 intersect = new Vector2(intersectx, intersectx * line1.Grad + line1.Yint);
-            // HACK: 여기 최적화 존나 애매함
             if (Vector2.Distance(intersect, line1.Point1) < Vector2.Distance(line1.Point1, line1.Point2) &&
                 Vector2.Distance(intersect, line1.Point2) < Vector2.Distance(line1.Point1, line1.Point2) &&
                 Vector2.Distance(intersect, line2.Point1) < Vector2.Distance(line2.Point1, line2.Point2) &&
@@ -53,9 +61,26 @@ namespace GCS
             else return new Vector2[] { };
         }
 
-        private static Vector2[] getIntersect(Segment line, Circle circle, bool isSegment = true)
+        private static Vector2[] getIntersect(Line line1, Segment line2)
         {
+            if (line1.Grad == line2.Grad && line1.Yint == line2.Yint) { throw new NotFiniteNumberException("일치"); }
+            else if (line1.Grad == line2.Grad) { return new Vector2[] { }; }
 
+            float intersectx = (line2.Yint - line1.Yint) / (line1.Grad - line2.Grad);
+            throw new WorkWoorimException("할 수 있지? ㅎ");
+        }
+
+        private static Vector2[] getIntersect(Line line1, Line line2)
+        {
+            if (line1.Grad == line2.Grad && line1.Yint == line2.Yint) { throw new NotFiniteNumberException("일치"); }
+            else if (line1.Grad == line2.Grad) { return new Vector2[] { }; }
+
+            float intersectx = (line2.Yint - line1.Yint) / (line1.Grad - line2.Grad);
+            return new Vector2[] { new Vector2(intersectx, intersectx * line1.Grad + line1.Yint) };
+        }
+
+        private static Vector2[] getIntersect(Line line, Circle circle)
+        {
             Vector2 d = line.Point2 - line.Point1;
             float dr = d.Length();
             float D = (line.Point1.X - circle.Center.X) * (line.Point2.Y - circle.Center.Y)
@@ -73,17 +98,39 @@ namespace GCS
                 float sgnDy = d.Y < 0 ? -1 : 1;
                 float xd = sgnDy * d.X * (float)Math.Sqrt(discriminant) / (dr * dr);
                 float yd = Math.Abs(d.Y) * (float)Math.Sqrt(discriminant) / (dr * dr);
+
+                return new[]
+                {
+                    new Vector2(x + xd, y + yd),
+                    new Vector2(x - xd, y - yd)
+                };
+            }
+        }
+
+        private static Vector2[] getIntersect(Segment line, Circle circle)
+        {
+            Vector2 d = line.Point2 - line.Point1;
+            float dr = d.Length();
+            float D = (line.Point1.X - circle.Center.X) * (line.Point2.Y - circle.Center.Y)
+                - (line.Point2.X - circle.Center.X) * (line.Point1.Y - circle.Center.Y);
+            float discriminant = circle.Radius * circle.Radius * dr * dr - D * D;
+
+            if (discriminant < 0)
+                return new Vector2[] { };
+            else if (discriminant == 0)
+                return new[] { new Vector2(D * d.Y / (dr * dr) + circle.Center.X, -D * d.X / (dr * dr) + circle.Center.Y) };
+            else
+            {
+                float x = D * d.Y / (dr * dr) + circle.Center.X;
+                float y = -D * d.X / (dr * dr) + circle.Center.Y;
+                float sgnDy = d.Y < 0 ? -1 : 1;
+                float xd = sgnDy * d.X * (float)Math.Sqrt(discriminant) / (dr * dr);
+                float yd = Math.Abs(d.Y) * (float)Math.Sqrt(discriminant) / (dr * dr);
+
                 Vector2 intersect1 = new Vector2(x + xd, y + yd);
                 Vector2 intersect2 = new Vector2(x - xd, y - yd);
                 float len = Vector2.Distance(line.Point1, line.Point2);
-                if (!isSegment)
-                {
-                    return new[]
-                    {
-                        new Vector2(x + xd, y + yd),
-                        new Vector2(x - xd, y - yd)
-                    };
-                }
+
                 if (Vector2.Distance(intersect1, line.Point1) < len && Vector2.Distance(intersect1, line.Point2) < len)
                 {
                     if (Vector2.Distance(intersect2, line.Point1) < len && Vector2.Distance(intersect2, line.Point2) < len)
@@ -95,7 +142,7 @@ namespace GCS
                 else return new Vector2[] { };
             }
         }
-
+        
         private static Vector2[] getIntersect(Circle circle1, Circle circle2)
         {
             float distance = (float)Math.Sqrt(Math.Pow(circle2.Center.X - circle1.Center.X, 2) + Math.Pow(circle2.Center.Y - circle1.Center.Y, 2));
@@ -122,7 +169,7 @@ namespace GCS
                 Vector2 v1 = circle1.Center - circle2.Center;
                 v1 = new Vector2(-v1.Y, v1.X);
                 Vector2 p2 = p1 + v1;
-                return getIntersect(new Segment(p1, p2), circle1, false);
+                return getIntersect(new Line(p1, p2), circle1);
             }
         }
 
@@ -134,23 +181,37 @@ namespace GCS
             throw new Exception("뀨우;");
         }
 
+        private static Vector2 getNearest(Line line, Vector2 point)
+        {
+            return GetLinePointNearest(line, point, false);
+        }
+
         private static Vector2 getNearest(Segment line, Vector2 point)
         {
+            return GetLinePointNearest(line.ToLine(), point, true);
+        }
+
+        private static Vector2 GetLinePointNearest(Line line, Vector2 point, bool isSegment)
+        {
             Vector2 temppoint = point + new Vector2(0, line.Yint);
-            Segment templine = new Segment(line.Point1 + new Vector2(0, line.Yint), line.Point2 + new Vector2(0, line.Yint));
-            Segment orthogonal = new Segment(point, new Vector2(point.X + templine.Grad, point.Y - 1));
-            Vector2 result = getIntersect(templine, orthogonal, false)[0] + new Vector2(0, -line.Yint);
-            return Vector2.Clamp(result, Vector2.Min(line.Point1, line.Point2), Vector2.Max(line.Point1, line.Point2));
+            // HACK: 이거 최적화 방법이 있지???
+            Line templine = new Line(line.Point1 + new Vector2(0, line.Yint), line.Point2 + new Vector2(0, line.Yint));
+            Line orthogonal = new Line(point, new Vector2(point.X + templine.Grad, point.Y - 1));
+            Vector2 result = getIntersect(templine, orthogonal)[0] + new Vector2(0, -line.Yint);
+            if (isSegment)
+                return Vector2.Clamp(result, Vector2.Min(line.Point1, line.Point2), Vector2.Max(line.Point1, line.Point2));
+            else
+                return result;
         }
 
         private static Vector2 getNearest(Circle circle, Vector2 point)
         {
             if (Vector2.Distance(point, circle.Center) < circle.Radius)
             {
-                Vector2[] res = getIntersect(new Segment(circle.Center, point), circle,false);
+                Vector2[] res = getIntersect(new Line(circle.Center, point), circle);
                 return Vector2.Distance(res[0], point) < Vector2.Distance(res[1], point) ? res[0] : res[1];
             }
-            else return getIntersect(new Segment(point, circle.Center), circle, false)[0];
+            else return getIntersect(new Line(point, circle.Center), circle)[0];
         }
 
         private static float GetNearestDistance(Shape shape, Vector2 point)
@@ -158,11 +219,11 @@ namespace GCS
             if (shape is Segment)
             {
                 Segment line = (Segment)shape;
-                return (float) (Math.Abs(line.Grad * point.X - point.Y + line.Yint) /Math.Sqrt(line.Grad*line.Grad+1)) ;
+                return (float)(Math.Abs(line.Grad * point.X - point.Y + line.Yint) / Math.Sqrt(line.Grad * line.Grad + 1));
             }
-            if (shape is Circle) return Vector2.Distance(((Circle)shape).Center,point) - ((Circle)shape).Radius;
+            if (shape is Circle) return Vector2.Distance(((Circle)shape).Center, point) - ((Circle)shape).Radius;
             if (shape is Dot) return Vector2.Distance(point, ((Dot)shape).Coord);
-      
+
             throw new ArgumentException("뀨우;;;");
         }
     }

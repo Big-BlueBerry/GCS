@@ -79,21 +79,31 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
+            // TODO: 화면에서 충분히 보이는 크기의 두 점을 잡아야함
             GUI.DrawLine(sb, Point1, Point2, Border, Color);
         }
     }
     
     public class Segment : Shape
     {
-        public Vector2 Point1 { get; set; }
-        public Vector2 Point2 { get; set; }
-        public float Grad { get => (Point2 - Point1).Y / (Point2 - Point1).X; }
-        public float Yint => (Point1.Y) - Grad * Point1.X;
+        private Vector2 _p1;
+        public Vector2 Point1 { get => _p1; set { _p1 = value; ResetAB(); } }
+        private Vector2 _p2;
+        public Vector2 Point2 { get => _p2; set { _p2 = value; ResetAB(); } }
         
+        public float Grad { get; private set; }
+        public float Yint { get; private set; }
+
         public Segment(Vector2 p1, Vector2 p2)
         {
             Point1 = p1;
             Point2 = p2;
+        }
+
+        private void ResetAB()
+        {
+            Grad = (Point2 - Point1).Y / (Point2 - Point1).X;
+            Yint = (Point1.Y) - Grad * Point1.X;
         }
 
         public override void Draw(SpriteBatch sb)
