@@ -80,7 +80,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             // TODO: 화면에서 충분히 보이는 크기의 두 점을 잡아야함
-            GUI.DrawLine(sb, Point1, Point2, Border, Color);
+            GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
         }
     }
     
@@ -124,7 +124,7 @@ namespace GCS
         public Dot(Vector2 coord)
         {
             Coord = coord;
-            Color = Color.Red;
+            Color = Color.OrangeRed;
         }
 
         public override bool Equals(object obj)

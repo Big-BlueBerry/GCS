@@ -87,6 +87,7 @@ namespace GCS
         {
             base.Update(gameTime);
             UpdateDrawState();
+            Debug.WriteLine($"{ScreenBounds}");
         }
     }
 }
