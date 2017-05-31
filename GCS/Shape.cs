@@ -33,16 +33,48 @@ namespace GCS
 
     public class Line : Shape
     {
-        public Vector2 Point1;
-        public Vector2 Point2;
-        public float Grad { get => (Point2 - Point1).Y / (Point2 - Point1).X; }
-        public float Yint => (Point1.Y) - Grad * Point1.X;
+        private Vector2 _p1;
+        public Vector2 Point1 { get => _p1; set { _p1 = value; ResetAB(); } }
+        private Vector2 _p2;
+        public Vector2 Point2 { get => _p2; set { _p2 = value; ResetAB(); } }
 
-
+        private float _grad;
+        public float Grad { get => _grad; set { _grad = value; ResetPoints(); } }
+        private float _yint;
+        public float Yint { get => _yint; set { _yint = value; ResetPoints(); } }
+        
         public Line(Vector2 p1, Vector2 p2)
         {
-            Point1 = p1;
-            Point2 = p2;
+            _p1 = p1;
+            _p2 = p2;
+            ResetAB();
+        }
+
+        public Line(float grad, float yint)
+        {
+            _grad = grad;
+            _yint = yint;
+            ResetPoints();
+        }
+
+        public Line(Vector2 p1, float grad)
+        {
+            _p1 = p1;
+            _p2 = new Vector2(Point1.X + 1, Point1.Y + grad);
+            _grad = grad;
+            _yint = p1.Y - grad * p1.X;
+        }
+
+        private void ResetAB()
+        {
+            _grad = (Point2 - Point1).Y / (Point2 - Point1).X;
+            _yint = (Point1.Y) - Grad * Point1.X;
+        }
+
+        private void ResetPoints()
+        {
+            _p1 = new Vector2(0, Yint);
+            _p2 = new Vector2(1, Grad + Yint);
         }
 
         public override void Draw(SpriteBatch sb)
