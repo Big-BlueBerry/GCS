@@ -15,7 +15,24 @@ namespace GCS
     {
         private Button _compassBtn, _segmentBtn, _lineBtn, _clearBtn;
         private ConstructComponent _construct;
-
+        protected override void Initialize()
+        {
+            base.Initialize();
+            // 윈도우 리사이즈는 모노게임자체에 버그가 있다고 함
+            /*
+            Window.ClientSizeChanged += (s, e) =>
+            {
+                _windowResized = !_windowResized;
+                if (_windowResized)
+                {
+                    _graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
+                    _graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
+                    _graphics.ApplyChanges();
+                }
+            };
+            Window.AllowUserResizing = true;
+            */
+        }
         protected override void InitSize()
         {
             base.InitSize();
