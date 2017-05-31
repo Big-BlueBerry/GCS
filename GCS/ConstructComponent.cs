@@ -75,6 +75,7 @@ namespace GCS
                 {
                     float radius = Vector2.Distance(_pos, _lastPoint);
                     AddShape(new Circle(_lastPoint, radius));
+                    AddShape(new Dot(_lastPoint));
                 }
                 else if (_drawState == DrawState.SEGMENT)
                 {
