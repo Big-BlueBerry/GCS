@@ -13,7 +13,7 @@ namespace GCS
 {
     public class Main : Scene
     {
-        private Button _compassBtn, _rulerBtn, _clearBtn;
+        private Button _compassBtn, _segmentBtn, _lineBtn, _clearBtn;
         private ConstructComponent _construct;
 
         protected override void InitSize()
@@ -38,10 +38,12 @@ namespace GCS
 
             GUIManager.DefaultFont = LoadContent<SpriteFont>("basicfont");
             _compassBtn = new Button(10, 10, 120, 80, "Compass");
-            _rulerBtn = new Button(140, 10, 120, 80, "Ruler");
+            _segmentBtn = new Button(140, 10, 120, 40, "Segment");
+            _lineBtn = new Button(140, 50, 120, 40, "Line");
             _clearBtn = new Button(270, 10, 120, 80, "Clear") { Color = Color.Azure };
             guiManagerComponent.GUIs.Add(_compassBtn);
-            guiManagerComponent.GUIs.Add(_rulerBtn);
+            guiManagerComponent.GUIs.Add(_segmentBtn);
+            guiManagerComponent.GUIs.Add(_lineBtn);
             guiManagerComponent.GUIs.Add(_clearBtn);
 
             MainCamera.AddComponent<Grid.Framework.Components.Movable2DCamera>();
@@ -56,7 +58,9 @@ namespace GCS
         {
             if (_compassBtn.IsMouseUp)
                 _construct.ChangeState(DrawState.CIRCLE);
-            if (_rulerBtn.IsMouseUp)
+            if (_segmentBtn.IsMouseUp)
+                _construct.ChangeState(DrawState.SEGMENT);
+            if (_lineBtn.IsMouseUp)
                 _construct.ChangeState(DrawState.LINE);
             if (_clearBtn.IsMouseUp)
                 _construct.Clear();

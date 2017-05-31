@@ -10,6 +10,7 @@ namespace GCS
     {
         NONE,
         CIRCLE,
+        SEGMENT,
         LINE
     }
 }

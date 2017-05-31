@@ -60,7 +60,7 @@ namespace GCS
             _pos = Mouse.GetState().Position.ToVector2();
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                if (_drawState == DrawState.CIRCLE || _drawState == DrawState.LINE)
+                if (_drawState == DrawState.CIRCLE || _drawState == DrawState.SEGMENT || _drawState == DrawState.LINE)
                 {
                     if (!_wasDrawing)
                     {
@@ -76,9 +76,13 @@ namespace GCS
                     float radius = Vector2.Distance(_pos, _lastPoint);
                     AddShape(new Circle(_lastPoint, radius));
                 }
-                else if (_drawState == DrawState.LINE)
+                else if (_drawState == DrawState.SEGMENT)
                 {
                     AddShape(new Segment(_lastPoint, _pos));
+                }
+                else if(_drawState == DrawState.LINE)
+                {
+                    AddShape(new Line(_lastPoint, _pos));
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
@@ -95,9 +99,13 @@ namespace GCS
                 float radius = (_pos - _lastPoint).Length();
                 GUI.DrawCircle(sb, _lastPoint, radius, 2, Color.DarkGray, 100);
             }
-            else if (_wasDrawing && _drawState == DrawState.LINE)
+            else if (_wasDrawing && _drawState == DrawState.SEGMENT)
             {
                 GUI.DrawLine(sb, _lastPoint, _pos, 2, Color.DarkGray);
+            }
+            else if(_wasDrawing && _drawState == DrawState.LINE)
+            {
+                new Line(_lastPoint, _pos).Draw(sb);
             }
 
             UpdateLists(sb);
