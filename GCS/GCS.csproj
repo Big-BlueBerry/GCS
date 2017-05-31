@@ -49,6 +49,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shape.cs" />
+    <Compile Include="SpriteBatchAntiAliasing.cs" />
     <Compile Include="WorkWoorimException.cs" />
   </ItemGroup>
   <ItemGroup>
