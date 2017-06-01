@@ -184,7 +184,7 @@ namespace GCS
         public static Vector2 GetNearest(Shape shape, Vector2 point)
         {
             if (shape is Segment) return getNearest(shape as Segment,point);
-            if (shape is Line) return GetLinePointNearest(shape as Line, point, false);
+            if (shape is Line) return getNearest(shape as Line, point);
             if (shape is Circle) return getNearest(shape as Circle, point);
             if (shape is Dot) return (shape as Dot).Coord;
             throw new Exception("뀨우;");
@@ -192,26 +192,25 @@ namespace GCS
 
         private static Vector2 getNearest(Line line, Vector2 point)
         {
-            return GetLinePointNearest(line, point, false);
+            Vector2 temppoint = point - new Vector2(0, line.Yint);
+            // HACK: 이거 최적화 방법이 있지??? ㅇㅇ 당여나지
+            Line templine = new Line(line.Point1 - new Vector2(0, line.Yint), line.Point2 - new Vector2(0, line.Yint));
+            Line orthogonal = new Line(temppoint, new Vector2(temppoint.X + templine.Grad * 10, temppoint.Y - 10));
+            Vector2 result = getIntersect(templine, orthogonal)[0] + new Vector2(0, line.Yint);
+            return result;
         }
 
         private static Vector2 getNearest(Segment line, Vector2 point)
         {
-            return GetLinePointNearest(line.ToLine(), point, true);
+            Vector2 temppoint = point - new Vector2(0, line.Yint);
+            Line templine = new Line(line.Point1 - new Vector2(0, line.Yint), line.Point2 - new Vector2(0, line.Yint));
+            Line orthogonal = new Line(temppoint, new Vector2(temppoint.X + templine.Grad * 10, temppoint.Y - 10));
+            Vector2 result = getIntersect(templine, orthogonal)[0] + new Vector2(0, line.Yint);
+            return Vector2.Clamp(result, Vector2.Min(line.Point1, line.Point2), Vector2.Max(line.Point1, line.Point2));
         }
 
-        private static Vector2 GetLinePointNearest(Line line, Vector2 point, bool isSegment)
-        {
-            Vector2 temppoint = point - new Vector2(0, line.Yint);
-            // HACK: 이거 최적화 방법이 있지??? ㅇㅇ 당여나지
-            Line templine = new Line(line.Point1 - new Vector2(0, line.Yint), line.Point2 - new Vector2(0, line.Yint));
-            Line orthogonal = new Line(temppoint, new Vector2(temppoint.X + templine.Grad*10, temppoint.Y - 10));
-            Vector2 result = getIntersect(templine, orthogonal)[0] + new Vector2(0, line.Yint);
-            if (isSegment)
-                return Vector2.Clamp(result, Vector2.Min(line.Point1, line.Point2), Vector2.Max(line.Point1, line.Point2));
-            else
-                return result;
-        }
+
+        
 
         private static Vector2 getNearest(Circle circle, Vector2 point)
         {       //원과 직선 버그 수정 완료.
