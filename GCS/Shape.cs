@@ -16,10 +16,10 @@ namespace GCS
     public class Circle : Shape
     {
         public static int Sides = 100;
-        public Vector2 Center;
+        public Dot Center;
         public float Radius;
         
-        public Circle(Vector2 center, float radius)
+        public Circle(Dot center, float radius)
         {
             Center = center;
             Radius = radius;
@@ -27,23 +27,23 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
-            GUI.DrawCircle(sb, Center, Radius, Border, Color, Sides);
+            GUI.DrawCircle(sb, Center.Coord, Radius, Border, Color, Sides);
         }
     }
 
     public class Line : Shape
     {
-        private Vector2 _p1;
-        public Vector2 Point1 { get => _p1; set { _p1 = value; ResetAB(); } }
-        private Vector2 _p2;
-        public Vector2 Point2 { get => _p2; set { _p2 = value; ResetAB(); } }
+        private Dot _p1;
+        public Dot Point1 { get => _p1; set { _p1 = value; ResetAB(); } }
+        private Dot _p2;
+        public Dot Point2 { get => _p2; set { _p2 = value; ResetAB(); } }
 
         private float _grad;
         public float Grad { get => _grad; set { _grad = value; ResetPoints(); } }
         private float _yint;
         public float Yint { get => _yint; set { _yint = value; ResetPoints(); } }
         
-        public Line(Vector2 p1, Vector2 p2)
+        public Line(Dot p1, Dot p2)
         {
             _p1 = p1;
             _p2 = p2;
@@ -57,24 +57,24 @@ namespace GCS
             ResetPoints();
         }
 
-        public Line(Vector2 p1, float grad)
+        public Line(Dot p1, float grad)
         {
             _p1 = p1;
-            _p2 = new Vector2(Point1.X + 1, Point1.Y + grad);
+            _p2 = new Dot(Point1.Coord.X + 1, Point1.Coord.Y + grad);
             _grad = grad;
-            _yint = p1.Y - grad * p1.X;
+            _yint = p1.Coord.Y - grad * p1.Coord.X;
         }
 
         private void ResetAB()
         {
-            _grad = (Point2 - Point1).Y / (Point2 - Point1).X;
-            _yint = (Point1.Y) - Grad * Point1.X;
+            _grad = (Point2.Coord - Point1.Coord).Y / (Point2.Coord - Point1.Coord).X;
+            _yint = (Point1.Coord.Y) - Grad * Point1.Coord.X;
         }
 
         private void ResetPoints()
         {
-            _p1 = new Vector2(0, Yint);
-            _p2 = new Vector2(1, Grad + Yint);
+            _p1 = new Dot(0, Yint);
+            _p2 = new Dot(1, Grad + Yint);
         }
 
         public override void Draw(SpriteBatch sb)
@@ -86,29 +86,30 @@ namespace GCS
     
     public class Segment : Shape
     {
-        private Vector2 _p1;
-        public Vector2 Point1 { get => _p1; set { _p1 = value; ResetAB(); } }
-        private Vector2 _p2;
-        public Vector2 Point2 { get => _p2; set { _p2 = value; ResetAB(); } }
+        private Dot _p1;
+        public Dot Point1 { get => _p1; set { _p1 = value; ResetAB(); } }
+        private Dot _p2;
+        public Dot Point2 { get => _p2; set { _p2 = value; ResetAB(); } }
         
         public float Grad { get; private set; }
         public float Yint { get; private set; }
 
-        public Segment(Vector2 p1, Vector2 p2)
+        public Segment(Dot p1, Dot p2)
         {
-            Point1 = p1;
-            Point2 = p2;
+            _p1 = p1;
+            _p2 = p2;
+            ResetAB();
         }
 
         private void ResetAB()
         {
-            Grad = (Point2 - Point1).Y / (Point2 - Point1).X;
-            Yint = (Point1.Y) - Grad * Point1.X;
+            Grad = (Point2.Coord - Point1.Coord).Y / (Point2.Coord- Point1.Coord).X;
+            Yint = (Point1.Coord.Y) - Grad * Point1.Coord.X;
         }
 
         public override void Draw(SpriteBatch sb)
         {
-            GUI.DrawLine(sb, Point1, Point2, Border, Color);
+            GUI.DrawLine(sb, Point1.Coord, Point2.Coord, Border, Color);
         }
 
         public Line ToLine()
@@ -126,6 +127,9 @@ namespace GCS
             Coord = coord;
             Color = Color.OrangeRed;
         }
+
+        public Dot(float x, float y) : this(new Vector2(x, y))
+        { }
 
         public override bool Equals(object obj)
         {

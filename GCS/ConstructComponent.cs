@@ -35,7 +35,7 @@ namespace GCS
             foreach (var s in _shapes)
             {
                 s.Draw(sb);
-                //GUI.DrawPoint(sb, Geometry.GetNearest(s, _pos), 5, Color.Blue);
+                GUI.DrawPoint(sb, Geometry.GetNearest(s, _pos), 5, Color.Blue);
             }
         }
 
@@ -71,19 +71,24 @@ namespace GCS
             }
             if (_wasDrawing && Mouse.GetState().LeftButton == ButtonState.Released)
             {
+                Dot last = new Dot(_lastPoint);
+                AddShape(last);
                 if (_drawState == DrawState.CIRCLE)
                 {
                     float radius = Vector2.Distance(_pos, _lastPoint);
-                    AddShape(new Circle(_lastPoint, radius));
-                    AddShape(new Dot(_lastPoint));
+                    AddShape(new Circle(last, radius));
                 }
                 else if (_drawState == DrawState.SEGMENT)
                 {
-                    AddShape(new Segment(_lastPoint, _pos));
+                    var p = new Dot(_pos);
+                    AddShape(new Segment(last, p));
+                    AddShape(p);
                 }
                 else if(_drawState == DrawState.LINE)
                 {
-                    AddShape(new Line(_lastPoint, _pos));
+                    var p = new Dot(_pos);
+                    AddShape(new Line(last, p));
+                    AddShape(p);
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
@@ -106,7 +111,7 @@ namespace GCS
             }
             else if(_wasDrawing && _drawState == DrawState.LINE)
             {
-                new Line(_lastPoint, _pos).Draw(sb);
+                new Line(new Dot(_lastPoint), new Dot(_pos)).Draw(sb);
             }
 
             UpdateLists(sb);

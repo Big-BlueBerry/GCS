@@ -50,7 +50,6 @@ namespace GCS
             _graphics.PreferMultiSampling = true;
             GameObject con = new GameObject("construct");
             _construct = con.AddComponent<ConstructComponent>();
-            _construct.Enabled = false;
             Instantiate(con);
 
             GUIManager.DefaultFont = LoadContent<SpriteFont>("basicfont");
@@ -64,12 +63,11 @@ namespace GCS
             guiManagerComponent.GUIs.Add(_clearBtn);
 
             MainCamera.AddComponent<Grid.Framework.Components.Movable2DCamera>();
-            
+            /*
             GameObject test = new GameObject("test");
             test.AddComponent<GeometryTestComponent>();
             Instantiate(test);
-            
-            
+            */
         }
 
         private void UpdateDrawState()
