@@ -24,7 +24,7 @@ namespace GCS
             else if (shape1 is Line)
             {
                 if (shape2 is Segment)
-                    return getIntersect(shape2 as Line, shape1 as Segment);
+                    return getIntersect(shape1 as Line, shape2 as Segment);
                 else if (shape2 is Line)
                     return getIntersect(shape1 as Line, shape2 as Line);
                 else if (shape2 is Circle)
