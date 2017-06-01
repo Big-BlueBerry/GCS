@@ -16,9 +16,16 @@ namespace GCS
         private List<Shape> _shapes;
         private Vector2 _pos;
 
+        private readonly float _nearDistance = 4;
+        private readonly float _nearDotDistance = 8;
+        private List<(Shape, float)> _nearShapes;
+        private List<Shape> _selectedShapes;
+
         public ConstructComponent()
         {
             _shapes = new List<Shape>();
+            _nearShapes = new List<(Shape, float)>();
+            _selectedShapes = new List<Shape>();
             OnCamera = false;
         }
 
@@ -35,7 +42,6 @@ namespace GCS
             foreach (var s in _shapes)
             {
                 s.Draw(sb);
-                GUI.DrawPoint(sb, Geometry.GetNearest(s, _pos), 5, Color.Blue);
             }
         }
 
@@ -92,6 +98,65 @@ namespace GCS
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
+            }
+
+            if(_drawState == DrawState.NONE)
+            {
+                //선택, 가까이있는 점 선택
+                foreach (var s in _shapes)
+                {
+                    var dist = Geometry.GetNearestDistance(s, _pos);
+                    if (dist <= (s is Dot ? _nearDotDistance : _nearDistance))
+                    {
+                        if (!s.Focused)
+                        {
+                            _nearShapes.Add((s, dist));
+                            s.Focused = true;
+                        }
+                    }
+                    else if (s.Focused)
+                    {
+                        for(int i = 0; i< _nearShapes.Count;i++)
+                        {
+                            if(_nearShapes[i].Item1 == s)
+                            {
+                                _nearShapes.RemoveAt(i);
+                                break;
+                            }
+                        }
+                        s.Focused = false;
+                    }
+                }
+
+                if(Scene.CurrentScene.IsLeftMouseDown && _nearShapes.Count > 0)
+                {
+                    Shape nearest = _nearShapes[0].Item1;
+                    float dist = _nearDistance;
+                    foreach (var (s, d) in _nearShapes)
+                    {
+                        if(s is Dot)
+                        {
+                            // 다 끝났다 그지 깽깽이들아!! 점이 우선순위 최고다!
+                            nearest = s;
+                            break;
+                        }
+                        if(dist > d)
+                        {
+                            nearest = s;
+                            dist = d;
+                        }
+                    }
+                    if (nearest.Selected)
+                    {
+                        _selectedShapes.Remove(nearest);
+                        nearest.Selected = false;
+                    }
+                    else
+                    {
+                        _selectedShapes.Add(nearest);
+                        nearest.Selected = true;
+                    }
+                }
             }
         }
 

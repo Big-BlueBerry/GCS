@@ -10,7 +10,14 @@ namespace GCS
         public string Name { get; set; }
         public float Border { get; set; } = 2f;
         public Color Color { get; set; } = Color.Black;
-        public abstract void Draw(SpriteBatch sb);
+        public bool Focused { get; set; } = false;
+        public bool Selected { get; set; } = false;
+        public virtual void Draw(SpriteBatch sb)
+        {
+            Color = Color.Black;
+            if (Focused) Color = Color.Orange;
+            if (Selected) Color = Color.Cyan;
+        }
     }
 
     public class Circle : Shape
@@ -27,6 +34,7 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
+            base.Draw(sb);
             GUI.DrawCircle(sb, Center.Coord, Radius, Border, Color, Sides);
         }
     }
@@ -79,7 +87,7 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
-            // TODO: 화면에서 충분히 보이는 크기의 두 점을 잡아야함
+            base.Draw(sb);
             GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
         }
     }
@@ -109,6 +117,7 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
+            base.Draw(sb);
             GUI.DrawLine(sb, Point1.Coord, Point2.Coord, Border, Color);
         }
 
@@ -142,6 +151,7 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
+            base.Draw(sb);
             GUI.DrawCircle(sb, Coord, 4f, Border, Color, 20);
             // GUI.DrawPoint(sb, Coord, Border, Color);
         }
