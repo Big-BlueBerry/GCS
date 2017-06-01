@@ -12,7 +12,8 @@ namespace GCS
     {
         private DrawState _drawState = DrawState.NONE;
         private bool _wasDrawing = false;
-        private Vector2 _lastPoint = new Vector2();
+        private bool _isDragging = false;
+        private Dot _lastPoint = new Dot(0, 0);
         private List<Shape> _shapes;
         private Vector2 _pos;
 
@@ -47,6 +48,7 @@ namespace GCS
 
         private void AddShape(Shape shape)
         {
+            if (_shapes.Contains(shape)) return;
             var keypoints = new List<Shape>();
             foreach (var s in _shapes)
             {
@@ -70,77 +72,76 @@ namespace GCS
                 {
                     if (!_wasDrawing)
                     {
-                        _lastPoint = _pos;
+                        _lastPoint = GetDot(_pos);
                         _wasDrawing = true;
                     }
                 }
             }
             if (_wasDrawing && Mouse.GetState().LeftButton == ButtonState.Released)
             {
-                Dot last = new Dot(_lastPoint);
-                AddShape(last);
+                AddShape(_lastPoint);
                 if (_drawState == DrawState.CIRCLE)
                 {
-                    float radius = Vector2.Distance(_pos, _lastPoint);
-                    AddShape(new Circle(last, radius));
+                    float radius = Vector2.Distance(_pos, _lastPoint.Coord);
+                    AddShape(new Circle(_lastPoint, radius));
                 }
                 else if (_drawState == DrawState.SEGMENT)
                 {
-                    var p = new Dot(_pos);
-                    AddShape(new Segment(last, p));
+                    var p = GetDot(_pos);
+                    AddShape(new Segment(_lastPoint, p));
                     AddShape(p);
                 }
-                else if(_drawState == DrawState.LINE)
+                else if (_drawState == DrawState.LINE)
                 {
-                    var p = new Dot(_pos);
-                    AddShape(new Line(last, p));
+                    var p = GetDot(_pos);
+                    AddShape(new Line(_lastPoint, p));
                     AddShape(p);
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
             }
-
-            if(_drawState == DrawState.NONE)
+            
+            //선택, 가까이있는 점 선택
+            foreach (var s in _shapes)
             {
-                //선택, 가까이있는 점 선택
-                foreach (var s in _shapes)
+                var dist = Geometry.GetNearestDistance(s, _pos);
+                if (dist <= (s is Dot ? _nearDotDistance : _nearDistance))
                 {
-                    var dist = Geometry.GetNearestDistance(s, _pos);
-                    if (dist <= (s is Dot ? _nearDotDistance : _nearDistance))
+                    if (!s.Focused)
                     {
-                        if (!s.Focused)
-                        {
-                            _nearShapes.Add((s, dist));
-                            s.Focused = true;
-                        }
-                    }
-                    else if (s.Focused)
-                    {
-                        for(int i = 0; i< _nearShapes.Count;i++)
-                        {
-                            if(_nearShapes[i].Item1 == s)
-                            {
-                                _nearShapes.RemoveAt(i);
-                                break;
-                            }
-                        }
-                        s.Focused = false;
+                        _nearShapes.Add((s, dist));
+                        s.Focused = true;
                     }
                 }
+                else if (s.Focused)
+                {
+                    for (int i = 0; i < _nearShapes.Count; i++)
+                    {
+                        if (_nearShapes[i].Item1 == s)
+                        {
+                            _nearShapes.RemoveAt(i);
+                            break;
+                        }
+                    }
+                    s.Focused = false;
+                }
+            }
 
-                if(Scene.CurrentScene.IsLeftMouseDown && _nearShapes.Count > 0)
+            if (_drawState == DrawState.NONE)
+            {
+                if (Scene.CurrentScene.IsLeftMouseDown && _nearShapes.Count > 0)
                 {
                     Shape nearest = _nearShapes[0].Item1;
                     float dist = _nearDistance;
                     foreach (var (s, d) in _nearShapes)
                     {
-                        if(s is Dot)
+                        if (s is Dot)
                         {
                             // 다 끝났다 그지 깽깽이들아!! 점이 우선순위 최고다!
                             nearest = s;
                             break;
                         }
-                        if(dist > d)
+                        if (dist > d)
                         {
                             nearest = s;
                             dist = d;
@@ -157,7 +158,45 @@ namespace GCS
                         nearest.Selected = true;
                     }
                 }
+
+                if(_isDragging || Scene.CurrentScene.IsLeftMouseClicking && Scene.CurrentScene.IsMouseMoved)
+                {
+                    var diff = Scene.CurrentScene.MousePosition - Scene.CurrentScene.LastMousePosition;
+                    if (_isDragging || _selectedShapes.Any(s => EnoughClose(s, _pos)))
+                    {
+                        if (!_isDragging) _isDragging = true;
+                        _selectedShapes.ForEach(s => s.Move(diff.ToVector2()));
+                    }
+                    if (Scene.CurrentScene.IsLeftMouseUp)
+                        _isDragging = false;
+                }
             }
+        }
+
+        /// <summary>
+        /// 가까운 점이 있다면 그 점을, 없다면 새 점을
+        /// </summary>
+        private Dot GetDot(Vector2 coord)
+        {
+            Dot dot = null;
+            float dist = _nearDotDistance;
+            foreach(var s in _shapes)
+            {
+                if (!(s is Dot)) continue;
+                var d = Geometry.GetNearestDistance(s, coord);
+                if(d < dist && d < _nearDotDistance)
+                {
+                    dot = s as Dot;
+                    dist = d;
+                }
+            }
+            return dot ?? new Dot(coord);
+        }
+
+        private bool EnoughClose(Shape shape, Vector2 coord)
+        {
+            var distance = Geometry.GetNearestDistance(shape, coord);
+            return shape is Dot ? distance <= _nearDotDistance : distance <= _nearDistance;
         }
 
         public override void Draw(SpriteBatch sb)
@@ -167,16 +206,16 @@ namespace GCS
             _pos = Mouse.GetState().Position.ToVector2();
             if (_wasDrawing && _drawState == DrawState.CIRCLE)
             {
-                float radius = (_pos - _lastPoint).Length();
-                GUI.DrawCircle(sb, _lastPoint, radius, 2, Color.DarkGray, 100);
+                float radius = (_pos - _lastPoint.Coord).Length();
+                GUI.DrawCircle(sb, _lastPoint.Coord, radius, 2, Color.DarkGray, 100);
             }
             else if (_wasDrawing && _drawState == DrawState.SEGMENT)
             {
-                GUI.DrawLine(sb, _lastPoint, _pos, 2, Color.DarkGray);
+                GUI.DrawLine(sb, _lastPoint.Coord, _pos, 2, Color.DarkGray);
             }
             else if(_wasDrawing && _drawState == DrawState.LINE)
             {
-                new Line(new Dot(_lastPoint), new Dot(_pos)).Draw(sb);
+                new Line(new Dot(_lastPoint.Coord), new Dot(_pos)).Draw(sb);
             }
 
             UpdateLists(sb);

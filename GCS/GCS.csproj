@@ -55,7 +55,7 @@
   <ItemGroup>
     <Reference Include="Grid, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Grid-master\Grid\bin\Windows\x86\Debug\Grid.exe</HintPath>
+      <HintPath>..\..\Grid\Grid\bin\Windows\x86\Debug\Grid.exe</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>

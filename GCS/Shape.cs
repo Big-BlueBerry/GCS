@@ -18,6 +18,7 @@ namespace GCS
             if (Focused) Color = Color.Orange;
             if (Selected) Color = Color.Cyan;
         }
+        public abstract void Move(Vector2 add);
     }
 
     public class Circle : Shape
@@ -25,7 +26,7 @@ namespace GCS
         public static int Sides = 100;
         public Dot Center;
         public float Radius;
-        
+
         public Circle(Dot center, float radius)
         {
             Center = center;
@@ -36,6 +37,11 @@ namespace GCS
         {
             base.Draw(sb);
             GUI.DrawCircle(sb, Center.Coord, Radius, Border, Color, Sides);
+        }
+
+        public override void Move(Vector2 add)
+        {
+            Center.Move(add);
         }
     }
 
@@ -50,7 +56,7 @@ namespace GCS
         public float Grad { get => _grad; set { _grad = value; ResetPoints(); } }
         private float _yint;
         public float Yint { get => _yint; set { _yint = value; ResetPoints(); } }
-        
+
         public Line(Dot p1, Dot p2)
         {
             _p1 = p1;
@@ -90,15 +96,22 @@ namespace GCS
             base.Draw(sb);
             GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
         }
+
+        public override void Move(Vector2 add)
+        {
+            _p1.Move(add);
+            _p2.Move(add);
+            ResetAB();
+        }
     }
-    
+
     public class Segment : Shape
     {
         private Dot _p1;
         public Dot Point1 { get => _p1; set { _p1 = value; ResetAB(); } }
         private Dot _p2;
         public Dot Point2 { get => _p2; set { _p2 = value; ResetAB(); } }
-        
+
         public float Grad { get; private set; }
         public float Yint { get; private set; }
 
@@ -111,7 +124,7 @@ namespace GCS
 
         private void ResetAB()
         {
-            Grad = (Point2.Coord - Point1.Coord).Y / (Point2.Coord- Point1.Coord).X;
+            Grad = (Point2.Coord - Point1.Coord).Y / (Point2.Coord - Point1.Coord).X;
             Yint = (Point1.Coord.Y) - Grad * Point1.Coord.X;
         }
 
@@ -124,6 +137,13 @@ namespace GCS
         public Line ToLine()
         {
             return new Line(Grad, Yint);
+        }
+
+        public override void Move(Vector2 add)
+        {
+            _p1.Move(add);
+            _p2.Move(add);
+            ResetAB();
         }
     }
 
@@ -154,6 +174,11 @@ namespace GCS
             base.Draw(sb);
             GUI.DrawCircle(sb, Coord, 4f, Border, Color, 20);
             // GUI.DrawPoint(sb, Coord, Border, Color);
+        }
+
+        public override void Move(Vector2 add)
+        {
+            Coord += add;
         }
     }
 }
