@@ -56,9 +56,9 @@ namespace GCS
     public class Line : Shape
     {
         private Dot _p1;
-        public Dot Point1 { get => _p1; set { _p1 = value; ResetAB(); } }
+        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += () => ResetAB(); ResetAB(); } }
         private Dot _p2;
-        public Dot Point2 { get => _p2; set { _p2 = value; ResetAB(); } }
+        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += () => ResetAB(); ResetAB(); } }
 
         private float _grad;
         public float Grad { get => _grad; set { _grad = value; ResetPoints(); } }
@@ -69,6 +69,8 @@ namespace GCS
         {
             _p1 = p1;
             _p2 = p2;
+            _p1.Moved += () => ResetAB();
+            _p2.Moved += () => ResetAB();
             ResetAB();
         }
 
@@ -83,6 +85,8 @@ namespace GCS
         {
             _p1 = p1;
             _p2 = new Dot(Point1.Coord.X + 1, Point1.Coord.Y + grad);
+            _p1.Moved += () => ResetAB();
+            _p2.Moved += () => ResetAB();
             _grad = grad;
             _yint = p1.Coord.Y - grad * p1.Coord.X;
         }
@@ -97,6 +101,8 @@ namespace GCS
         {
             _p1 = new Dot(0, Yint);
             _p2 = new Dot(1, Grad + Yint);
+            _p1.Moved += () => ResetAB();
+            _p2.Moved += () => ResetAB();
         }
 
         public override void Draw(SpriteBatch sb)
@@ -118,9 +124,9 @@ namespace GCS
     public class Segment : Shape
     {
         private Dot _p1;
-        public Dot Point1 { get => _p1; set { _p1 = value; ResetAB(); } }
+        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += () => ResetAB(); ResetAB(); } }
         private Dot _p2;
-        public Dot Point2 { get => _p2; set { _p2 = value; ResetAB(); } }
+        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += () => ResetAB(); ResetAB(); } }
 
         public float Grad { get; private set; }
         public float Yint { get; private set; }
@@ -129,6 +135,8 @@ namespace GCS
         {
             _p1 = p1;
             _p2 = p2;
+            _p1.Moved += () => ResetAB();
+            _p2.Moved += () => ResetAB();
             ResetAB();
         }
 
@@ -161,7 +169,9 @@ namespace GCS
 
     public class Dot : Shape
     {
-        public Vector2 Coord;
+        private Vector2 _coord;
+        public Vector2 Coord { get => _coord; set { _coord = value; Moved?.Invoke(); } }
+        public event Action Moved;
 
         public Dot(Vector2 coord)
         {
