@@ -12,6 +12,10 @@ namespace GCS
         public Color Color { get; set; } = Color.Black;
         public bool Focused { get; set; } = false;
         public bool Selected { get; set; } = false;
+        /// <summary>
+        /// 마우스를 떼면 Selected가 false가 되어야 하는가?
+        /// </summary>
+        internal bool UnSelect { get; set; } = false;
         public virtual void Draw(SpriteBatch sb)
         {
             Color = Color.Black;

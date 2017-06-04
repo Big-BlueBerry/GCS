@@ -17,8 +17,8 @@ namespace GCS
         private List<Shape> _shapes;
         private Vector2 _pos;
 
-        private readonly float _nearDistance = 4;
-        private readonly float _nearDotDistance = 8;
+        private readonly float _nearDistance = 5;
+        private readonly float _nearDotDistance = 10;
         private List<(Shape, float)> _nearShapes;
         private List<Shape> _selectedShapes;
 
@@ -126,43 +126,52 @@ namespace GCS
 
             if (_drawState == DrawState.NONE)
             {
-                if (Scene.CurrentScene.IsLeftMouseDown && _nearShapes.Count > 0)
+                if (_nearShapes.Count > 0)
                 {
                     Shape nearest = _nearShapes[0].Item1;
-                    float dist = _nearDistance;
-                    foreach (var (s, d) in _nearShapes)
+                    if (Scene.CurrentScene.IsLeftMouseDown)
                     {
-                        if (s is Dot)
+                        float dist = _nearDistance;
+                        foreach (var (s, d) in _nearShapes)
                         {
-                            // 다 끝났다 그지 깽깽이들아!! 점이 우선순위 최고다!
-                            nearest = s;
-                            break;
+                            if (s is Dot)
+                            {
+                                // 다 끝났다 그지 깽깽이들아!! 점이 우선순위 최고다!
+                                nearest = s;
+                                break;
+                            }
+                            if (dist > d)
+                            {
+                                nearest = s;
+                                dist = d;
+                            }
                         }
-                        if (dist > d)
+                        if (!nearest.Selected)
                         {
-                            nearest = s;
-                            dist = d;
+                            _selectedShapes.ForEach(s => s.UnSelect = true);
+                            _selectedShapes.Add(nearest);
+                            nearest.Selected = true;
+                            nearest.UnSelect = false;
                         }
+                        else
+                            nearest.UnSelect = true;
                     }
-                    if (nearest.Selected)
+                    if (Scene.CurrentScene.IsLeftMouseUp)
                     {
-                        _selectedShapes.Remove(nearest);
-                        nearest.Selected = false;
-                    }
-                    else
-                    {
-                        _selectedShapes.Add(nearest);
-                        nearest.Selected = true;
+                        if (nearest.Selected && nearest.UnSelect)
+                        {
+                            _selectedShapes.Remove(nearest);
+                            nearest.Selected = false;
+                        }
                     }
                 }
-
                 if(_isDragging || Scene.CurrentScene.IsLeftMouseClicking && Scene.CurrentScene.IsMouseMoved)
                 {
                     var diff = Scene.CurrentScene.MousePosition - Scene.CurrentScene.LastMousePosition;
                     if (_isDragging || _selectedShapes.Any(s => EnoughClose(s, _pos)))
                     {
                         if (!_isDragging) _isDragging = true;
-                        _selectedShapes.ForEach(s => s.Move(diff.ToVector2()));
+                        _selectedShapes.ForEach(s => { s.UnSelect = false; s.Move(diff.ToVector2()); });
                     }
                     if (Scene.CurrentScene.IsLeftMouseUp)
                         _isDragging = false;
