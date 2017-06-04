@@ -43,6 +43,7 @@ namespace GCS
         public override void Move(Vector2 add)
         {
             Center.Move(add);
+            Another.Move(add);
         }
     }
 
