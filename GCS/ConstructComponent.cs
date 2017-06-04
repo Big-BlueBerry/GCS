@@ -79,23 +79,20 @@ namespace GCS
             }
             if (_wasDrawing && Mouse.GetState().LeftButton == ButtonState.Released)
             {
+                var p = GetDot(_pos);
+                AddShape(p);
                 AddShape(_lastPoint);
                 if (_drawState == DrawState.CIRCLE)
                 {
-                    float radius = Vector2.Distance(_pos, _lastPoint.Coord);
-                    AddShape(new Circle(_lastPoint, radius));
+                    AddShape(new Circle(_lastPoint, p));
                 }
                 else if (_drawState == DrawState.SEGMENT)
                 {
-                    var p = GetDot(_pos);
                     AddShape(new Segment(_lastPoint, p));
-                    AddShape(p);
                 }
                 else if (_drawState == DrawState.LINE)
                 {
-                    var p = GetDot(_pos);
                     AddShape(new Line(_lastPoint, p));
-                    AddShape(p);
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;

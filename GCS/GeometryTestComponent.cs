@@ -13,7 +13,7 @@ namespace GCS
     {
         public override void Draw(SpriteBatch sb)
         {
-            var v1 = new Circle(new Dot(30, 30), 200);
+            var v1 = new Circle(new Dot(30, 30), new Dot(50, 30));
             var v2 = new Segment(new Dot(100,200), new Dot(200, 230));
             v1.Draw(sb);
             v2.Draw(sb);

@@ -25,12 +25,13 @@ namespace GCS
     {
         public static int Sides = 100;
         public Dot Center;
-        public float Radius;
+        public Dot Another;
+        public float Radius => Vector2.Distance(Center.Coord, Another.Coord);
 
-        public Circle(Dot center, float radius)
+        public Circle(Dot center, Dot another)
         {
             Center = center;
-            Radius = radius;
+            Another = another;
         }
 
         public override void Draw(SpriteBatch sb)
