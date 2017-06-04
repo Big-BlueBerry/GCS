@@ -46,8 +46,10 @@ namespace GCS
 
         public override void Move(Vector2 add)
         {
-            Center.Move(add);
-            Another.Move(add);
+            if (!Center.Selected)
+                Center.Move(add);
+            if (!Another.Selected)
+                Another.Move(add);
         }
     }
 
@@ -105,8 +107,10 @@ namespace GCS
 
         public override void Move(Vector2 add)
         {
-            _p1.Move(add);
-            _p2.Move(add);
+            if (!_p1.Selected)
+                _p1.Move(add);
+            if (!_p2.Selected)
+                _p2.Move(add);
             ResetAB();
         }
     }
@@ -147,8 +151,10 @@ namespace GCS
 
         public override void Move(Vector2 add)
         {
-            _p1.Move(add);
-            _p2.Move(add);
+            if (!_p1.Selected)
+                _p1.Move(add);
+            if (!_p2.Selected)
+                _p2.Move(add);
             ResetAB();
         }
     }
