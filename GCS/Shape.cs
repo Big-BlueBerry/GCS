@@ -169,17 +169,19 @@ namespace GCS
 
     public class Dot : Shape
     {
+        public Shape Parent { get; set; }
         private Vector2 _coord;
         public Vector2 Coord { get => _coord; set { _coord = value; Moved?.Invoke(); } }
         public event Action Moved;
 
-        public Dot(Vector2 coord)
+        public Dot(Vector2 coord, Shape parent = null)
         {
             Coord = coord;
             Color = Color.OrangeRed;
+            Parent = parent;
         }
 
-        public Dot(float x, float y) : this(new Vector2(x, y))
+        public Dot(float x, float y, Shape parent = null) : this(new Vector2(x, y), parent)
         { }
 
         public override bool Equals(object obj)
