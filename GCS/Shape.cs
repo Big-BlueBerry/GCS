@@ -189,10 +189,10 @@ namespace GCS
 
         public Dot(Vector2 coord, IParentRule rule = null)
         {
-            Coord = coord;
+            _coord = coord;
             Color = Color.OrangeRed;
             _rule = rule;
-            _rule.MoveTo += _rule_MoveTo;
+            if (rule != null) _rule.MoveTo += _rule_MoveTo;
         }
 
         public Dot(float x, float y) : this(new Vector2(x, y))
