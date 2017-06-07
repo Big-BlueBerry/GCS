@@ -49,7 +49,9 @@
     <Compile Include="IParentRule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\CircleRule.cs" />
     <Compile Include="Rules\LineRule.cs" />
+    <Compile Include="Rules\SegmentRule.cs" />
     <Compile Include="Shape.cs" />
     <Compile Include="SpriteBatchAntiAliasing.cs" />
     <Compile Include="WorkWoorimException.cs" />
