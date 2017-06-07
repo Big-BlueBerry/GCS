@@ -12,6 +12,7 @@ namespace GCS
         public Color Color { get; set; } = Color.Black;
         public bool Focused { get; set; } = false;
         public bool Selected { get; set; } = false;
+        public abstract event Action Moved;
         /// <summary>
         /// 마우스를 떼면 Selected가 false가 되어야 하는가?
         /// </summary>
@@ -28,9 +29,12 @@ namespace GCS
     public class Circle : Shape
     {
         public static int Sides = 100;
-        public Dot Center;
-        public Dot Another;
+        private Dot _center;
+        public Dot Center { get => _center; set { _center = value; Moved?.Invoke(); } }
+        private Dot _another;
+        public Dot Another { get => _another; set { _another = value; Moved?.Invoke(); } }
         public float Radius => Vector2.Distance(Center.Coord, Another.Coord);
+        public override event Action Moved;
 
         public Circle(Dot center, Dot another)
         {
@@ -50,20 +54,22 @@ namespace GCS
                 Center.Move(add);
             if (!Another.Selected)
                 Another.Move(add);
+            Moved?.Invoke();
         }
     }
 
     public class Line : Shape
     {
         private Dot _p1;
-        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += () => ResetAB(); ResetAB(); } }
+        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += () => { ResetAB(); Moved?.Invoke(); }; ResetAB(); Moved?.Invoke(); } }
         private Dot _p2;
-        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += () => ResetAB(); ResetAB(); } }
+        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += () => { ResetAB(); Moved?.Invoke(); }; ResetAB(); Moved?.Invoke(); } }
 
         private float _grad;
-        public float Grad { get => _grad; set { _grad = value; ResetPoints(); } }
+        public float Grad { get => _grad; set { _grad = value; ResetPoints(); Moved?.Invoke(); } }
         private float _yint;
-        public float Yint { get => _yint; set { _yint = value; ResetPoints(); } }
+        public float Yint { get => _yint; set { _yint = value; ResetPoints(); Moved?.Invoke(); } }
+        public override event Action Moved;
 
         public Line(Dot p1, Dot p2)
         {
@@ -118,18 +124,22 @@ namespace GCS
             if (!_p2.Selected)
                 _p2.Move(add);
             ResetAB();
+
+            Moved?.Invoke();
         }
     }
 
     public class Segment : Shape
     {
         private Dot _p1;
-        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += () => ResetAB(); ResetAB(); } }
+        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += () => { ResetAB(); Moved?.Invoke(); }; ResetAB(); Moved?.Invoke(); } }
         private Dot _p2;
-        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += () => ResetAB(); ResetAB(); } }
+        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += () => { ResetAB(); Moved?.Invoke(); }; ResetAB(); Moved?.Invoke(); } }
 
         public float Grad { get; private set; }
         public float Yint { get; private set; }
+
+        public override event Action Moved;
 
         public Segment(Dot p1, Dot p2)
         {
@@ -164,6 +174,8 @@ namespace GCS
             if (!_p2.Selected)
                 _p2.Move(add);
             ResetAB();
+
+            Moved?.Invoke();
         }
     }
 
@@ -172,7 +184,8 @@ namespace GCS
         public Shape Parent { get; set; }
         private Vector2 _coord;
         public Vector2 Coord { get => _coord; set { _coord = value; Moved?.Invoke(); } }
-        public event Action Moved;
+
+        public override event Action Moved;
 
         public Dot(Vector2 coord, Shape parent = null)
         {
