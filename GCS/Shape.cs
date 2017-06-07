@@ -181,20 +181,21 @@ namespace GCS
 
     public class Dot : Shape
     {
-        public Shape Parent { get; set; }
         private Vector2 _coord;
-        public Vector2 Coord { get => _coord; set { _coord = value; Moved?.Invoke(); } }
+        public Vector2 Coord { get => _coord; set { MoveTo(_coord); } }
+        private IParentRule _rule;
 
         public override event Action Moved;
 
-        public Dot(Vector2 coord, Shape parent = null)
+        public Dot(Vector2 coord, IParentRule rule = null)
         {
             Coord = coord;
             Color = Color.OrangeRed;
-            Parent = parent;
+            _rule = rule;
+            _rule.MoveTo += _rule_MoveTo;
         }
 
-        public Dot(float x, float y, Shape parent = null) : this(new Vector2(x, y), parent)
+        public Dot(float x, float y) : this(new Vector2(x, y))
         { }
 
         public override bool Equals(object obj)
@@ -213,9 +214,18 @@ namespace GCS
             // GUI.DrawPoint(sb, Coord, Border, Color);
         }
 
-        public override void Move(Vector2 add)
+        private void _rule_MoveTo(Vector2 obj)
         {
-            Coord += add;
+            MoveTo(obj);
         }
+
+        public void MoveTo(Vector2 to)
+        {
+            _coord = _rule == null ? to : _rule.FixedCoord(to);
+            Moved?.Invoke();
+        }
+
+        public override void Move(Vector2 add)
+            => MoveTo(Coord + add);
     }
 }

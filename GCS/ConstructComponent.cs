@@ -53,7 +53,7 @@ namespace GCS
             foreach (var s in _shapes)
             {
                 var dots = from d in Geometry.GetIntersect(shape, s)
-                           select new Dot(d, shape);
+                           select new Dot(d);
                 if (dots.Count() != 0)
                     keypoints.AddRange(dots.Where(d => !_shapes.Contains(d)));
             }
