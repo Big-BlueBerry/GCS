@@ -221,7 +221,7 @@ namespace GCS
 
         public void MoveTo(Vector2 to)
         {
-            _coord = _rule == null ? to : _rule.FixedCoord(to);
+            _coord = _rule?.FixedCoord(to) ?? to;
             Moved?.Invoke();
         }
 
