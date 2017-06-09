@@ -11,6 +11,7 @@ namespace GCS
         NONE,
         CIRCLE,
         SEGMENT,
-        LINE
+        LINE,
+        DOT
     }
 }

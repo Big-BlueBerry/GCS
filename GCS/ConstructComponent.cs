@@ -68,31 +68,40 @@ namespace GCS
             _pos = Mouse.GetState().Position.ToVector2();
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                if (_drawState == DrawState.CIRCLE || _drawState == DrawState.SEGMENT || _drawState == DrawState.LINE)
+                if (_drawState != DrawState.NONE)
                 {
                     if (!_wasDrawing)
                     {
                         _lastPoint = GetDot(_pos);
                         _wasDrawing = true;
                     }
+                    else if (_drawState == DrawState.DOT)
+                        _lastPoint.MoveTo(_pos);
                 }
             }
             if (_wasDrawing && Mouse.GetState().LeftButton == ButtonState.Released)
             {
-                var p = GetDot(_pos);
-                AddShape(p);
-                AddShape(_lastPoint);
-                if (_drawState == DrawState.CIRCLE)
+                if (_drawState == DrawState.DOT)
                 {
-                    AddShape(new Circle(_lastPoint, p));
+                    AddShape(_lastPoint);
                 }
-                else if (_drawState == DrawState.SEGMENT)
+                else
                 {
-                    AddShape(new Segment(_lastPoint, p));
-                }
-                else if (_drawState == DrawState.LINE)
-                {
-                    AddShape(new Line(_lastPoint, p));
+                    var p = GetDot(_pos);
+                    AddShape(p);
+                    AddShape(_lastPoint);
+                    if (_drawState == DrawState.CIRCLE)
+                    {
+                        AddShape(new Circle(_lastPoint, p));
+                    }
+                    else if (_drawState == DrawState.SEGMENT)
+                    {
+                        AddShape(new Segment(_lastPoint, p));
+                    }
+                    else if (_drawState == DrawState.LINE)
+                    {
+                        AddShape(new Line(_lastPoint, p));
+                    }
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
@@ -210,18 +219,25 @@ namespace GCS
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
             sb.BeginAA();
             _pos = Mouse.GetState().Position.ToVector2();
-            if (_wasDrawing && _drawState == DrawState.CIRCLE)
+            if (_wasDrawing)
             {
-                float radius = (_pos - _lastPoint.Coord).Length();
-                GUI.DrawCircle(sb, _lastPoint.Coord, radius, 2, Color.DarkGray, 100);
-            }
-            else if (_wasDrawing && _drawState == DrawState.SEGMENT)
-            {
-                GUI.DrawLine(sb, _lastPoint.Coord, _pos, 2, Color.DarkGray);
-            }
-            else if(_wasDrawing && _drawState == DrawState.LINE)
-            {
-                new Line(new Dot(_lastPoint.Coord), new Dot(_pos)).Draw(sb);
+                if (_drawState == DrawState.CIRCLE)
+                {
+                    float radius = (_pos - _lastPoint.Coord).Length();
+                    GUI.DrawCircle(sb, _lastPoint.Coord, radius, 2, Color.DarkGray, 100);
+                }
+                else if (_drawState == DrawState.SEGMENT)
+                {
+                    GUI.DrawLine(sb, _lastPoint.Coord, _pos, 2, Color.DarkGray);
+                }
+                else if (_drawState == DrawState.LINE)
+                {
+                    new Line(new Dot(_lastPoint.Coord), new Dot(_pos)).Draw(sb);
+                }
+                else if (_drawState == DrawState.DOT)
+                {
+                    _lastPoint.Draw(sb);
+                }
             }
 
             UpdateLists(sb);
