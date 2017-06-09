@@ -16,16 +16,19 @@ namespace GCS.Rules
             Dot = dot;
             Dot.Rule = this;
             Parent = parent;
-            _leftRatio = -1; throw new WorkWoorimException("웅림앙 leftratio 구해죠..");
+            _leftRatio = (Dot.Coord.X - Parent.Point1.Coord.X) / (Parent.Point2.Coord.X - Parent.Point1.Coord.X);
         }
 
         private void Parent_Moved()
-        {
+        {   
             var p1 = Parent.Point1.Coord;
             var p2 = Parent.Point2.Coord;
             Vector2 moved = Vector2.Zero;
-            moved = new Vector2((p1.X * _leftRatio + p2.X * (1 - _leftRatio)) / (p1.X + p2.X),
-                                        (p1.Y * _leftRatio + p2.Y * (1 - _leftRatio)) / (p1.Y + p2.Y));
+            moved =  new Vector2((p1.X * _leftRatio + p2.X * (1 - _leftRatio)),
+                                        (p1.Y * _leftRatio + p2.Y * (1 - _leftRatio)));
+
+            Grid.Framework.Debug.WriteLine($"leftratio : {_leftRatio}");
+            Grid.Framework.Debug.WriteLine(moved.ToString());
 
             MoveTo?.Invoke(moved);
         }

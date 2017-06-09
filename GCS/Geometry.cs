@@ -223,7 +223,7 @@ namespace GCS
             if (shape is Segment)
             {
                 Segment line = (Segment)shape;
-                return (float)(Math.Abs(line.Grad * point.X - point.Y + line.Yint) / Math.Sqrt(line.Grad * line.Grad + 1));
+                return Vector2.Distance(point, getNearest(line, point));
             }
             if (shape is Circle) return Math.Abs(Vector2.Distance((shape as Circle).Center.Coord, point) - ((shape as Circle).Radius));
             if (shape is Dot) return Vector2.Distance(point, (shape as Dot).Coord);
