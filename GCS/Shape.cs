@@ -62,7 +62,7 @@ namespace GCS
 
         private void _another_Moved()
         {
-            throw new NotImplementedException();
+            Moved?.Invoke();
         }
 
         public float Radius => Vector2.Distance(Center.Coord, Another.Coord);
