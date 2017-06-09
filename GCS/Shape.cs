@@ -75,8 +75,8 @@ namespace GCS
         {
             _p1 = p1;
             _p2 = p2;
-            _p1.Moved += () => ResetAB();
-            _p2.Moved += () => ResetAB();
+            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
             ResetAB();
         }
 
@@ -91,8 +91,8 @@ namespace GCS
         {
             _p1 = p1;
             _p2 = new Dot(Point1.Coord.X + 1, Point1.Coord.Y + grad);
-            _p1.Moved += () => ResetAB();
-            _p2.Moved += () => ResetAB();
+            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
             _grad = grad;
             _yint = p1.Coord.Y - grad * p1.Coord.X;
         }
@@ -107,8 +107,8 @@ namespace GCS
         {
             _p1 = new Dot(0, Yint);
             _p2 = new Dot(1, Grad + Yint);
-            _p1.Moved += () => ResetAB();
-            _p2.Moved += () => ResetAB();
+            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
         }
 
         public override void Draw(SpriteBatch sb)
@@ -145,8 +145,8 @@ namespace GCS
         {
             _p1 = p1;
             _p2 = p2;
-            _p1.Moved += () => ResetAB();
-            _p2.Moved += () => ResetAB();
+            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
             ResetAB();
         }
 
