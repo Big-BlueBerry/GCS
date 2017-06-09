@@ -9,7 +9,7 @@ namespace GCS.Rules
         public Dot Dot { get; }
         public event Action<Vector2> MoveTo;
         protected float _angle;
-        protected float _cosangle, _sinangle;
+        //protected float _cosangle, _sinangle;
 
         public CircleRule(Dot dot, Circle parent)
         {
@@ -20,9 +20,9 @@ namespace GCS.Rules
 
             float dx = parent.Center.Coord.X - Dot.Coord.X;
             float dy = parent.Center.Coord.Y - Dot.Coord.Y;
-            _angle = (float) Math.Acos(parent.Radius / dx);
-            _cosangle = parent.Radius / dx;
-            _sinangle = parent.Radius / dy;
+            _angle = (float)(Math.PI+ Math.Acos(dx / parent.Radius));
+            //_cosangle = dx / parent.Radius;
+            //_sinangle = dy / parent.Radius;
         }
 
         private void Parent_Moved()
@@ -30,7 +30,7 @@ namespace GCS.Rules
             var p1 = Parent.Center.Coord;
             float rad = Parent.Radius;
             Vector2 moved = Vector2.Zero;
-            moved = new Vector2(p1.X + _cosangle * rad, p1.Y + _sinangle * rad);
+            moved = new Vector2(p1.X + (float)Math.Cos(_angle) * rad, p1.Y + (float)Math.Sin(_angle) * rad);
 
             Grid.Framework.Debug.WriteLine($"angle : {_angle}");
             Grid.Framework.Debug.WriteLine(moved.ToString());
