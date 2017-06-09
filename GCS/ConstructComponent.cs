@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Grid.Framework;
 using Grid.Framework.Components;
+using GCS.Rules;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -193,19 +194,49 @@ namespace GCS
         /// </summary>
         private Dot GetDot(Vector2 coord)
         {
-            Dot dot = null;
-            float dist = _nearDotDistance;
-            foreach(var s in _shapes)
+            Dot nearestDot = null;
+            float distDot = _nearDotDistance;
+            Shape nearest = null;
+            float dist = _nearDistance;
+            foreach (var (s, d) in _nearShapes)
             {
-                if (!(s is Dot)) continue;
-                var d = Geometry.GetNearestDistance(s, coord);
-                if(d < dist && d < _nearDotDistance)
+                if (s is Dot)
                 {
-                    dot = s as Dot;
-                    dist = d;
+                    if (d < distDot && d < _nearDotDistance)
+                    {
+                        nearestDot = s as Dot;
+                        distDot = d;
+                    }
+                }
+                else
+                {
+                    if(d < dist)
+                    {
+                        nearest = s;
+                        dist = d;
+                    }
                 }
             }
-            return dot ?? new Dot(coord);
+            if (nearestDot == null) // 가장 가까운게 점이 아니라면
+            {
+                if (_nearShapes.Count == 1)
+                {
+                    IParentRule rule = null;
+                    Dot dot = new Dot(Geometry.GetNearest(nearest, coord));
+                    if (nearest is Line)
+                        rule = new LineRule(dot, nearest as Line);
+                    else if (nearest is Segment)
+                        rule = new SegmentRule(dot, nearest as Segment);
+                    else if (nearest is Circle)
+                        rule = new CircleRule(dot, nearest as Circle);
+                    else
+                        throw new System.Exception("일어날 수 없음");
+                    return dot;
+                }
+                else return new Dot(coord); // 임시방편임
+            }
+            else if (nearestDot is Dot) return nearestDot as Dot;
+            else return new Dot(coord);
         }
 
         private bool EnoughClose(Shape shape, Vector2 coord)
