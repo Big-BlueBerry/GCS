@@ -30,9 +30,41 @@ namespace GCS
     {
         public static int Sides = 100;
         private Dot _center;
-        public Dot Center { get => _center; set { _center = value; Moved?.Invoke(); } }
+        public Dot Center
+        {
+            get => _center;
+            set
+            {
+                if (_center != null) _center.Moved -= _center_Moved;
+                _center = value;
+                if (_center != null) _center.Moved += _center_Moved;
+                
+                Moved?.Invoke();
+            }
+        }
+        private void _center_Moved()
+        {
+            Moved?.Invoke();
+        }
+
         private Dot _another;
-        public Dot Another { get => _another; set { _another = value; Moved?.Invoke(); } }
+        public Dot Another
+        {
+            get => _another;
+            set
+            {
+                if(_another != null) _another.Moved -= _another_Moved;
+                _another = value;
+                if (_another != null) _another.Moved += _another_Moved;
+                Moved?.Invoke();
+            }
+        }
+
+        private void _another_Moved()
+        {
+            throw new NotImplementedException();
+        }
+
         public float Radius => Vector2.Distance(Center.Coord, Another.Coord);
         public override event Action Moved;
 
