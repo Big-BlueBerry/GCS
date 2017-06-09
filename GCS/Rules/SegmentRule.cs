@@ -14,6 +14,7 @@ namespace GCS.Rules
         {
             parent.Moved += Parent_Moved;
             Dot = dot;
+            Dot.Rule = this;
             Parent = parent;
             _leftRatio = -1; throw new WorkWoorimException("웅림앙 leftratio 구해죠..");
         }

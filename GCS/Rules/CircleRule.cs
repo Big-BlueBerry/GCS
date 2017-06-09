@@ -14,8 +14,9 @@ namespace GCS.Rules
         {
             parent.Moved += Parent_Moved;
             Dot = dot;
+            Dot.Rule = this;
             Parent = parent;
-            _angle = -1; throw new WorkWoorimException("웅림앙 leftratio 구해죠..");
+            _angle = -1; throw new WorkWoorimException("웅림앙 angle 구해죠..");
         }
 
         private void Parent_Moved()

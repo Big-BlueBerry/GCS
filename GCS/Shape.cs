@@ -184,15 +184,23 @@ namespace GCS
         private Vector2 _coord;
         public Vector2 Coord { get => _coord; set { MoveTo(_coord); } }
         private IParentRule _rule;
+        public IParentRule Rule
+        {
+            get => _rule;
+            set
+            {
+                if (_rule != null) _rule.MoveTo -= _rule_MoveTo;
+                _rule = value;
+                if (value != null) value.MoveTo += _rule_MoveTo;
+            }
+        }
 
         public override event Action Moved;
 
-        public Dot(Vector2 coord, IParentRule rule = null)
+        public Dot(Vector2 coord)
         {
             _coord = coord;
             Color = Color.OrangeRed;
-            _rule = rule;
-            if (rule != null) _rule.MoveTo += _rule_MoveTo;
         }
 
         public Dot(float x, float y) : this(new Vector2(x, y))
@@ -221,7 +229,7 @@ namespace GCS
 
         public void MoveTo(Vector2 to)
         {
-            _coord = _rule?.FixedCoord(to) ?? to;
+            _coord = Rule?.FixedCoord(to) ?? to;
             Moved?.Invoke();
         }
 
