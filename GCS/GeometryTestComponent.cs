@@ -11,21 +11,24 @@ namespace GCS
 {
     class GeometryTestComponent : Renderable
     {
-        Segment v2;
+        Circle v2;
         Dot d;
         public GeometryTestComponent() { OnCamera = false; }
         public override void Start()
         {
             base.Start();
-
-            v2 = new Segment(new Dot(0, 0), new Dot(200, 100));
+            
+            v2 = new Circle(new Dot(100, 100), new Dot(100, 200));
             d = new Dot(Geometry.GetNearest(v2, new Vector2(100, 100)));
-            var rule = new GCS.Rules.SegmentRule(d, v2);
+            var rule = new GCS.Rules.CircleRule(d, v2);
+            
+            Circle c = new Circle(new Dot(100, 100), new Dot(100, 200));
+            
         }
         public override void Update()
         {
             base.Update();
-            v2.Point2.MoveTo(Mouse.GetState().Position.ToVector2());
+            v2.Another.MoveTo(Mouse.GetState().Position.ToVector2());
         }
  
         public override void Draw(SpriteBatch sb)
