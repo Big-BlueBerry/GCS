@@ -20,7 +20,7 @@ namespace GCS
             base.Start();
             
             v2 = new Circle(new Dot(500, 500), new Dot(100, 200));
-            first = Geometry.GetNearest(v2, new Vector2(100, 100));
+            first = Geometry.GetNearest(v2, new Vector2(300, 100));
             d = new Dot(first);
             var rule = new GCS.Rules.CircleRule(d, v2);
             //Circle c = new Circle(new Dot(100, 100), new Dot(100, 200));

@@ -154,7 +154,7 @@ namespace GCS
         {
             float distance = (float)Math.Sqrt(Math.Pow(circle2.Center.Coord.X - circle1.Center.Coord.X, 2) + Math.Pow(circle2.Center.Coord.Y - circle1.Center.Coord.Y, 2));
 
-            if (distance == 0) { throw new NotFiniteNumberException("일치"); }
+            if (distance == 0) return new Vector2[] { }; 
             else if (distance > circle1.Radius + circle2.Radius) //두 원이 밖에 있으면서 만나지 않음.
             {
                 return new Vector2[] { };

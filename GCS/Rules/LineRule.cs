@@ -24,7 +24,7 @@ namespace GCS.Rules
             var p1 = Parent.Point1.Coord;
             var p2 = Parent.Point2.Coord;
             Vector2 moved = Vector2.Zero;
-            moved = new Vector2((p1.X * _leftRatio + p2.X * (1 - _leftRatio)),
+            moved = new Vector2((p2.X * _leftRatio + p1.X * (1 - _leftRatio)),
                                         (p1.Y * _leftRatio + p2.Y * (1 - _leftRatio)));
             /* 
              * 우림 여기서 점이 라인 밖에 있으면 외분이잖아
