@@ -209,6 +209,7 @@ namespace GCS
 
         private static Vector2 getNearest(Circle circle, Vector2 point)
         {
+            if (circle.Center.Coord == point) { return circle.Center.Coord; }
             Vector2[] res = getIntersect(new Line(circle.Center, new Dot(point)), circle);
             return Vector2.Distance(res[0], point) < Vector2.Distance(res[1], point) ? res[0] : res[1];
         }

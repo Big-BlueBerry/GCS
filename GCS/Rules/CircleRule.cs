@@ -9,6 +9,7 @@ namespace GCS.Rules
         public Dot Dot { get; }
         public event Action<Vector2> MoveTo;
         protected float _angle;
+        protected float _cosangle, _sinangle;
 
         public CircleRule(Dot dot, Circle parent)
         {
@@ -16,12 +17,25 @@ namespace GCS.Rules
             Dot = dot;
             Dot.Rule = this;
             Parent = parent;
-            _angle = -1; throw new WorkWoorimException("웅림앙 angle 구해죠..");
+
+            float dx = parent.Center.Coord.X - Dot.Coord.X;
+            float dy = parent.Center.Coord.Y - Dot.Coord.Y;
+            _angle = (float) Math.Acos(parent.Radius / dx);
+            _cosangle = parent.Radius / dx;
+            _sinangle = parent.Radius / dy;
         }
 
         private void Parent_Moved()
         {
-            throw new WorkWoorimException("점이 원의 angle에 맞춰서...해야댐");
+            var p1 = Parent.Center.Coord;
+            float rad = Parent.Radius;
+            Vector2 moved = Vector2.Zero;
+            moved = new Vector2(p1.X + _cosangle * rad, p1.Y + _sinangle * rad);
+
+            Grid.Framework.Debug.WriteLine($"angle : {_angle}");
+            Grid.Framework.Debug.WriteLine(moved.ToString());
+
+            MoveTo?.Invoke(moved);
         }
 
         public Vector2 FixedCoord(Vector2 original)
