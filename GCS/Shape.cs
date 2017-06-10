@@ -93,14 +93,14 @@ namespace GCS
     public class Line : Shape
     {
         private Dot _p1;
-        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += () => { ResetAB(); Moved?.Invoke(); }; ResetAB(); Moved?.Invoke(); } }
+        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += dot_Moved; dot_Moved(); } }
         private Dot _p2;
-        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += () => { ResetAB(); Moved?.Invoke(); }; ResetAB(); Moved?.Invoke(); } }
+        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += dot_Moved; dot_Moved(); } }
 
         private float _grad;
-        public float Grad { get => _grad; set { _grad = value; ResetPoints(); Moved?.Invoke(); } }
+        public float Grad { get => _grad; set { _grad = value; dot_Moved(); } }
         private float _yint;
-        public float Yint { get => _yint; set { _yint = value; ResetPoints(); Moved?.Invoke(); } }
+        public float Yint { get => _yint; set { _yint = value; dot_Moved(); } }
         public override event Action Moved;
 
         public Line(Dot p1, Dot p2)
@@ -123,10 +123,16 @@ namespace GCS
         {
             _p1 = p1;
             _p2 = new Dot(Point1.Coord.X + 1, Point1.Coord.Y + grad);
-            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
-            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            _p1.Moved += dot_Moved;
+            _p2.Moved += dot_Moved;
             _grad = grad;
             _yint = p1.Coord.Y - grad * p1.Coord.X;
+        }
+
+        private void dot_Moved()
+        {
+            ResetAB();
+            Moved?.Invoke();
         }
 
         private void ResetAB()
@@ -139,8 +145,8 @@ namespace GCS
         {
             _p1 = new Dot(0, Yint);
             _p2 = new Dot(1, Grad + Yint);
-            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
-            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            _p1.Moved += dot_Moved;
+            _p2.Moved += dot_Moved;
         }
 
         public override void Draw(SpriteBatch sb)
@@ -164,9 +170,9 @@ namespace GCS
     public class Segment : Shape
     {
         private Dot _p1;
-        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += () => { ResetAB(); Moved?.Invoke(); }; ResetAB(); Moved?.Invoke(); } }
+        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += dot_Moved; dot_Moved(); } }
         private Dot _p2;
-        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += () => { ResetAB(); Moved?.Invoke(); }; ResetAB(); Moved?.Invoke(); } }
+        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += dot_Moved; dot_Moved(); } }
 
         public float Grad { get; private set; }
         public float Yint { get; private set; }
@@ -177,9 +183,15 @@ namespace GCS
         {
             _p1 = p1;
             _p2 = p2;
-            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
-            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            _p1.Moved += dot_Moved;
+            _p2.Moved += dot_Moved;
             ResetAB();
+        }
+
+        private void dot_Moved()
+        {
+            ResetAB();
+            Moved?.Invoke();
         }
 
         private void ResetAB()
