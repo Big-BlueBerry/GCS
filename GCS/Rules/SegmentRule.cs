@@ -36,10 +36,6 @@ namespace GCS.Rules
             Vector2 moved = Vector2.Zero;
             moved =  new Vector2((p2.X * _leftRatio + p1.X * (1 - _leftRatio)),
                                         (p2.Y * _leftRatio + p1.Y * (1 - _leftRatio)));
-
-            Grid.Framework.Debug.WriteLine($"leftratio : {_leftRatio}");
-            Grid.Framework.Debug.WriteLine(moved.ToString());
-
             MoveTo?.Invoke(moved);
             parent_Moved = false;
         }

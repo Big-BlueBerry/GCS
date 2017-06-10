@@ -32,11 +32,6 @@ namespace GCS.Rules
             Vector2 moved = Vector2.Zero;
             moved = new Vector2((p2.X * _leftRatio + p1.X * (1 - _leftRatio)),
                                         (p2.Y * _leftRatio + p1.Y * (1 - _leftRatio)));
-            /* 
-             * 우림 여기서 점이 라인 밖에 있으면 외분이잖아
-             * 외분이면 _leftRatio가 0 미만 혹은 1 초과가 되는데 그래도 잘 작동할까?
-             */
-
             MoveTo?.Invoke(moved);
         }
 
