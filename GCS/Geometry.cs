@@ -88,7 +88,7 @@ namespace GCS
 
         private static Vector2[] getIntersect(Line line, Circle circle)
         {
-            Vector2 d = line.Point2.Coord- line.Point1.Coord;
+            Vector2 d = line.Point2.Coord - line.Point1.Coord;
             float dr = d.Length();
             float D = (line.Point1.Coord.X - circle.Center.Coord.X) * (line.Point2.Coord.Y - circle.Center.Coord.Y)
                 - (line.Point2.Coord.X - circle.Center.Coord.X) * (line.Point1.Coord.Y - circle.Center.Coord.Y);
@@ -154,7 +154,7 @@ namespace GCS
         {
             float distance = (float)Math.Sqrt(Math.Pow(circle2.Center.Coord.X - circle1.Center.Coord.X, 2) + Math.Pow(circle2.Center.Coord.Y - circle1.Center.Coord.Y, 2));
 
-            if (distance == 0) return new Vector2[] { }; 
+            if (distance == 0) return new Vector2[] { };
             else if (distance > circle1.Radius + circle2.Radius) //두 원이 밖에 있으면서 만나지 않음.
             {
                 return new Vector2[] { };
@@ -216,7 +216,7 @@ namespace GCS
 
         public static float GetNearestDistance(Shape shape, Vector2 point)
         {
-            if(shape is Line)
+            if (shape is Line)
             {
                 Line line = (Line)shape;
                 return (float)(Math.Abs(line.Grad * point.X - point.Y + line.Yint) / Math.Sqrt(line.Grad * line.Grad + 1));

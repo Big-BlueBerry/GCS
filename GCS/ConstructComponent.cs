@@ -107,7 +107,7 @@ namespace GCS
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
             }
-            
+
             //선택, 가까이있는 점 선택
             foreach (var s in _shapes)
             {
@@ -175,7 +175,7 @@ namespace GCS
                         }
                     }
                 }
-                if(_isDragging || Scene.CurrentScene.IsLeftMouseClicking && Scene.CurrentScene.IsMouseMoved)
+                if (_isDragging || Scene.CurrentScene.IsLeftMouseClicking && Scene.CurrentScene.IsMouseMoved)
                 {
                     var diff = Scene.CurrentScene.MousePosition - Scene.CurrentScene.LastMousePosition;
                     if (_isDragging || _selectedShapes.Any(s => EnoughClose(s, _pos)))
@@ -210,7 +210,7 @@ namespace GCS
                 }
                 else
                 {
-                    if(d < dist)
+                    if (d < dist)
                     {
                         nearest = s;
                         dist = d;

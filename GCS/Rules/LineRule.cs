@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace GCS.Rules
 {
-    public  class LineRule : IParentRule
+    public class LineRule : IParentRule
     {
         public Line Parent;
         public Dot Dot { get; }

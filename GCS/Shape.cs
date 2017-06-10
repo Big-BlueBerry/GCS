@@ -38,7 +38,7 @@ namespace GCS
                 if (_center != null) _center.Moved -= _center_Moved;
                 _center = value;
                 if (_center != null) _center.Moved += _center_Moved;
-                
+
                 Moved?.Invoke();
             }
         }
@@ -53,7 +53,7 @@ namespace GCS
             get => _another;
             set
             {
-                if(_another != null) _another.Moved -= _another_Moved;
+                if (_another != null) _another.Moved -= _another_Moved;
                 _another = value;
                 if (_another != null) _another.Moved += _another_Moved;
                 Moved?.Invoke();

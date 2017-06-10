@@ -18,7 +18,7 @@ namespace GCS.Rules
             Dot.Rule = this;
             dot.Moved += Dot_Moved;
             Parent = parent;
-            
+
             _angle = getAngle();
         }
 

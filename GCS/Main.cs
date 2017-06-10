@@ -66,12 +66,12 @@ namespace GCS
             guiManagerComponent.GUIs.Add(_clearBtn);
 
             MainCamera.AddComponent<Grid.Framework.Components.Movable2DCamera>();
-            
+
             GameObject test = new GameObject("test");
             test.AddComponent<GeometryTestComponent>();
             test.Enabled = false;
             Instantiate(test);
-            
+
         }
 
         private void UpdateDrawState()
@@ -92,7 +92,6 @@ namespace GCS
         {
             base.Update(gameTime);
             UpdateDrawState();
-            Debug.WriteLine($"{ScreenBounds}");
         }
     }
 }
