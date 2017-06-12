@@ -186,6 +186,7 @@ namespace GCS
                     if (Scene.CurrentScene.IsLeftMouseUp)
                         _isDragging = false;
                 }
+
             }
         }
 
@@ -202,7 +203,7 @@ namespace GCS
             {
                 if (s is Dot)
                 {
-                    if (d < distDot && d < _nearDotDistance)
+                    if (d <= distDot && d <= _nearDotDistance)
                     {
                         nearestDot = s as Dot;
                         distDot = d;
@@ -210,7 +211,7 @@ namespace GCS
                 }
                 else
                 {
-                    if (d < dist)
+                    if (d <= dist)
                     {
                         nearest = s;
                         dist = d;
