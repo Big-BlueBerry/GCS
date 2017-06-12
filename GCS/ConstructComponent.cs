@@ -59,7 +59,7 @@ namespace GCS
                     keypoints.AddRange(dots.Where(d => !_shapes.Contains(d)));
             }
             _shapes.Add(shape);
-            _shapes.AddRange(keypoints);
+            //_shapes.AddRange(keypoints);
         }
 
         public override void Update()
@@ -112,7 +112,7 @@ namespace GCS
             foreach (var s in _shapes)
             {
                 var dist = Geometry.GetNearestDistance(s, _pos);
-                if (dist <= (s is Dot ? _nearDotDistance : _nearDistance))
+                if (EnoughClose(s, _pos))
                 {
                     if (!s.Focused)
                     {
@@ -220,24 +220,41 @@ namespace GCS
             }
             if (nearestDot == null) // 가장 가까운게 점이 아니라면
             {
+                if (_nearShapes.Count == 0)
+                    return new Dot(coord);
                 if (_nearShapes.Count == 1)
                 {
-                    IParentRule rule = null;
-                    Dot dot = new Dot(Geometry.GetNearest(nearest, coord));
-                    if (nearest is Line)
-                        rule = new LineRule(dot, nearest as Line);
-                    else if (nearest is Segment)
-                        rule = new SegmentRule(dot, nearest as Segment);
-                    else if (nearest is Circle)
-                        rule = new CircleRule(dot, nearest as Circle);
-                    else
-                        throw new System.Exception("일어날 수 없음");
-                    return dot;
+                    return OneShapeRuleDot(nearest, coord);
                 }
-                else return new Dot(coord); // 임시방편임
+                else if (_nearShapes.Count == 2)
+                {
+                    if (Geometry.GetIntersect(_nearShapes[0].Item1, _nearShapes[1].Item1).Length != 0)
+                    {
+                        Dot dot = new Dot(Geometry.GetIntersect(_nearShapes[0].Item1, _nearShapes[1].Item1)[0]);
+                        IntersectRule rule = new IntersectRule(dot, _nearShapes[0].Item1, _nearShapes[1].Item1);
+                        return dot;
+                    }
+                    else return OneShapeRuleDot(nearest, coord);
+                }
+                else return OneShapeRuleDot(nearest, coord);
             }
             else if (nearestDot is Dot) return nearestDot as Dot;
             else return new Dot(coord);
+        }
+
+        private Dot OneShapeRuleDot(Shape nearest, Vector2 coord)
+        {
+            IParentRule rule = null;
+            Dot dot = new Dot(Geometry.GetNearest(nearest, coord));
+            if (nearest is Line)
+                rule = new LineRule(dot, nearest as Line);
+            else if (nearest is Segment)
+                rule = new SegmentRule(dot, nearest as Segment);
+            else if (nearest is Circle)
+                rule = new CircleRule(dot, nearest as Circle);
+            else
+                throw new System.Exception("일어날 수 없음");
+            return dot;
         }
 
         private bool EnoughClose(Shape shape, Vector2 coord)

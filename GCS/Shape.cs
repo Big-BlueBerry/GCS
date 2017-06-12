@@ -7,6 +7,8 @@ namespace GCS
 {
     public abstract class Shape
     {
+        public bool Enabled { get; set; }
+
         public string Name { get; set; }
         public float Border { get; set; } = 2f;
         public Color Color { get; set; } = Color.Black;
