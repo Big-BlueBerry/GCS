@@ -12,6 +12,7 @@ namespace GCS.Rules
         private bool _parentMoved = false;
 
 
+
         public IntersectRule(Dot dot, Shape p1, Shape p2)
         {
             Dot = dot;
@@ -40,10 +41,14 @@ namespace GCS.Rules
         {
             _parentMoved = true;
             var vs = Geometry.GetIntersect(Parent1, Parent2);
-            if (vs.Length == 0) { Dot.Enabled = false; _parentMoved = false; return Vector2.Zero; }
+            if (vs.Length == 0) { Dot.Enabled = false; _parentMoved = false;  return Vector2.Zero; }
             else Dot.Enabled = true;
             _parentMoved = false;
-            return vs[0]; // 우림아 일해라~~~
+            if (vs.Length == 1)
+            {
+                return vs[0];
+            }
+            else return Vector2.Distance(vs[0], Dot.Coord) < Vector2.Distance(vs[1], Dot.Coord) ? vs[0] : vs[1];
         }
     }
 }
