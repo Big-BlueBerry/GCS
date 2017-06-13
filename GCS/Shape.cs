@@ -7,7 +7,7 @@ namespace GCS
 {
     public abstract class Shape
     {
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
 
         public string Name { get; set; }
         public float Border { get; set; } = 2f;
@@ -78,6 +78,7 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
+            if (!(Enabled && Center.Enabled && Another.Enabled)) return;
             base.Draw(sb);
             GUI.DrawCircle(sb, Center.Coord, Radius, Border, Color, Sides);
         }
@@ -154,6 +155,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
+            if (!(Enabled && Point1.Enabled && Point2.Enabled)) return;
             GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
         }
 
@@ -205,6 +207,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
+            if (!(Enabled && Point1.Enabled && Point2.Enabled)) return;
             GUI.DrawLine(sb, Point1.Coord, Point2.Coord, Border, Color);
         }
 
@@ -264,6 +267,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
+            if (!Enabled) return;
             GUI.DrawCircle(sb, Coord, 4f, Border, Color, 20);
             // GUI.DrawPoint(sb, Coord, Border, Color);
         }

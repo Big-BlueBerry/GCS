@@ -228,9 +228,16 @@ namespace GCS
                 }
                 else if (_nearShapes.Count == 2)
                 {
-                    if (Geometry.GetIntersect(_nearShapes[0].Item1, _nearShapes[1].Item1).Length != 0)
+                    Vector2[] intersects = Geometry.GetIntersect(_nearShapes[0].Item1, _nearShapes[1].Item1);
+                    if (intersects.Length != 0)
                     {
-                        Dot dot = new Dot(Geometry.GetIntersect(_nearShapes[0].Item1, _nearShapes[1].Item1)[0]);
+                        Dot dot;
+                        if (intersects.Length == 2)
+                         {
+                             dot = Vector2.Distance(intersects[0], coord) < Vector2.Distance(intersects[1], coord) ? new Dot(intersects[0]) : new Dot(intersects[1]);
+                         }
+                         else dot = new Dot(intersects[0]);
+                        //dot = new Dot(intersects[0]);
                         IntersectRule rule = new IntersectRule(dot, _nearShapes[0].Item1, _nearShapes[1].Item1);
                         return dot;
                     }

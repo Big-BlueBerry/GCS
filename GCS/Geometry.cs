@@ -231,5 +231,18 @@ namespace GCS
 
             throw new ArgumentException("뀨우;;;");
         }
+
+        private static Line GetIntersectLine(Circle circle, Dot dot)
+        {
+            if (Vector2.Distance(dot.Coord, circle.Center.Coord) != circle.Radius){
+                throw new ArgumentException("dot is not on circle");
+            }
+            else
+            {
+                Line rad = new Line(dot, circle.Center);
+                return new Line(dot, -1 / rad.Grad);
+            }
+        }
+        
     }
 }
