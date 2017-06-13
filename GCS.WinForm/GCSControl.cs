@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using WinFormsGraphicsDevice;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using GCS;
+using Grid.Framework;
 
 namespace GCS.WinForm
 {
@@ -12,7 +15,6 @@ namespace GCS.WinForm
     {
         protected override void Initialize()
         {
-
         }
         protected override void Draw()
         {
