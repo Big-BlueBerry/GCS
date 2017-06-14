@@ -232,10 +232,10 @@ namespace GCS
                     if (intersects.Length != 0)
                     {
                         Dot dot;
-                        if (intersects.Length == 2)
+                        if (intersects.Length == 2 )
                          {
-                             dot = Vector2.Distance(intersects[0], coord) < Vector2.Distance(intersects[1], coord) ? new Dot(intersects[0]) : new Dot(intersects[1]);
-                         }
+                            dot = Vector2.Distance(coord, intersects[0]) < Vector2.Distance(intersects[1], coord) ? new Dot(intersects[0]) : new Dot(intersects[1]);
+                        }
                          else dot = new Dot(intersects[0]);
                         //dot = new Dot(intersects[0]);
                         IntersectRule rule = new IntersectRule(dot, _nearShapes[0].Item1, _nearShapes[1].Item1);
