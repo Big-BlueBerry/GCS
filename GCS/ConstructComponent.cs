@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+
 namespace GCS
 {
     public class ConstructComponent : Renderable
@@ -22,6 +23,8 @@ namespace GCS
         private readonly float _nearDotDistance = 10;
         private List<(Shape, float)> _nearShapes;
         private List<Shape> _selectedShapes;
+        private List<IntersectRule> _currentRules=new List<IntersectRule>(); 
+        private List<ImportantAction> _actionStack=new List<ImportantAction>();
 
         public ConstructComponent()
         {
@@ -34,6 +37,56 @@ namespace GCS
         public void Clear()
         {
             _shapes.Clear();
+        }
+        public void Delete()// 여기 removeAll 이나 removeRange 같은 걸로 리팩토링 좀 해주셈 저것들 사용법 모름.
+        {
+            //그리고 for문 돌면서 리스트 객체들 없애면 예외 발생함
+            foreach (var shape in _selectedShapes)
+            {
+                _shapes.Remove(shape);
+                List<IntersectRule> temp = new List<IntersectRule>();
+                foreach (IntersectRule r in _currentRules)
+                {
+                    if (r.Parent1 == shape || r.Parent2 == shape)
+                    {
+                        Dot d = r.Dot;
+                        Vector2 newcoord = d.Coord;
+                        _shapes.Remove(d);
+                        foreach (var s in _shapes)//이건 _nearShapes 재설정 부분인데 코드 단축시켜야 될까?
+                        {
+                                var dist = Geometry.GetNearestDistance(s, newcoord);
+                                if (EnoughClose(s, newcoord))
+                                {
+                                    if (!s.Focused)
+                                    {
+                                        _nearShapes.Add((s, dist));
+                                        s.Focused = true;
+                                    }
+                                }
+                                else if (s.Focused)
+                                {
+                                    for (int i = 0; i < _nearShapes.Count; i++)
+                                    {
+                                        if (_nearShapes[i].Item1 == s)
+                                        {
+                                            _nearShapes.RemoveAt(i);
+                                            break;
+                                        }
+                                    }
+                                s.Focused = false;
+                                }
+                        }
+                        AddShape(GetDot(newcoord));
+                    }
+                }
+ 
+            }
+            _selectedShapes.Clear();
+        }
+
+        public void Undo()
+        {
+
         }
 
         public void ChangeState(DrawState state)
@@ -238,7 +291,8 @@ namespace GCS
                         }
                          else dot = new Dot(intersects[0]);
                         //dot = new Dot(intersects[0]);
-                        IntersectRule rule = new IntersectRule(dot, _nearShapes[0].Item1, _nearShapes[1].Item1);
+                        IntersectRule rule=new IntersectRule(dot, _nearShapes[0].Item1, _nearShapes[1].Item1);
+                        _currentRules.Add(rule);
                         return dot;
                     }
                     else return OneShapeRuleDot(nearest, coord);
