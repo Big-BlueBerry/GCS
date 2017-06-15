@@ -13,7 +13,7 @@ namespace GCS
 {
     public class Main : Scene
     {
-        private Button _compassBtn, _segmentBtn, _lineBtn, _dotBtn, _clearBtn;
+        private Button _compassBtn, _segmentBtn, _lineBtn, _dotBtn, _clearBtn, _deleteBtn, _undoBtn;
         private ConstructComponent _construct;
         protected override void Initialize()
         {
@@ -59,11 +59,15 @@ namespace GCS
             _lineBtn = new ImageButton(190, 10, 80, 80, LoadContent<Texture2D>("icon\\line"));
             _dotBtn = new ImageButton(280, 10, 80, 80, LoadContent<Texture2D>("icon\\dot"));
             _clearBtn = new Button(370, 10, 80, 80, "Clear") { Color = Color.Azure };
+            _deleteBtn = new Button(460, 10, 80, 80, "Delete") { Color=Color.Honeydew};
+            _undoBtn = new Button(550, 10, 80, 80, "Undo") { Color=Color.Violet};
             guiManagerComponent.GUIs.Add(_compassBtn);
             guiManagerComponent.GUIs.Add(_segmentBtn);
             guiManagerComponent.GUIs.Add(_lineBtn);
             guiManagerComponent.GUIs.Add(_dotBtn);
             guiManagerComponent.GUIs.Add(_clearBtn);
+            guiManagerComponent.GUIs.Add(_deleteBtn);
+            guiManagerComponent.GUIs.Add(_undoBtn);
 
             MainCamera.AddComponent<Grid.Framework.Components.Movable2DCamera>();
 
@@ -86,6 +90,10 @@ namespace GCS
                 _construct.ChangeState(DrawState.DOT);
             if (_clearBtn.IsMouseUp)
                 _construct.Clear();
+            if (_deleteBtn.IsMouseUp)
+                _construct.Delete();
+            if (_undoBtn.IsMouseUp)
+                _construct.Undo();
         }
 
         protected override void Update(GameTime gameTime)

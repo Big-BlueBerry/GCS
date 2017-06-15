@@ -12,7 +12,7 @@ namespace GCS.Rules
         private bool _parentMoved = false;
         private int _orientation=0;
         private int _firstdirection=0;
-
+        
         public IntersectRule(Dot dot, Shape p1, Shape p2)
         {
             Dot = dot;
