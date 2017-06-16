@@ -1,12 +1,15 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Grid.Framework;
+using Grid.Framework.Components;
+using GCS.Rules;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
 
 namespace GCS
 {
-    public enum Actions
+    public enum userActions
     {
         CREATE,
         DELETE,
@@ -15,12 +18,17 @@ namespace GCS
 
     public class ImportantAction
     {
-        public Actions action;
+        public userActions action;
+        public Shape subject;
+        public Vector2 [] movInfo;
         
-        public ImportantAction()
+        public ImportantAction(userActions action, Shape subject, Vector2 [] movInfo )
         {
-               
+            this.action = action;
+            this.subject = subject;
+            this.movInfo = movInfo;
         }
+
     }
  
 }

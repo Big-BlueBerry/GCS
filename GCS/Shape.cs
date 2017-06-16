@@ -2,6 +2,7 @@
 using Grid.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace GCS
 {
@@ -74,6 +75,8 @@ namespace GCS
         {
             Center = center;
             Another = another;
+            Center.dotParents.Add(this);
+            Another.dotParents.Add(this);
         }
 
         public override void Draw(SpriteBatch sb)
@@ -112,6 +115,8 @@ namespace GCS
             _p2 = p2;
             _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
             _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            Point1.dotParents.Add(this);
+            Point2.dotParents.Add(this);
             ResetAB();
         }
 
@@ -190,6 +195,8 @@ namespace GCS
             _p1.Moved += dot_Moved;
             _p2.Moved += dot_Moved;
             ResetAB();
+            Point1.dotParents.Add(this);
+            Point2.dotParents.Add(this);
         }
 
         private void dot_Moved()
@@ -232,6 +239,7 @@ namespace GCS
     {
         private Vector2 _coord;
         public Vector2 Coord { get => _coord; set { MoveTo(_coord); } }
+        public List<Shape> dotParents = new List<Shape>();
         private IParentRule _rule;
         public IParentRule Rule
         {

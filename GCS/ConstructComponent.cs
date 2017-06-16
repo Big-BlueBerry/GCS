@@ -38,13 +38,21 @@ namespace GCS
         {
             _shapes.Clear();
         }
-        public void Delete()// 여기 removeAll 이나 removeRange 같은 걸로 리팩토링 좀 해주셈 저것들 사용법 모름.
+        public void Delete()
         {
-            //그리고 for문 돌면서 리스트 객체들 없애면 예외 발생함
+            List<Shape> temp = new List<Shape>();
+            foreach (var shape in _selectedShapes)
+            {
+                if(shape is Dot)
+                {
+                    temp.AddRange(from s in (shape as Dot).dotParents select s );
+                }
+            }
+            _selectedShapes.AddRange(temp);
+
             foreach (var shape in _selectedShapes)
             {
                 _shapes.Remove(shape);
-                List<IntersectRule> temp = new List<IntersectRule>();
                 foreach (IntersectRule r in _currentRules)
                 {
                     if (r.Parent1 == shape || r.Parent2 == shape)
@@ -52,41 +60,42 @@ namespace GCS
                         Dot d = r.Dot;
                         Vector2 newcoord = d.Coord;
                         _shapes.Remove(d);
-                        foreach (var s in _shapes)//이건 _nearShapes 재설정 부분인데 코드 단축시켜야 될까?
+                        foreach (var s in _shapes)
                         {
-                                var dist = Geometry.GetNearestDistance(s, newcoord);
-                                if (EnoughClose(s, newcoord))
+                            var dist = Geometry.GetNearestDistance(s, newcoord);
+                            if (EnoughClose(s, newcoord))
+                            {
+                                if (!s.Focused)
                                 {
-                                    if (!s.Focused)
+                                    _nearShapes.Add((s, dist));
+                                    s.Focused = true;
+                                }
+                            }
+                            else if (s.Focused)
+                            {
+                                for (int i = 0; i < _nearShapes.Count; i++)
+                                {
+                                    if (_nearShapes[i].Item1 == s)
                                     {
-                                        _nearShapes.Add((s, dist));
-                                        s.Focused = true;
+                                        _nearShapes.RemoveAt(i);
+                                        break;
                                     }
                                 }
-                                else if (s.Focused)
-                                {
-                                    for (int i = 0; i < _nearShapes.Count; i++)
-                                    {
-                                        if (_nearShapes[i].Item1 == s)
-                                        {
-                                            _nearShapes.RemoveAt(i);
-                                            break;
-                                        }
-                                    }
                                 s.Focused = false;
-                                }
+                            }
                         }
                         AddShape(GetDot(newcoord));
                     }
                 }
- 
+
             }
             _selectedShapes.Clear();
+            //_actionStack.Add();
         }
 
         public void Undo()
         {
-
+            
         }
 
         public void ChangeState(DrawState state)
@@ -112,6 +121,7 @@ namespace GCS
                     keypoints.AddRange(dots.Where(d => !_shapes.Contains(d)));
             }
             _shapes.Add(shape);
+            //_actionStack.Add();
             //_shapes.AddRange(keypoints);
         }
 
@@ -126,7 +136,7 @@ namespace GCS
                 {
                     if (!_wasDrawing)
                     {
-                        _lastPoint = GetDot(_pos);
+                        _lastPoint = GetDot(_pos);  
                         _wasDrawing = true;
                     }
                     else if (_drawState == DrawState.DOT)
