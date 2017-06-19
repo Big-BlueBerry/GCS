@@ -23,8 +23,7 @@ namespace GCS
         private readonly float _nearDotDistance = 10;
         private List<(Shape, float)> _nearShapes;
         private List<Shape> _selectedShapes;
-        private List<IntersectRule> _currentRules=new List<IntersectRule>(); 
-        private List<ImportantAction> _actionStack=new List<ImportantAction>();
+        private List<IntersectRule> _currentRules = new List<IntersectRule>();
 
         public ConstructComponent()
         {
@@ -38,17 +37,15 @@ namespace GCS
         {
             _shapes.Clear();
         }
-        public void Delete()
+
+        public void DeleteSelected()
         {
-            List<Shape> temp = new List<Shape>();
-            foreach (var shape in _selectedShapes)
-            {
-                if(shape is Dot)
-                {
-                    temp.AddRange(from s in (shape as Dot).dotParents select s );
-                }
-            }
-            _selectedShapes.AddRange(temp);
+            var parents = from s in _selectedShapes
+                          where s is Dot
+                          from p in (s as Dot).dotParents
+                          select p;
+
+            _selectedShapes.AddRange(parents);
 
             foreach (var shape in _selectedShapes)
             {
@@ -60,37 +57,12 @@ namespace GCS
                         Dot d = r.Dot;
                         Vector2 newcoord = d.Coord;
                         _shapes.Remove(d);
-                        foreach (var s in _shapes)
-                        {
-                            var dist = Geometry.GetNearestDistance(s, newcoord);
-                            if (EnoughClose(s, newcoord))
-                            {
-                                if (!s.Focused)
-                                {
-                                    _nearShapes.Add((s, dist));
-                                    s.Focused = true;
-                                }
-                            }
-                            else if (s.Focused)
-                            {
-                                for (int i = 0; i < _nearShapes.Count; i++)
-                                {
-                                    if (_nearShapes[i].Item1 == s)
-                                    {
-                                        _nearShapes.RemoveAt(i);
-                                        break;
-                                    }
-                                }
-                                s.Focused = false;
-                            }
-                        }
                         AddShape(GetDot(newcoord));
                     }
                 }
 
             }
             _selectedShapes.Clear();
-            //_actionStack.Add();
         }
 
         public void Undo()

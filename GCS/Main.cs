@@ -91,7 +91,7 @@ namespace GCS
             if (_clearBtn.IsMouseUp)
                 _construct.Clear();
             if (_deleteBtn.IsMouseUp)
-                _construct.Delete();
+                _construct.DeleteSelected();
             if (_undoBtn.IsMouseUp)
                 _construct.Undo();
         }
