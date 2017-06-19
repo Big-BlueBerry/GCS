@@ -54,10 +54,10 @@ namespace GCS
                 {
                     if (r.Parent1 == shape || r.Parent2 == shape)
                     {
-                        Dot d = r.Dot;
-                        Vector2 newcoord = d.Coord;
-                        _shapes.Remove(d);
-                        AddShape(GetDot(newcoord));
+                        _shapes.Remove(r.Dot);
+                        var nears = new List<(Shape, float)>();
+                        GetNearShapes(ref nears, r.Dot.Coord);
+                        AddShape(GetDot(r.Dot.Coord, nears));
                     }
                 }
 
@@ -67,7 +67,7 @@ namespace GCS
 
         public void Undo()
         {
-            
+            throw new WorkWoorimException("해야지");
         }
 
         public void ChangeState(DrawState state)
@@ -84,17 +84,7 @@ namespace GCS
         private void AddShape(Shape shape)
         {
             if (_shapes.Contains(shape)) return;
-            var keypoints = new List<Shape>();
-            foreach (var s in _shapes)
-            {
-                var dots = from d in Geometry.GetIntersect(shape, s)
-                           select new Dot(d);
-                if (dots.Count() != 0)
-                    keypoints.AddRange(dots.Where(d => !_shapes.Contains(d)));
-            }
             _shapes.Add(shape);
-            //_actionStack.Add();
-            //_shapes.AddRange(keypoints);
         }
 
         public override void Update()
@@ -108,7 +98,7 @@ namespace GCS
                 {
                     if (!_wasDrawing)
                     {
-                        _lastPoint = GetDot(_pos);  
+                        _lastPoint = GetDot(_pos);
                         _wasDrawing = true;
                     }
                     else if (_drawState == DrawState.DOT)
@@ -144,30 +134,7 @@ namespace GCS
             }
 
             //선택, 가까이있는 점 선택
-            foreach (var s in _shapes)
-            {
-                var dist = Geometry.GetNearestDistance(s, _pos);
-                if (EnoughClose(s, _pos))
-                {
-                    if (!s.Focused)
-                    {
-                        _nearShapes.Add((s, dist));
-                        s.Focused = true;
-                    }
-                }
-                else if (s.Focused)
-                {
-                    for (int i = 0; i < _nearShapes.Count; i++)
-                    {
-                        if (_nearShapes[i].Item1 == s)
-                        {
-                            _nearShapes.RemoveAt(i);
-                            break;
-                        }
-                    }
-                    s.Focused = false;
-                }
-            }
+            GetNearShapes(ref _nearShapes, _pos);
 
             if (_drawState == DrawState.NONE)
             {
@@ -225,16 +192,19 @@ namespace GCS
             }
         }
 
+        private Dot GetDot(Vector2 coord)
+            => GetDot(coord, _nearShapes);
+
         /// <summary>
         /// 가까운 점이 있다면 그 점을, 없다면 새 점을
         /// </summary>
-        private Dot GetDot(Vector2 coord)
+        private Dot GetDot(Vector2 coord, List<(Shape, float)> nears)
         {
             Dot nearestDot = null;
             float distDot = _nearDotDistance;
             Shape nearest = null;
             float dist = _nearDistance;
-            foreach (var (s, d) in _nearShapes)
+            foreach (var (s, d) in nears)
             {
                 if (s is Dot)
                 {
@@ -255,25 +225,25 @@ namespace GCS
             }
             if (nearestDot == null) // 가장 가까운게 점이 아니라면
             {
-                if (_nearShapes.Count == 0)
+                if (nears.Count == 0)
                     return new Dot(coord);
-                if (_nearShapes.Count == 1)
+                if (nears.Count == 1)
                 {
                     return OneShapeRuleDot(nearest, coord);
                 }
-                else if (_nearShapes.Count == 2)
+                else if (nears.Count == 2)
                 {
-                    Vector2[] intersects = Geometry.GetIntersect(_nearShapes[0].Item1, _nearShapes[1].Item1);
+                    Vector2[] intersects = Geometry.GetIntersect(nears[0].Item1, nears[1].Item1);
                     if (intersects.Length != 0)
                     {
                         Dot dot;
-                        if (intersects.Length == 2 )
-                         {
+                        if (intersects.Length == 2)
+                        {
                             dot = Vector2.Distance(coord, intersects[0]) < Vector2.Distance(intersects[1], coord) ? new Dot(intersects[0]) : new Dot(intersects[1]);
                         }
-                         else dot = new Dot(intersects[0]);
+                        else dot = new Dot(intersects[0]);
                         //dot = new Dot(intersects[0]);
-                        IntersectRule rule=new IntersectRule(dot, _nearShapes[0].Item1, _nearShapes[1].Item1);
+                        IntersectRule rule = new IntersectRule(dot, nears[0].Item1, nears[1].Item1);
                         _currentRules.Add(rule);
                         return dot;
                     }
@@ -304,6 +274,35 @@ namespace GCS
         {
             var distance = Geometry.GetNearestDistance(shape, coord);
             return shape is Dot ? distance <= _nearDotDistance : distance <= _nearDistance;
+        }
+
+        private void GetNearShapes(ref List<(Shape, float)> res, Vector2 coord)
+        {
+            if (res == null) res = new List<(Shape, float)>();
+            foreach (var s in _shapes)
+            {
+                var dist = Geometry.GetNearestDistance(s, coord);
+                if (EnoughClose(s, coord))
+                {
+                    if (!s.Focused)
+                    {
+                        res.Add((s, dist));
+                        s.Focused = true;
+                    }
+                }
+                else if (s.Focused)
+                {
+                    for (int i = 0; i < res.Count; i++)
+                    {
+                        if (res[i].Item1 == s)
+                        {
+                            res.RemoveAt(i);
+                            break;
+                        }
+                    }
+                    s.Focused = false;
+                }
+            }
         }
 
         public override void Draw(SpriteBatch sb)
