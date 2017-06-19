@@ -10,7 +10,7 @@ namespace GCS.Rules
         public event Action<Vector2> MoveTo;
         protected float _leftRatio;
 
-        bool parent_Moved = false;
+        bool _parentMoved = false;
 
         public SegmentRule(Dot dot, Segment parent)
         {
@@ -24,13 +24,13 @@ namespace GCS.Rules
 
         private void Dot_Moved()
         {
-            if (!parent_Moved)
+            if (!_parentMoved)
                 _leftRatio = (Dot.Coord.X - Parent.Point1.Coord.X) / (Parent.Point2.Coord.X - Parent.Point1.Coord.X);
         }
 
         private void Parent_Moved()
         {
-            parent_Moved = true;
+            _parentMoved = true;
             var p1 = Parent.Point1.Coord;
             var p2 = Parent.Point2.Coord;
             Vector2 moved = Vector2.Zero;
@@ -38,7 +38,7 @@ namespace GCS.Rules
             moved = new Vector2((p2.X * _leftRatio + p1.X * (1 - _leftRatio)),
                                         (p2.Y * _leftRatio + p1.Y * (1 - _leftRatio)));
             MoveTo?.Invoke(moved);
-            parent_Moved = false;
+            _parentMoved = false;
         }
 
         public Vector2 FixedCoord(Vector2 original)

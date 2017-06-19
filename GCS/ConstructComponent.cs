@@ -45,7 +45,7 @@ namespace GCS
                           from p in (s as Dot).dotParents
                           select p;
 
-            _selectedShapes.AddRange(parents);
+            _selectedShapes.AddRange(parents.ToArray());
 
             foreach (var shape in _selectedShapes)
             {
