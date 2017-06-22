@@ -16,5 +16,20 @@ namespace GCS.WinForm
         {
             InitializeComponent();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.gcsControl1.DrawState = DrawState.CIRCLE;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.gcsControl1.DrawState = DrawState.LINE;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.gcsControl1.DrawState = DrawState.DOT;
+        }
     }
 }

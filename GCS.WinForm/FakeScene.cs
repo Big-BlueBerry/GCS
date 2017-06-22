@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Graphics;
 using Grid.Framework;
 
 namespace GCS.WinForm
 {
-    public class GCSScene : Scene
+    public class FakeScene : Scene
     {
-        protected override void Initialize()
+        public new GraphicsDevice GraphicsDevice;
+        public FakeScene()
         {
-            base.Initialize();
+            CurrentScene = this;
         }
     }
 }

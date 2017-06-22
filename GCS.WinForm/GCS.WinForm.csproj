@@ -59,10 +59,10 @@
     <Compile Include="EditorForm.Designer.cs">
       <DependentUpon>EditorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FakeScene.cs" />
     <Compile Include="GCSControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GCSScene.cs" />
     <Compile Include="GraphicsDeviceControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -70,6 +70,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceContainer.cs" />
+    <Compile Include="Trans.cs" />
     <EmbeddedResource Include="EditorForm.resx">
       <DependentUpon>EditorForm.cs</DependentUpon>
     </EmbeddedResource>
