@@ -143,7 +143,7 @@ namespace GCS
                     if (Scene.CurrentScene.IsLeftMouseDown)
                     {
                         float dist = int.MaxValue;
-                        foreach (var s in _shapes)
+                        foreach (var s in _nearShapes)
                         {
                             if (s is Dot)
                             {
