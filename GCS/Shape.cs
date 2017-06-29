@@ -8,6 +8,8 @@ namespace GCS
 {
     public abstract class Shape
     {
+        private static readonly float _nearDistance = 5;
+
         public bool Enabled { get; set; } = true;
 
         public string Name { get; set; }
@@ -20,6 +22,10 @@ namespace GCS
         /// 마우스를 떼면 Selected가 false가 되어야 하는가?
         /// </summary>
         internal bool UnSelect { get; set; } = false;
+        /// <summary>
+        /// 커서와의 거리
+        /// </summary>
+        public float Distance { get; set; } = -1;
         public virtual void Draw(SpriteBatch sb)
         {
             Color = Color.Black;
@@ -27,6 +33,18 @@ namespace GCS
             if (Selected) Color = Color.Cyan;
         }
         public abstract void Move(Vector2 add);
+
+        public virtual bool IsEnoughClose(Vector2 coord)
+            => Distance <= _nearDistance;
+
+        public virtual void Update(Vector2 cursor)
+        {
+            Distance = Geometry.GetNearestDistance(this, cursor);
+            if (IsEnoughClose(cursor))
+                Focused = true;
+            else if (Focused)
+                Focused = false;
+        }
     }
 
     public class Circle : Shape
@@ -237,6 +255,8 @@ namespace GCS
 
     public class Dot : Shape
     {
+        private static readonly float _nearDotDistance = 10;
+
         private Vector2 _coord;
         public Vector2 Coord { get => _coord; set { MoveTo(_coord); } }
         public List<Shape> dotParents = new List<Shape>();
@@ -293,5 +313,8 @@ namespace GCS
 
         public override void Move(Vector2 add)
             => MoveTo(Coord + add);
+
+        public override bool IsEnoughClose(Vector2 coord)
+            => Distance <= _nearDotDistance;
     }
 }
