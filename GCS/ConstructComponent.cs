@@ -20,13 +20,14 @@ namespace GCS
         private Vector2 _pos;
         private List<Shape> _nearShapes;
         private List<Shape> _selectedShapes;
-        private List<IntersectRule> _currentRules = new List<IntersectRule>();
+        private List<IParentRule> _currentRules;
 
         public ConstructComponent()
         {
             _shapes = new List<Shape>();
             _nearShapes = new List<Shape>();
             _selectedShapes = new List<Shape>();
+            _currentRules = new List<IParentRule>();
             OnCamera = false;
         }
 
@@ -47,17 +48,13 @@ namespace GCS
             foreach (var shape in _selectedShapes)
             {
                 _shapes.Remove(shape);
-                foreach (IntersectRule r in _currentRules)
+                foreach (IParentRule r in _currentRules)
                 {
-                    if (r.Parent1 == shape || r.Parent2 == shape)
+                    if (r.IsParent(shape))
                     {
-                        _shapes.Remove(r.Dot);
-                        var nears = new List<(Shape, float)>();
-                        //GetNearShapes(ref nears, r.Dot.Coord);
-                        //AddShape(GetDot(r.Dot.Coord, nears));
+                        shape.DetachRule(r);
                     }
                 }
-
             }
             _selectedShapes.Clear();
         }
@@ -90,6 +87,8 @@ namespace GCS
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
             _pos = Mouse.GetState().Position.ToVector2();
             foreach (var s in _shapes) s.Update(_pos);
+            //선택, 가까이있는 점 선택
+            _nearShapes = _shapes.Where(s => s.Focused).ToList();
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
@@ -131,10 +130,7 @@ namespace GCS
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
             }
-
-            //선택, 가까이있는 점 선택
-            _nearShapes = _shapes.Where(s => s.Focused).ToList();
-
+            
             if (_drawState == DrawState.NONE)
             {
                 if (_nearShapes.Count > 0)
@@ -256,16 +252,8 @@ namespace GCS
 
         private Dot OneShapeRuleDot(Shape nearest, Vector2 coord)
         {
-            IParentRule rule = null;
             Dot dot = new Dot(Geometry.GetNearest(nearest, coord));
-            if (nearest is Line)
-                rule = new LineRule(dot, nearest as Line);
-            else if (nearest is Segment)
-                rule = new SegmentRule(dot, nearest as Segment);
-            else if (nearest is Circle)
-                rule = new CircleRule(dot, nearest as Circle);
-            else
-                throw new System.Exception("일어날 수 없음");
+            _currentRules.Add(nearest.GetNearDot(dot));
             return dot;
         }
 

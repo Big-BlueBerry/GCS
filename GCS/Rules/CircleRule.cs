@@ -6,7 +6,7 @@ namespace GCS.Rules
     public class CircleRule : IParentRule
     {
         public Circle Parent;
-        public Dot Dot { get; }
+        public Dot Dot { get; private set; }
         public event Action<Vector2> MoveTo;
         protected float _angle;
         private bool _parentMoved = false;
@@ -47,5 +47,15 @@ namespace GCS.Rules
         {
             return Geometry.GetNearest(Parent, original);
         }
+
+        public void Dispose()
+        {
+            Parent = null;
+            Dot = null;
+            MoveTo = null;
+        }
+
+        public bool IsParent(Shape shape)
+            => Parent == shape;
     }
 }

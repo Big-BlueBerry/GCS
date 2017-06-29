@@ -7,7 +7,7 @@ namespace GCS.Rules
     public class LineRule : IParentRule
     {
         public Line Parent;
-        public Dot Dot { get; }
+        public Dot Dot { get; private set; }
         public event Action<Vector2> MoveTo;
         protected float _leftRatio;
         private bool _parentMoved;
@@ -47,5 +47,15 @@ namespace GCS.Rules
         {
             return Geometry.GetNearest(Parent, original);
         }
+
+        public void Dispose()
+        {
+            Parent = null;
+            Dot = null;
+            MoveTo = null;
+        }
+
+        public bool IsParent(Shape shape)
+            => Parent == shape;
     }
 }

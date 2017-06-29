@@ -45,6 +45,34 @@ namespace GCS
             else if (Focused)
                 Focused = false;
         }
+
+        public void DetachRule(IParentRule rule)
+        {
+            // rule이 IntersectRule 이면 반대쪽 남은 도형 하나에 붙여야 함
+            // rule이 Circle/Line/SegmentRule 이면 Rule 없는 점이 되어야 함
+
+            if(rule is Rules.IntersectRule)
+            {
+                var r = rule as Rules.IntersectRule;
+                if (r.Parent1 == this)
+                    r.Dot.Rule = r.Parent2.GetNearDot(r.Dot);
+                else if (r.Parent2 == this)
+                    r.Dot.Rule = r.Parent1.GetNearDot(r.Dot);
+                else
+                    throw new ArgumentException("Parent가 둘다 아닐 수 있나? 너의 인생은 잘못됬어");
+
+                r.Dispose();
+            }
+            else
+            {
+                rule.Dot.Rule = null;
+            }
+        }
+
+        /// <summary>
+        /// 주어진 점에 자신을 부모로 생각하는 IParentRule 을 리턴해줌
+        /// </summary>
+        public abstract IParentRule GetNearDot(Dot dot);
     }
 
     public class Circle : Shape
@@ -112,6 +140,9 @@ namespace GCS
                 Another.Move(add);
             Moved?.Invoke();
         }
+
+        public override IParentRule GetNearDot(Dot dot)
+            => new Rules.CircleRule(dot, this);
     }
 
     public class Line : Shape
@@ -192,6 +223,9 @@ namespace GCS
 
             Moved?.Invoke();
         }
+
+        public override IParentRule GetNearDot(Dot dot)
+            => new Rules.LineRule(dot, this);
     }
 
     public class Segment : Shape
@@ -251,6 +285,9 @@ namespace GCS
 
             Moved?.Invoke();
         }
+
+        public override IParentRule GetNearDot(Dot dot)
+            => new Rules.SegmentRule(dot, this);
     }
 
     public class Dot : Shape
@@ -316,5 +353,10 @@ namespace GCS
 
         public override bool IsEnoughClose(Vector2 coord)
             => Distance <= _nearDotDistance;
+
+        public override IParentRule GetNearDot(Dot dot)
+        {
+            throw new ArgumentException("Dot에서 이 메서드가 호출되면 안되지 바보야");
+        }
     }
 }

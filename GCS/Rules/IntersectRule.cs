@@ -7,7 +7,7 @@ namespace GCS.Rules
     {
         public Shape Parent1;
         public Shape Parent2;
-        public Dot Dot { get; }
+        public Dot Dot { get; private set; }
         public event Action<Vector2> MoveTo;
         private bool _parentMoved = false;
         private int _orientation=0;
@@ -130,5 +130,18 @@ namespace GCS.Rules
             if (l.Grad * d.X + l.Yint > d.Y) return -1;
             else return 1;
         }
+
+        public void Dispose()
+        {
+            Parent1.Moved -= Parent_Moved;
+            Parent2.Moved -= Parent_Moved;
+            Parent1 = null;
+            Parent2 = null;
+            Dot = null;
+            MoveTo = null;
+        }
+
+        public bool IsParent(Shape shape)
+            => Parent1 == shape || Parent2 == shape;
     }
 }
