@@ -34,6 +34,7 @@ namespace GCS
         public void Clear()
         {
             _shapes.Clear();
+            _selectedShapes.Clear();
         }
 
         public void DeleteSelected()
@@ -130,29 +131,30 @@ namespace GCS
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
             }
-            
+
             if (_drawState == DrawState.NONE)
             {
                 if (_nearShapes.Count > 0)
                 {
                     Shape nearest = _nearShapes[0];
+
+                    float dist = int.MaxValue;
+                    foreach (var s in _nearShapes)
+                    {
+                        if (s is Dot)
+                        {
+                            // 다 끝났다 그지 깽깽이들아!! 점이 우선순위 최고다!
+                            nearest = s;
+                            break;
+                        }
+                        if (dist > s.Distance)
+                        {
+                            nearest = s;
+                            dist = s.Distance;
+                        }
+                    }
                     if (Scene.CurrentScene.IsLeftMouseDown)
                     {
-                        float dist = int.MaxValue;
-                        foreach (var s in _nearShapes)
-                        {
-                            if (s is Dot)
-                            {
-                                // 다 끝났다 그지 깽깽이들아!! 점이 우선순위 최고다!
-                                nearest = s;
-                                break;
-                            }
-                            if (dist > s.Distance)
-                            {
-                                nearest = s;
-                                dist = s.Distance;
-                            }
-                        }
                         if (!nearest.Selected)
                         {
                             _selectedShapes.ForEach(s => s.UnSelect = true);
@@ -163,6 +165,7 @@ namespace GCS
                         else
                             nearest.UnSelect = true;
                     }
+
                     if (Scene.CurrentScene.IsLeftMouseUp)
                     {
                         if (nearest.Selected && nearest.UnSelect)
