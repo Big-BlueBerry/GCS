@@ -6,7 +6,7 @@ namespace GCS.Rules
 {
     public class LineRule : IParentRule
     {
-        public Line Parent;
+        private Line _parent;
         public Dot Dot { get; private set; }
         public event Action<Vector2> MoveTo;
         protected float _leftRatio;
@@ -18,21 +18,21 @@ namespace GCS.Rules
             Dot = dot;
             dot.Moved += Dot_Moved;
             Dot.Rule = this;
-            Parent = parent;
-            _leftRatio = (Dot.Coord.X - Parent.Point1.Coord.X) / (Parent.Point2.Coord.X - Parent.Point1.Coord.X);
+            _parent = parent;
+            _leftRatio = (Dot.Coord.X - _parent.Point1.Coord.X) / (_parent.Point2.Coord.X - _parent.Point1.Coord.X);
         }
 
         private void Dot_Moved()
         {
             if (!_parentMoved)
-                _leftRatio = (Dot.Coord.X - Parent.Point1.Coord.X) / (Parent.Point2.Coord.X - Parent.Point1.Coord.X);
+                _leftRatio = (Dot.Coord.X - _parent.Point1.Coord.X) / (_parent.Point2.Coord.X - _parent.Point1.Coord.X);
         }
 
         private void Parent_Moved()
         {
             _parentMoved = true;
-            var p1 = Parent.Point1.Coord;
-            var p2 = Parent.Point2.Coord;
+            var p1 = _parent.Point1.Coord;
+            var p2 = _parent.Point2.Coord;
             Vector2 moved = Vector2.Zero;
             moved = new Vector2((p2.X * _leftRatio + p1.X * (1 - _leftRatio)),
                                         (p2.Y * _leftRatio + p1.Y * (1 - _leftRatio)));
@@ -45,17 +45,19 @@ namespace GCS.Rules
 
         public Vector2 FixedCoord(Vector2 original)
         {
-            return Geometry.GetNearest(Parent, original);
+            return Geometry.GetNearest(_parent, original);
         }
 
         public void Dispose()
         {
-            Parent = null;
+            _parent.Moved -= Parent_Moved;
+            Dot.Moved -= Dot_Moved;
+            _parent = null;
             Dot = null;
             MoveTo = null;
         }
 
         public bool IsParent(Shape shape)
-            => Parent == shape;
+            => _parent == shape;
     }
 }

@@ -5,8 +5,8 @@ namespace GCS.Rules
 {
     public class IntersectRule : IParentRule
     {
-        public Shape Parent1;
-        public Shape Parent2;
+        public Shape Parent1 { get; private set; }
+        public Shape Parent2 { get; private set; }
         public Dot Dot { get; private set; }
         public event Action<Vector2> MoveTo;
         private bool _parentMoved = false;
@@ -135,6 +135,7 @@ namespace GCS.Rules
         {
             Parent1.Moved -= Parent_Moved;
             Parent2.Moved -= Parent_Moved;
+            Dot.Moved -= Dot_Moved;
             Parent1 = null;
             Parent2 = null;
             Dot = null;

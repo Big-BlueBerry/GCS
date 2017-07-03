@@ -66,6 +66,7 @@ namespace GCS
             else
             {
                 rule.Dot.Rule = null;
+                rule.Dispose();
             }
         }
 
@@ -357,6 +358,18 @@ namespace GCS
         public override IParentRule GetNearDot(Dot dot)
         {
             throw new ArgumentException("Dot에서 이 메서드가 호출되면 안되지 바보야");
+        }
+
+        public void Attach(Dot dot)
+        {
+            dot._coord = this.Coord;
+            Rules.FollowRule rule = new Rules.FollowRule(dot, this);
+        }
+
+        public void Detach(Dot dot)
+        {
+            dot.Rule = null;
+            dot.Rule.Dispose();
         }
     }
 }

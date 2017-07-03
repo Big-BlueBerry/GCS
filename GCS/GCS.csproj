@@ -51,6 +51,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rules\CircleRule.cs" />
+    <Compile Include="Rules\FollowRule.cs" />
     <Compile Include="Rules\IntersectRule.cs" />
     <Compile Include="Rules\LineRule.cs" />
     <Compile Include="Rules\SegmentRule.cs" />
