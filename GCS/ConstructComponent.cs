@@ -132,6 +132,31 @@ namespace GCS
                 _drawState = DrawState.NONE;
             }
 
+            if(_drawState == DrawState.NONE)
+            {
+                if (Mouse.GetState().MiddleButton == ButtonState.Pressed)
+                {
+                    if (_selectedShapes.Count == 1)
+                    {
+                        if (_selectedShapes[0] is Dot)
+                        {
+                            if (_nearShapes.Count > 0)
+                            {
+                                var parent = GetDot(_pos);
+                                if(_shapes.Contains(parent))
+                                {
+                                    parent.Attach(_selectedShapes[0] as Dot);
+                                }
+                                else
+                                {
+                                    throw new WorkWoorimException("Rule을 Copy해야함");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (_drawState == DrawState.NONE)
             {
                 if (_nearShapes.Count > 0)
@@ -153,6 +178,7 @@ namespace GCS
                             dist = s.Distance;
                         }
                     }
+
                     if (Scene.CurrentScene.IsLeftMouseDown)
                     {
                         if (!nearest.Selected)

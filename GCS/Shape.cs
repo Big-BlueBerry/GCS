@@ -340,13 +340,23 @@ namespace GCS
 
         private void _rule_MoveTo(Vector2 obj)
         {
+            if (fixed_triggerd) return;
             MoveTo(obj);
         }
 
+        bool fixed_triggerd = false;
         public void MoveTo(Vector2 to)
         {
-            _coord = Rule?.FixedCoord(to) ?? to;
+            fixed_triggerd = true;
+            if (Rule != null)
+            {
+                _coord = Rule.FixedCoord(to);
+            }
+            else
+                _coord = to;
+
             Moved?.Invoke();
+            fixed_triggerd = false;
         }
 
         public override void Move(Vector2 add)
@@ -370,6 +380,11 @@ namespace GCS
         {
             dot.Rule = null;
             dot.Rule.Dispose();
+        }
+
+        internal void SetCoordForce(Vector2 coord)
+        {
+            _coord = coord;
         }
     }
 }
