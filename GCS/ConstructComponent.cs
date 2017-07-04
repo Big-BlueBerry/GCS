@@ -143,14 +143,8 @@ namespace GCS
                             if (_nearShapes.Count > 0)
                             {
                                 var parent = GetDot(_pos);
-                                if (_shapes.Contains(parent))
-                                {
-                                    parent.Attach(_selectedShapes[0] as Dot);
-                                }
-                                else
-                                {
-                                    throw new WorkWoorimException("Rule을 Copy해야함");
-                                }
+                                AddShape(parent);
+                                parent.Attach(_selectedShapes[0] as Dot);
                             }
                         }
                     }
@@ -184,7 +178,14 @@ namespace GCS
                         if (!nearest.Selected)
                         {
                             _selectedShapes.ForEach(s => s.UnSelect = true);
+
+                            NEAR_LOOP:
                             _selectedShapes.Add(nearest);
+                            if (nearest is Dot && (nearest as Dot).Rule is FollowRule)
+                            {
+                                nearest = ((nearest as Dot).Rule as FollowRule).Parent;
+                                goto NEAR_LOOP;
+                            }
                             nearest.Selected = true;
                             nearest.UnSelect = false;
                         }

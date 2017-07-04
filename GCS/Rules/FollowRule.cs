@@ -6,6 +6,7 @@ namespace GCS.Rules
     public class FollowRule : IParentRule
     {
         private Dot _parent;
+        public Dot Parent => _parent;
         public Dot Dot { get; private set; }
         public event Action<Vector2> MoveTo;
 
