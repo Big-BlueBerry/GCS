@@ -28,7 +28,8 @@ namespace GCS.Rules
         private void Parent_Moved()
         {
             _parentMoved = true;
-            Dot.SetCoordForce(_parent.Coord);
+            //Dot.SetCoordForce(_parent.Coord);
+            //Dot.MoveTo(_parent.Coord);
             MoveTo?.Invoke(_parent.Coord);
             _parentMoved = false;
         }

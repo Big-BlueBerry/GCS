@@ -131,10 +131,10 @@ namespace GCS
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
             }
-
-            if(_drawState == DrawState.NONE)
+            
+            if (_drawState == DrawState.NONE)
             {
-                if (Mouse.GetState().MiddleButton == ButtonState.Pressed)
+                if (Scene.CurrentScene.IsMiddleMouseDown)
                 {
                     if (_selectedShapes.Count == 1)
                     {
@@ -143,7 +143,7 @@ namespace GCS
                             if (_nearShapes.Count > 0)
                             {
                                 var parent = GetDot(_pos);
-                                if(_shapes.Contains(parent))
+                                if (_shapes.Contains(parent))
                                 {
                                     parent.Attach(_selectedShapes[0] as Dot);
                                 }
@@ -201,6 +201,14 @@ namespace GCS
                         }
                     }
                 }
+                else
+                {
+                    if (Scene.CurrentScene.IsLeftMouseUp)
+                    {
+                        _selectedShapes.ForEach(s => { s.UnSelect = true; s.Selected = false; });
+                        _selectedShapes.Clear();
+                    }
+                }
                 if (_isDragging || Scene.CurrentScene.IsLeftMouseClicking && Scene.CurrentScene.IsMouseMoved)
                 {
                     var diff = Scene.CurrentScene.MousePosition - Scene.CurrentScene.LastMousePosition;
@@ -212,7 +220,6 @@ namespace GCS
                     if (Scene.CurrentScene.IsLeftMouseUp)
                         _isDragging = false;
                 }
-
             }
         }
 
