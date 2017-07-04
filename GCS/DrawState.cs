@@ -12,6 +12,7 @@ namespace GCS
         CIRCLE,
         SEGMENT,
         LINE,
+        VECTOR,
         DOT
     }
 }

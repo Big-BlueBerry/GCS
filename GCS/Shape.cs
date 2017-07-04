@@ -235,7 +235,7 @@ namespace GCS
         public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += dot_Moved; dot_Moved(); } }
         private Dot _p2;
         public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += dot_Moved; dot_Moved(); } }
-
+        
         public float Grad { get; private set; }
         public float Yint { get; private set; }
 
@@ -289,6 +289,40 @@ namespace GCS
 
         public override IParentRule GetNearDot(Dot dot)
             => new Rules.SegmentRule(dot, this);
+    }
+    
+    public class Vector : Segment
+    {
+        readonly static float arrowAngle = (float)Math.PI/6;
+        readonly static float arrowlength = 20;
+
+        //Point2 가 종점임.
+        public Vector(Dot p1, Dot p2) : base(p1, p2)
+        {
+           
+        }
+
+        public override void Draw(SpriteBatch sb)
+        {
+            base.Draw(sb);
+            Vector2 del = Point2.Coord - Point1.Coord;
+            Vector2 delta1, delta2;
+            float angle = (float)Math.Atan(del.Y/del.X);
+            Vector2 Initvector = new Vector2(Point1.Coord.X + Vector2.Distance(Point1.Coord, Point2.Coord), Point1.Coord.Y);
+            delta1 = new Vector2((float)(Initvector.X - arrowlength*Math.Cos(arrowAngle)) , (float)(Initvector.Y + arrowlength*Math.Sin(arrowAngle)));
+            delta2 = new Vector2((float)(Initvector.X - arrowlength * Math.Cos(arrowAngle)), (float)(Initvector.Y - arrowlength * Math.Sin(arrowAngle)));
+            if(del.X >0)
+            {
+                GUI.DrawLine(sb, Point2.Coord, Point1.Coord + Geometry.Rotate(delta1 - Point1.Coord, angle), Border, Color);
+                GUI.DrawLine(sb, Point2.Coord, Point1.Coord + Geometry.Rotate(delta2 - Point1.Coord, angle), Border, Color);
+            }
+            else
+            {
+                GUI.DrawLine(sb, Point2.Coord, Point1.Coord - Geometry.Rotate(delta1 - Point1.Coord, angle), Border, Color);
+                GUI.DrawLine(sb, Point2.Coord, Point1.Coord - Geometry.Rotate(delta2 - Point1.Coord, angle), Border, Color);
+            }
+
+        }
     }
 
     public class Dot : Shape

@@ -141,6 +141,8 @@ namespace GCS.Rules
             Dot = null;
             MoveTo = null;
         }
+        
+        //Simulator
 
         public bool IsParent(Shape shape)
             => Parent1 == shape || Parent2 == shape;

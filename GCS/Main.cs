@@ -13,7 +13,7 @@ namespace GCS
 {
     public class Main : Scene
     {
-        private Button _compassBtn, _segmentBtn, _lineBtn, _dotBtn, _clearBtn, _deleteBtn, _undoBtn;
+        private Button _compassBtn, _segmentBtn, _lineBtn, _dotBtn, _vectorBtn, _clearBtn, _deleteBtn, _undoBtn;
         private ConstructComponent _construct;
         protected override void Initialize()
         {
@@ -56,13 +56,15 @@ namespace GCS
             GUIManager.DefaultFont = LoadContent<SpriteFont>("basicfont");
             _compassBtn = new ImageButton(10, 10, 80, 80, LoadContent<Texture2D>("icon\\circle"));
             _segmentBtn = new ImageButton(100, 10, 80, 80, LoadContent<Texture2D>("icon\\segment"));
-            _lineBtn = new ImageButton(190, 10, 80, 80, LoadContent<Texture2D>("icon\\line"));
-            _dotBtn = new ImageButton(280, 10, 80, 80, LoadContent<Texture2D>("icon\\dot"));
-            _clearBtn = new Button(370, 10, 80, 80, "Clear") { Color = Color.Azure };
-            _deleteBtn = new Button(460, 10, 80, 80, "Delete") { Color=Color.Honeydew};
-            _undoBtn = new Button(550, 10, 80, 80, "Undo") { Color=Color.Violet};
+            _vectorBtn = new ImageButton(190, 10, 80, 80, LoadContent<Texture2D>("icon\\vector"));
+            _lineBtn = new ImageButton(280, 10, 80, 80, LoadContent<Texture2D>("icon\\line"));
+            _dotBtn = new ImageButton(370, 10, 80, 80, LoadContent<Texture2D>("icon\\dot"));
+            _clearBtn = new Button(460, 10, 80, 80, "Clear") { Color = Color.Azure };
+            _deleteBtn = new Button(550, 10, 80, 80, "Delete") { Color=Color.Honeydew};
+            _undoBtn = new Button(640, 10, 80, 80, "Undo") { Color=Color.Violet};
             guiManagerComponent.GUIs.Add(_compassBtn);
             guiManagerComponent.GUIs.Add(_segmentBtn);
+            guiManagerComponent.GUIs.Add(_vectorBtn);
             guiManagerComponent.GUIs.Add(_lineBtn);
             guiManagerComponent.GUIs.Add(_dotBtn);
             guiManagerComponent.GUIs.Add(_clearBtn);
@@ -88,6 +90,8 @@ namespace GCS
                 _construct.ChangeState(DrawState.LINE);
             if (_dotBtn.IsMouseUp)
                 _construct.ChangeState(DrawState.DOT);
+            if (_vectorBtn.IsMouseUp)
+                _construct.ChangeState(DrawState.VECTOR);
             if (_clearBtn.IsMouseUp)
                 _construct.Clear();
             if (_deleteBtn.IsMouseUp)

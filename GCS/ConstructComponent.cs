@@ -127,6 +127,10 @@ namespace GCS
                     {
                         AddShape(new Line(_lastPoint, p));
                     }
+                    else if(_drawState == DrawState.VECTOR)
+                    {
+                        AddShape(new Vector(_lastPoint, p));
+                    }
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
@@ -309,6 +313,10 @@ namespace GCS
                 else if (_drawState == DrawState.SEGMENT)
                 {
                     GUI.DrawLine(sb, _lastPoint.Coord, _pos, 2, Color.DarkGray);
+                }
+                else if (_drawState == DrawState.VECTOR)
+                {
+                    new Vector(_lastPoint, new Dot(_pos)).Draw(sb);
                 }
                 else if (_drawState == DrawState.LINE)
                 {

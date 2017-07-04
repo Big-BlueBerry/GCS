@@ -231,5 +231,9 @@ namespace GCS
 
             throw new ArgumentException("뀨우;;;");
         }
+        public static Vector2 Rotate(Vector2 vec, float angle)
+        {
+                return new Vector2((float)(vec.X * Math.Cos(angle) - vec.Y * Math.Sin(angle)), (float)(vec.X * Math.Sin(angle) + vec.Y * Math.Cos(angle)));
+        }
     }
 }
