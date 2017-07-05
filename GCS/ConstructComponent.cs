@@ -187,8 +187,12 @@ namespace GCS
                             _selectedShapes.Add(nearest);
                             if (nearest is Dot && (nearest as Dot).Rule is FollowRule)
                             {
-                                nearest = ((nearest as Dot).Rule as FollowRule).Parent;
-                                goto NEAR_LOOP;
+                                var p = ((nearest as Dot).Rule as FollowRule).Parent;
+                                if (nearest != p)
+                                {
+                                    nearest = p;
+                                    goto NEAR_LOOP;
+                                }
                             }
                             nearest.Selected = true;
                             nearest.UnSelect = false;
