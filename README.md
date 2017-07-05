@@ -41,3 +41,5 @@ Geometric Construction Simulator, 작도 시뮬레이션 프로그램
 - [ ] WinForm 으로 포팅
 - [ ] 복사/붙여넣기
 - [x] 점 병합
+- [ ] 점 분리
+- [ ] 파일로 저장
