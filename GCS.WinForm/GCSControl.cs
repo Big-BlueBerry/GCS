@@ -36,7 +36,7 @@ namespace GCS.WinForm
         protected override void Draw()
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            _spriteBatch.BeginAA();
+            _spriteBatch.Begin();
             if(_isDrawing)
             {
                 if (DrawState == DrawState.CIRCLE)
