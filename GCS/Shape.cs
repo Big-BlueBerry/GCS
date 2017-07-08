@@ -146,17 +146,54 @@ namespace GCS
             => new Rules.CircleRule(dot, this);
     }
 
-    public class Line : Shape
+    public abstract class LineLike : Shape
     {
-        private Dot _p1;
+        protected Dot _p1;
         public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += dot_Moved; dot_Moved(); } }
-        private Dot _p2;
+        protected Dot _p2;
         public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += dot_Moved; dot_Moved(); } }
 
-        private float _grad;
+        protected float _grad;
         public float Grad { get => _grad; set { _grad = value; dot_Moved(); } }
-        private float _yint;
+        protected float _yint;
         public float Yint { get => _yint; set { _yint = value; dot_Moved(); } }
+
+        public override event Action Moved;
+
+        protected void dot_Moved()
+        {
+            ResetAB();
+            Moved?.Invoke();
+        }
+
+        protected void ResetAB()
+        {
+            _grad = (Point2.Coord - Point1.Coord).Y / (Point2.Coord - Point1.Coord).X;
+            _yint = (Point1.Coord.Y) - Grad * Point1.Coord.X;
+        }
+
+        protected void ResetPoints()
+        {
+            _p1 = new Dot(0, Yint);
+            _p2 = new Dot(1, Grad + Yint);
+            _p1.Moved += dot_Moved;
+            _p2.Moved += dot_Moved;
+        }
+
+        public override void Move(Vector2 add)
+        {
+            if (!_p1.Selected)
+                _p1.Move(add);
+            if (!_p2.Selected)
+                _p2.Move(add);
+            ResetAB();
+
+            Moved?.Invoke();
+        }
+    }
+
+    public class Line : LineLike
+    {
         public override event Action Moved;
 
         public Line(Dot p1, Dot p2)
@@ -186,59 +223,20 @@ namespace GCS
             _grad = grad;
             _yint = p1.Coord.Y - grad * p1.Coord.X;
         }
-
-        private void dot_Moved()
-        {
-            ResetAB();
-            Moved?.Invoke();
-        }
-
-        private void ResetAB()
-        {
-            _grad = (Point2.Coord - Point1.Coord).Y / (Point2.Coord - Point1.Coord).X;
-            _yint = (Point1.Coord.Y) - Grad * Point1.Coord.X;
-        }
-
-        private void ResetPoints()
-        {
-            _p1 = new Dot(0, Yint);
-            _p2 = new Dot(1, Grad + Yint);
-            _p1.Moved += dot_Moved;
-            _p2.Moved += dot_Moved;
-        }
-
+        
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
             if (!(Enabled && Point1.Enabled && Point2.Enabled)) return;
             GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
         }
-
-        public override void Move(Vector2 add)
-        {
-            if (!_p1.Selected)
-                _p1.Move(add);
-            if (!_p2.Selected)
-                _p2.Move(add);
-            ResetAB();
-
-            Moved?.Invoke();
-        }
-
+        
         public override IParentRule GetNearDot(Dot dot)
             => new Rules.LineRule(dot, this);
     }
 
-    public class Segment : Shape
+    public class Segment : LineLike
     {
-        private Dot _p1;
-        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += dot_Moved; dot_Moved(); } }
-        private Dot _p2;
-        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += dot_Moved; dot_Moved(); } }
-        
-        public float Grad { get; private set; }
-        public float Yint { get; private set; }
-
         public override event Action Moved;
 
         public Segment(Dot p1, Dot p2)
@@ -251,19 +249,7 @@ namespace GCS
             Point1.dotParents.Add(this);
             Point2.dotParents.Add(this);
         }
-
-        private void dot_Moved()
-        {
-            ResetAB();
-            Moved?.Invoke();
-        }
-
-        private void ResetAB()
-        {
-            Grad = (Point2.Coord - Point1.Coord).Y / (Point2.Coord - Point1.Coord).X;
-            Yint = (Point1.Coord.Y) - Grad * Point1.Coord.X;
-        }
-
+        
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
@@ -274,17 +260,6 @@ namespace GCS
         public Line ToLine()
         {
             return new Line(Grad, Yint);
-        }
-
-        public override void Move(Vector2 add)
-        {
-            if (!_p1.Selected)
-                _p1.Move(add);
-            if (!_p2.Selected)
-                _p2.Move(add);
-            ResetAB();
-
-            Moved?.Invoke();
         }
 
         public override IParentRule GetNearDot(Dot dot)
