@@ -124,6 +124,14 @@ namespace GCS
             //선택, 가까이있는 점 선택
             _nearShapes = _shapes.Where(s => s.Focused).ToList();
 
+            UpdateAdding();
+            UpdateAttach();
+            UpdateSelect();
+            UpdateDrag();
+        }
+
+        private void UpdateAdding()
+        {
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 if (_drawState != DrawState.NONE)
@@ -151,7 +159,7 @@ namespace GCS
                     AddShape(_lastPoint);
                     _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { p }, null));
                     _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
-                    Shape sp=null;
+                    Shape sp = null;
                     if (_drawState == DrawState.CIRCLE)
                     {
                         sp = new Circle(_lastPoint, p);
@@ -167,7 +175,7 @@ namespace GCS
                         sp = new Line(_lastPoint, p);
                         AddShape(sp);
                     }
-                    else if(_drawState == DrawState.VECTOR)
+                    else if (_drawState == DrawState.VECTOR)
                     {
                         sp = new Vector(_lastPoint, p);
                         AddShape(sp);
@@ -177,7 +185,10 @@ namespace GCS
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
             }
-            
+        }
+
+        private void UpdateAttach()
+        {
             if (_drawState == DrawState.NONE)
             {
                 if (Scene.CurrentScene.IsMiddleMouseDown)
@@ -196,7 +207,10 @@ namespace GCS
                     }
                 }
             }
+        }
 
+        private void UpdateSelect()
+        {
             if (_drawState == DrawState.NONE)
             {
                 if (_nearShapes.Count > 0)
@@ -260,6 +274,13 @@ namespace GCS
                         _selectedShapes.Clear();
                     }
                 }
+            }
+        }
+
+        private void UpdateDrag()
+        {
+            if (_drawState == DrawState.NONE)
+            {
                 if (_isDragging || Scene.CurrentScene.IsLeftMouseClicking && Scene.CurrentScene.IsMouseMoved)
                 {
                     var diff = Scene.CurrentScene.MousePosition - Scene.CurrentScene.LastMousePosition;
@@ -270,8 +291,6 @@ namespace GCS
                     }
                     if (Scene.CurrentScene.IsLeftMouseUp)
                         _isDragging = false;
-
-                        
                 }
             }
         }
