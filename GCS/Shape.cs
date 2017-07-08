@@ -160,6 +160,17 @@ namespace GCS
 
         public override event Action Moved;
 
+        public LineLike(Dot p1, Dot p2)
+        {
+            _p1 = p1;
+            _p2 = p2;
+            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
+            Point1.dotParents.Add(this);
+            Point2.dotParents.Add(this);
+            ResetAB();
+        }
+
         protected void dot_Moved()
         {
             ResetAB();
@@ -194,35 +205,11 @@ namespace GCS
 
     public class Line : LineLike
     {
-        public override event Action Moved;
-
-        public Line(Dot p1, Dot p2)
+        public Line(Dot p1, Dot p2) : base(p1, p2)
         {
-            _p1 = p1;
-            _p2 = p2;
-            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
-            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
-            Point1.dotParents.Add(this);
-            Point2.dotParents.Add(this);
-            ResetAB();
-        }
 
-        public Line(float grad, float yint)
-        {
-            _grad = grad;
-            _yint = yint;
-            ResetPoints();
         }
-
-        public Line(Dot p1, float grad)
-        {
-            _p1 = p1;
-            _p2 = new Dot(Point1.Coord.X + 1, Point1.Coord.Y + grad);
-            _p1.Moved += dot_Moved;
-            _p2.Moved += dot_Moved;
-            _grad = grad;
-            _yint = p1.Coord.Y - grad * p1.Coord.X;
-        }
+        
         
         public override void Draw(SpriteBatch sb)
         {
@@ -237,17 +224,9 @@ namespace GCS
 
     public class Segment : LineLike
     {
-        public override event Action Moved;
-
-        public Segment(Dot p1, Dot p2)
+        public Segment(Dot p1, Dot p2) : base(p1, p2)
         {
-            _p1 = p1;
-            _p2 = p2;
-            _p1.Moved += dot_Moved;
-            _p2.Moved += dot_Moved;
-            ResetAB();
-            Point1.dotParents.Add(this);
-            Point2.dotParents.Add(this);
+
         }
         
         public override void Draw(SpriteBatch sb)
@@ -259,7 +238,7 @@ namespace GCS
 
         public Line ToLine()
         {
-            return new Line(Grad, Yint);
+            return new Line(Point1, Point2);
         }
 
         public override IParentRule GetNearDot(Dot dot)
