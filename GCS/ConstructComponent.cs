@@ -21,6 +21,7 @@ namespace GCS
         private List<Shape> _nearShapes;
         private List<Shape> _selectedShapes;
         private List<IParentRule> _currentRules;
+        private Stack<ImportantAction> _doneActions;
 
         public ConstructComponent()
         {
@@ -28,25 +29,34 @@ namespace GCS
             _nearShapes = new List<Shape>();
             _selectedShapes = new List<Shape>();
             _currentRules = new List<IParentRule>();
+            _doneActions = new Stack<ImportantAction>();
             OnCamera = false;
         }
 
         public void Clear()
         {
+            _doneActions.Push(new ImportantAction(userActions.CLEAR, _shapes.ToArray() , null));
             _shapes.Clear();
             _selectedShapes.Clear();
         }
 
         public void DeleteSelected()
         {
-            var parents = from s in _selectedShapes
+            Delete(_selectedShapes);
+            _doneActions.Push(new ImportantAction(userActions.DELETE, _selectedShapes.ToArray(), null));
+            _selectedShapes.Clear();
+        }
+
+        private void Delete(List<Shape> target)
+        {
+            var parents = from s in target
                           where s is Dot
                           from p in (s as Dot).dotParents
                           select p;
 
-            _selectedShapes.AddRange(parents.ToArray());
+            target.AddRange(parents.ToArray());
 
-            foreach (var shape in _selectedShapes)
+            foreach (var shape in target)
             {
                 _shapes.Remove(shape);
                 foreach (IParentRule r in _currentRules)
@@ -57,12 +67,35 @@ namespace GCS
                     }
                 }
             }
-            _selectedShapes.Clear();
         }
 
-        public void Undo()
+        public void Undo() 
         {
-            throw new WorkWoorimException("해야지");
+            if (_doneActions.Count == 0) return;
+            ImportantAction ac = _doneActions.Pop();
+            switch (ac.action)
+            {
+                case userActions.CREATE:
+                    Delete(ac.subject.ToList());
+                    
+                    while (_doneActions.Count != 0)
+                    {
+                        if (!_shapes.Contains(_doneActions.Peek().subject[0]))
+                            _doneActions.Pop();
+                        else break;
+                    }
+                    break;
+                case userActions.CLEAR:
+                    _shapes.AddRange(ac.subject.ToList());
+                    break;
+                case userActions.MOVE:
+                    break;
+                case userActions.DELETE:
+                    break;
+                case userActions.MERGE:
+                    break;
+            }
+
         }
 
         public void ChangeState(DrawState state)
@@ -109,28 +142,37 @@ namespace GCS
                 if (_drawState == DrawState.DOT)
                 {
                     AddShape(_lastPoint);
+                    _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
                 }
                 else
                 {
                     var p = GetDot(_pos);
                     AddShape(p);
                     AddShape(_lastPoint);
+                    _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { p }, null));
+                    _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
+                    Shape sp=null;
                     if (_drawState == DrawState.CIRCLE)
                     {
-                        AddShape(new Circle(_lastPoint, p));
+                        sp = new Circle(_lastPoint, p);
+                        AddShape(sp);
                     }
                     else if (_drawState == DrawState.SEGMENT)
                     {
-                        AddShape(new Segment(_lastPoint, p));
+                        sp = new Segment(_lastPoint, p);
+                        AddShape(sp);
                     }
                     else if (_drawState == DrawState.LINE)
                     {
-                        AddShape(new Line(_lastPoint, p));
+                        sp = new Line(_lastPoint, p);
+                        AddShape(sp);
                     }
                     else if(_drawState == DrawState.VECTOR)
                     {
-                        AddShape(new Vector(_lastPoint, p));
+                        sp = new Vector(_lastPoint, p);
+                        AddShape(sp);
                     }
+                    _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { sp }, null));
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
@@ -228,6 +270,8 @@ namespace GCS
                     }
                     if (Scene.CurrentScene.IsLeftMouseUp)
                         _isDragging = false;
+
+                        
                 }
             }
         }

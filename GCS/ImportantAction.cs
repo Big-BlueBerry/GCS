@@ -13,16 +13,18 @@ namespace GCS
     {
         CREATE,
         DELETE,
-        MOVE
+        MOVE,
+        CLEAR,
+        MERGE
     }
 
     public class ImportantAction
     {
         public userActions action;
-        public Shape subject;
+        public Shape [] subject;
         public Vector2 [] movInfo;
         
-        public ImportantAction(userActions action, Shape subject, Vector2 [] movInfo )
+        public ImportantAction(userActions action, Shape [] subject, Vector2 [] movInfo )
         {
             this.action = action;
             this.subject = subject;
