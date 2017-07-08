@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Grid.Framework;
 using Grid.Framework.Components;
+using Grid.Framework.GUIs;
 using GCS.Rules;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -22,6 +23,7 @@ namespace GCS
         private List<Shape> _selectedShapes;
         private List<IParentRule> _currentRules;
         private Stack<ImportantAction> _doneActions;
+        private MenuStrip _shapeMenuStrip;
 
         public ConstructComponent()
         {
@@ -31,6 +33,15 @@ namespace GCS
             _currentRules = new List<IParentRule>();
             _doneActions = new Stack<ImportantAction>();
             OnCamera = false;
+        }
+
+        public override void Start()
+        {
+            base.Start();
+
+            _shapeMenuStrip = new MenuStrip();
+            _shapeMenuStrip.Items.Add(new MenuStripItem("Delete"));
+            Scene.CurrentScene.GuiManager.GetComponent<GUIManager>().GUIs.Add(_shapeMenuStrip);
         }
 
         public void Clear()
@@ -47,16 +58,17 @@ namespace GCS
             _selectedShapes.Clear();
         }
 
-        private void Delete(List<Shape> target)
+        private void Delete(IEnumerable<Shape> target)
         {
+            var targetList = target.ToList();
             var parents = from s in target
                           where s is Dot
                           from p in (s as Dot).dotParents
                           select p;
 
-            target.AddRange(parents.ToArray());
+            targetList.AddRange(parents.ToArray());
 
-            foreach (var shape in target)
+            foreach (var shape in targetList)
             {
                 _shapes.Remove(shape);
                 foreach (IParentRule r in _currentRules)
@@ -115,6 +127,26 @@ namespace GCS
             _shapes.Add(shape);
         }
 
+        private void Select(Shape shape)
+        {
+            shape.Selected = true;
+            shape.UnSelect = false;
+            _selectedShapes.Add(shape);
+        }
+
+        private void Unselect(Shape shape)
+        {
+            shape.UnSelect = true;
+            shape.Selected = false;
+            _selectedShapes.Remove(shape);
+        }
+
+        private void UnselectAll()
+        {
+            _selectedShapes.ForEach(s => { s.UnSelect = true; s.Selected = false; });
+            _selectedShapes.Clear();
+        }
+
         public override void Update()
         {
             base.Update();
@@ -124,6 +156,7 @@ namespace GCS
             //선택, 가까이있는 점 선택
             _nearShapes = _shapes.Where(s => s.Focused).ToList();
 
+            UpdateRightClick();
             UpdateAdding();
             UpdateAttach();
             UpdateSelect();
@@ -270,8 +303,7 @@ namespace GCS
                 {
                     if (Scene.CurrentScene.IsLeftMouseUp)
                     {
-                        _selectedShapes.ForEach(s => { s.UnSelect = true; s.Selected = false; });
-                        _selectedShapes.Clear();
+                        UnselectAll();
                     }
                 }
             }
@@ -292,6 +324,27 @@ namespace GCS
                     if (Scene.CurrentScene.IsLeftMouseUp)
                         _isDragging = false;
                 }
+            }
+        }
+
+        private void UpdateRightClick()
+        {
+            // 우선 테스트 정도로 작동 대충 되도록 짜봤음
+            if(_drawState == DrawState.NONE)
+            {
+                if(_nearShapes.Count == 1)
+                {
+                    if(Scene.CurrentScene.IsRightMouseUp)
+                    {
+                        UnselectAll();
+                        Select(_nearShapes[0]);
+                        _shapeMenuStrip.Show(Scene.CurrentScene.MousePosition.X, Scene.CurrentScene.MousePosition.Y);
+                    }
+                }
+
+                if (_shapeMenuStrip.IsSelected)
+                    if (_shapeMenuStrip.SelectedIndex == 0)
+                        DeleteSelected();
             }
         }
 
