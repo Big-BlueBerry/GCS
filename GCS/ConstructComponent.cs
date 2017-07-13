@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-
 namespace GCS
 {
     public class ConstructComponent : Renderable
@@ -343,7 +342,7 @@ namespace GCS
                 }
 
                 if (_shapeMenuStrip.IsSelected)
-                    if (_shapeMenuStrip.SelectedIndex == 0)
+                    if (_shapeMenuStrip.SelectedItem.Text == "Delete")
                         DeleteSelected();
             }
         }

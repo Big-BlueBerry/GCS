@@ -53,15 +53,16 @@ namespace GCS
             _construct.Enabled = true;
             Instantiate(con);
 
-            GUIManager.DefaultFont = LoadContent<SpriteFont>("basicfont");
+            Resources.LoadAll();
+
             _compassBtn = new ImageButton(10, 10, 80, 80, LoadContent<Texture2D>("icon\\circle"));
             _segmentBtn = new ImageButton(100, 10, 80, 80, LoadContent<Texture2D>("icon\\segment"));
             _vectorBtn = new ImageButton(190, 10, 80, 80, LoadContent<Texture2D>("icon\\vector"));
             _lineBtn = new ImageButton(280, 10, 80, 80, LoadContent<Texture2D>("icon\\line"));
             _dotBtn = new ImageButton(370, 10, 80, 80, LoadContent<Texture2D>("icon\\dot"));
-            _clearBtn = new Button(460, 10, 80, 80, "Clear") { Color = Color.Azure };
-            _deleteBtn = new Button(550, 10, 80, 80, "Delete") { Color=Color.Honeydew};
-            _undoBtn = new Button(640, 10, 80, 80, "Undo") { Color=Color.Violet};
+            _clearBtn = new Button(460, 10, 80, 80, "Clear") { BackColor = Color.Azure };
+            _deleteBtn = new Button(550, 10, 80, 80, "Delete") { BackColor = Color.Honeydew};
+            _undoBtn = new Button(640, 10, 80, 80, "Undo") { BackColor = Color.Violet};
             guiManagerComponent.GUIs.Add(_compassBtn);
             guiManagerComponent.GUIs.Add(_segmentBtn);
             guiManagerComponent.GUIs.Add(_vectorBtn);

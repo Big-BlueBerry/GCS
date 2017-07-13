@@ -13,13 +13,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin basicfont.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:basicfont.spritefont
-
 #begin icon/circle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -91,4 +84,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:icon/vector.png
+
+#begin Grid/defaultFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Grid/defaultFont.spritefont
 
