@@ -15,6 +15,8 @@ namespace GCS
         internal List<Shape> Parents { get; private set; } = new List<Shape>();
         internal List<Shape> Childs { get; private set; } = new List<Shape>();
 
+        protected ShapeRule _rule = null;
+
         public bool Enabled { get; set; } = true;
 
         public string Name { get; set; }
@@ -63,8 +65,33 @@ namespace GCS
                 child.Delete();
         }
 
-        public virtual void MovedFromParent() { }
-        public virtual void MovedFromChild() { }
+        /// <summary>
+        /// 이 도형의 상위 객체가 움직였을 때 이 메서드가 호출됨
+        /// </summary>
+        public virtual void MovedFromParent()
+        {
+            _rule?.OnParentMoved();
+            // 점이 아니면 상위 객체를 움직인다
+            if (!(this is Dot))
+                foreach (var parent in Parents)
+                    parent.MovedFromParent();
+        }
+
+        /// <summary>
+        /// 이 도형의 하위 객체가 움직였을 때 이 메서드가 호출됨
+        /// </summary>
+        public virtual void MovedFromChild()
+        {
+            _rule?.OnChildMoved();
+
+            foreach (var child in Childs)
+                child.MovedFromChild();
+        }
+
+        public virtual void MoveTo(Vector2 delta)
+        {
+            _rule?.OnSelfMoved();
+        }
     }
 
     public class Circle : Shape
