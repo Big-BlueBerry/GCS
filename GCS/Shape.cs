@@ -6,9 +6,14 @@ using System.Collections.Generic;
 
 namespace GCS
 {
-    public abstract class Shape
+    public abstract partial class Shape
     {
         private static readonly float _nearDistance = 5;
+
+        private ShapeManager _manager;
+
+        internal List<Shape> Parents { get; private set; } = new List<Shape>();
+        internal List<Shape> Childs { get; private set; } = new List<Shape>();
 
         public bool Enabled { get; set; } = true;
 
@@ -34,6 +39,11 @@ namespace GCS
         }
         public abstract void Move(Vector2 add);
 
+        public Shape(ShapeManager manager)
+        {
+            _manager = manager;
+        }
+
         public virtual bool IsEnoughClose(Vector2 coord)
             => Distance <= _nearDistance;
 
@@ -46,34 +56,15 @@ namespace GCS
                 Focused = false;
         }
 
-        public void DetachRule(IParentRule rule)
+        public void Delete()
         {
-            // rule이 IntersectRule 이면 반대쪽 남은 도형 하나에 붙여야 함
-            // rule이 Circle/Line/SegmentRule 이면 Rule 없는 점이 되어야 함
-
-            if(rule is Rules.IntersectRule)
-            {
-                var r = rule as Rules.IntersectRule;
-                if (r.Parent1 == this)
-                    r.Dot.Rule = r.Parent2.GetNearDot(r.Dot);
-                else if (r.Parent2 == this)
-                    r.Dot.Rule = r.Parent1.GetNearDot(r.Dot);
-                else
-                    throw new ArgumentException("Parent가 둘다 아닐 수 있나? 너의 인생은 잘못됬어");
-
-                r.Dispose();
-            }
-            else
-            {
-                rule.Dot.Rule = null;
-                rule.Dispose();
-            }
+            _manager.DeleteShapes(Childs);
+            foreach (var child in Childs)
+                child.Delete();
         }
 
-        /// <summary>
-        /// 주어진 점에 자신을 부모로 생각하는 IParentRule 을 리턴해줌
-        /// </summary>
-        public abstract IParentRule GetNearDot(Dot dot);
+        public virtual void MovedFromParent() { }
+        public virtual void MovedFromChild() { }
     }
 
     public class Circle : Shape
@@ -203,7 +194,7 @@ namespace GCS
         }
     }
 
-    public class Line : LineLike
+    public partial class Line : LineLike
     {
         public Line(Dot p1, Dot p2) : base(p1, p2)
         {
