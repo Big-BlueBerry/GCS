@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Grid.Framework;
 using Grid.Framework.Components;
 using Grid.Framework.GUIs;
-using GCS.Rules;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -15,13 +14,11 @@ namespace GCS
         private DrawState _drawState = DrawState.NONE;
         private bool _wasDrawing = false;
         private bool _isDragging = false;
-        private Dot _lastPoint = new Dot(0, 0);
+        private Dot _lastPoint;
         private List<Shape> _shapes;
         private Vector2 _pos;
         private List<Shape> _nearShapes;
         private List<Shape> _selectedShapes;
-        private List<IParentRule> _currentRules;
-        private Stack<ImportantAction> _doneActions;
         private MenuStrip _shapeMenuStrip;
 
         public ConstructComponent()
@@ -29,8 +26,7 @@ namespace GCS
             _shapes = new List<Shape>();
             _nearShapes = new List<Shape>();
             _selectedShapes = new List<Shape>();
-            _currentRules = new List<IParentRule>();
-            _doneActions = new Stack<ImportantAction>();
+            _lastPoint = new Dot(0, 0);
             OnCamera = false;
         }
 
@@ -45,7 +41,6 @@ namespace GCS
 
         public void Clear()
         {
-            _doneActions.Push(new ImportantAction(userActions.CLEAR, _shapes.ToArray() , null));
             _shapes.Clear();
             _selectedShapes.Clear();
         }
@@ -53,60 +48,17 @@ namespace GCS
         public void DeleteSelected()
         {
             Delete(_selectedShapes);
-            _doneActions.Push(new ImportantAction(userActions.DELETE, _selectedShapes.ToArray(), null));
             _selectedShapes.Clear();
         }
 
         private void Delete(IEnumerable<Shape> target)
         {
-            var targetList = target.ToList();
-            var parents = from s in target
-                          where s is Dot
-                          from p in (s as Dot).dotParents
-                          select p;
-
-            targetList.AddRange(parents.ToArray());
-
-            foreach (var shape in targetList)
-            {
-                _shapes.Remove(shape);
-                foreach (IParentRule r in _currentRules)
-                {
-                    if (r.IsParent(shape))
-                    {
-                        shape.DetachRule(r);
-                    }
-                }
-            }
+            throw new WorkWoorimException("리팩토링 하느라 구현 안함");
         }
 
-        public void Undo() 
+        public void Undo()
         {
-            if (_doneActions.Count == 0) return;
-            ImportantAction ac = _doneActions.Pop();
-            switch (ac.action)
-            {
-                case userActions.CREATE:
-                    Delete(ac.subject.ToList());
-                    
-                    while (_doneActions.Count != 0)
-                    {
-                        if (!_shapes.Contains(_doneActions.Peek().subject[0]))
-                            _doneActions.Pop();
-                        else break;
-                    }
-                    break;
-                case userActions.CLEAR:
-                    _shapes.AddRange(ac.subject.ToList());
-                    break;
-                case userActions.MOVE:
-                    break;
-                case userActions.DELETE:
-                    break;
-                case userActions.MERGE:
-                    break;
-            }
-
+            throw new WorkWoorimException("리팩토링 하느라 구현 안함");
         }
 
         public void ChangeState(DrawState state)
@@ -182,15 +134,15 @@ namespace GCS
                 if (_drawState == DrawState.DOT)
                 {
                     AddShape(_lastPoint);
-                    _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
+                    //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
                 }
                 else
                 {
                     var p = GetDot(_pos);
                     AddShape(p);
                     AddShape(_lastPoint);
-                    _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { p }, null));
-                    _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
+                    //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { p }, null));
+                    //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
                     Shape sp = null;
                     if (_drawState == DrawState.CIRCLE)
                     {
@@ -212,7 +164,7 @@ namespace GCS
                         sp = new Vector(_lastPoint, p);
                         AddShape(sp);
                     }
-                    _doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { sp }, null));
+                    //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { sp }, null));
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
@@ -233,7 +185,7 @@ namespace GCS
                             {
                                 var parent = GetDot(_pos);
                                 AddShape(parent);
-                                parent.Attach(_selectedShapes[0] as Dot);
+                                //parent.Attach(_selectedShapes[0] as Dot);
                             }
                         }
                     }
@@ -273,6 +225,7 @@ namespace GCS
 
                             NEAR_LOOP:
                             _selectedShapes.Add(nearest);
+                            /*
                             if (nearest is Dot && (nearest as Dot).Rule is FollowRule)
                             {
                                 var p = ((nearest as Dot).Rule as FollowRule).Parent;
@@ -282,6 +235,7 @@ namespace GCS
                                     goto NEAR_LOOP;
                                 }
                             }
+                            */
                             nearest.Selected = true;
                             nearest.UnSelect = false;
                         }
@@ -329,11 +283,11 @@ namespace GCS
         private void UpdateRightClick()
         {
             // 우선 테스트 정도로 작동 대충 되도록 짜봤음
-            if(_drawState == DrawState.NONE)
+            if (_drawState == DrawState.NONE)
             {
-                if(_nearShapes.Count == 1)
+                if (_nearShapes.Count == 1)
                 {
-                    if(Scene.CurrentScene.IsRightMouseUp)
+                    if (Scene.CurrentScene.IsRightMouseUp)
                     {
                         UnselectAll();
                         Select(_nearShapes[0]);
@@ -394,12 +348,13 @@ namespace GCS
                         Dot dot;
                         if (intersects.Length == 2)
                         {
-                            dot = Vector2.Distance(coord, intersects[0]) < Vector2.Distance(intersects[1], coord) ? new Dot(intersects[0]) : new Dot(intersects[1]);
+                            dot = Vector2.Distance(coord, intersects[0]) < Vector2.Distance(intersects[1], coord)
+                                ? new Dot(intersects[0]) : new Dot(intersects[1]);
                         }
                         else dot = new Dot(intersects[0]);
                         //dot = new Dot(intersects[0]);
-                        IntersectRule rule = new IntersectRule(dot, nears[0], nears[1]);
-                        _currentRules.Add(rule);
+                        //IntersectRule rule = new IntersectRule(dot, nears[0], nears[1]);
+                        //_currentRules.Add(rule);
                         return dot;
                     }
                     else return OneShapeRuleDot(nearest, coord);
@@ -413,7 +368,7 @@ namespace GCS
         private Dot OneShapeRuleDot(Shape nearest, Vector2 coord)
         {
             Dot dot = new Dot(Geometry.GetNearest(nearest, coord));
-            _currentRules.Add(nearest.GetNearDot(dot));
+            //_currentRules.Add(nearest.GetNearDot(dot));
             return dot;
         }
 

@@ -10,12 +10,10 @@ namespace GCS
     {
         private static readonly float _nearDistance = 5;
 
-        private ShapeManager _manager;
-
         internal List<Shape> Parents { get; private set; } = new List<Shape>();
         internal List<Shape> Childs { get; private set; } = new List<Shape>();
 
-        protected ShapeRule _rule = null;
+        internal ShapeRule _rule = null;
 
         public bool Enabled { get; set; } = true;
 
@@ -41,9 +39,9 @@ namespace GCS
         }
         public abstract void Move(Vector2 add);
 
-        public Shape(ShapeManager manager)
+        public Shape()
         {
-            _manager = manager;
+
         }
 
         public virtual bool IsEnoughClose(Vector2 coord)
@@ -60,116 +58,79 @@ namespace GCS
 
         public void Delete()
         {
-            _manager.DeleteShapes(Childs);
+            //_manager.DeleteShapes(Childs);
             foreach (var child in Childs)
                 child.Delete();
         }
-
-        /// <summary>
-        /// 이 도형의 상위 객체가 움직였을 때 이 메서드가 호출됨
-        /// </summary>
-        public virtual void MovedFromParent()
-        {
-            _rule?.OnParentMoved();
-            // 점이 아니면 상위 객체를 움직인다
-            if (!(this is Dot))
-                foreach (var parent in Parents)
-                    parent.MovedFromParent();
-        }
-
-        /// <summary>
-        /// 이 도형의 하위 객체가 움직였을 때 이 메서드가 호출됨
-        /// </summary>
-        public virtual void MovedFromChild()
-        {
-            _rule?.OnChildMoved();
-
-            foreach (var child in Childs)
-                child.MovedFromChild();
-        }
-
+        
         public virtual void MoveTo(Vector2 delta)
         {
             _rule?.OnSelfMoved();
         }
     }
 
-    public class Circle : Shape
+    public interface ICircle
+    {
+        Vector2 Center { get; set; }
+        float Radius { get; set; }
+    }
+
+    public class Circle : Shape, ICircle
     {
         public static int Sides = 100;
-        private Dot _center;
-        public Dot Center
-        {
-            get => _center;
-            set
-            {
-                if (_center != null) _center.Moved -= _center_Moved;
-                _center = value;
-                if (_center != null) _center.Moved += _center_Moved;
 
-                Moved?.Invoke();
-            }
-        }
-        private void _center_Moved()
+        public Dot CenterDot => Parents[0] as Dot;
+        public Dot AnotherDot => Parents[1] as Dot;
+
+        public Vector2 Center { get => CenterDot.Coord; set => CenterDot.Coord = value; }
+        public Vector2 Another { get => AnotherDot.Coord; set => AnotherDot.Coord = value; }
+
+        public float Radius
         {
-            Moved?.Invoke();
+            get => Vector2.Distance(Center, AnotherDot.Coord);
+            set => throw new NotSupportedException();
         }
 
-        private Dot _another;
-        public Dot Another
-        {
-            get => _another;
-            set
-            {
-                if (_another != null) _another.Moved -= _another_Moved;
-                _another = value;
-                if (_another != null) _another.Moved += _another_Moved;
-                Moved?.Invoke();
-            }
-        }
-
-        private void _another_Moved()
-        {
-            Moved?.Invoke();
-        }
-
-        public float Radius => Vector2.Distance(Center.Coord, Another.Coord);
         public override event Action Moved;
 
-        public Circle(Dot center, Dot another)
+        public Circle(Dot center, Dot another) : base()
         {
-            Center = center;
-            Another = another;
-            Center.dotParents.Add(this);
-            Another.dotParents.Add(this);
+            Parents.Clear();
+            Parents.Add(center);
+            Parents.Add(another);
         }
 
         public override void Draw(SpriteBatch sb)
         {
-            if (!(Enabled && Center.Enabled && Another.Enabled)) return;
+            if (!(Enabled && CenterDot.Enabled && AnotherDot.Enabled)) return;
             base.Draw(sb);
-            GUI.DrawCircle(sb, Center.Coord, Radius, Border, Color, Sides);
+            GUI.DrawCircle(sb, Center, Radius, Border, Color, Sides);
         }
 
         public override void Move(Vector2 add)
         {
-            if (!Center.Selected)
-                Center.Move(add);
-            if (!Another.Selected)
-                Another.Move(add);
-            Moved?.Invoke();
+            Center += add;
+            Another += add;
         }
-
-        public override IParentRule GetNearDot(Dot dot)
-            => new Rules.CircleRule(dot, this);
     }
 
+    public interface ILine
+    {
+        Vector2 Point1 { get; set; }
+        Vector2 Point2 { get; set; }
+
+        float Grad { get; set; }
+        float Yint { get; set; }
+    }
+
+    /*
     public abstract class LineLike : Shape
     {
         protected Dot _p1;
         public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += dot_Moved; dot_Moved(); } }
         protected Dot _p2;
         public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += dot_Moved; dot_Moved(); } }
+        
 
         protected float _grad;
         public float Grad { get => _grad; set { _grad = value; dot_Moved(); } }
@@ -178,7 +139,7 @@ namespace GCS
 
         public override event Action Moved;
 
-        public LineLike(Dot p1, Dot p2)
+        public LineLike(ShapeManager manager, Dot p1, Dot p2) : base(manager)
         {
             _p1 = p1;
             _p2 = p2;
@@ -220,47 +181,74 @@ namespace GCS
             Moved?.Invoke();
         }
     }
+    */
 
-    public partial class Line : LineLike
+    public partial class Line : Shape, ILine
     {
-        public Line(Dot p1, Dot p2) : base(p1, p2)
-        {
+        public Dot Dot1 => Parents[0] as Dot;
+        public Dot Dot2 => Parents[1] as Dot;
 
+        public Vector2 Point1 { get => Dot1.Coord; set => Dot1.Coord = value; }
+        public Vector2 Point2 { get => Dot2.Coord; set => Dot2.Coord = value; }
+
+        public float Grad { get; set; }
+        public float Yint { get; set; }
+
+        public override event Action Moved;
+
+        public Line(Dot d1, Dot d2) : base()
+        {
+            Parents.Clear();
+            Parents.Add(d1);
+            Parents.Add(d2);
         }
-        
         
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            if (!(Enabled && Point1.Enabled && Point2.Enabled)) return;
+            if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
             GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
         }
-        
-        public override IParentRule GetNearDot(Dot dot)
-            => new Rules.LineRule(dot, this);
+
+        public override void Move(Vector2 add)
+        {
+            Point1 += add;
+            Point2 += add;
+        }
     }
 
-    public class Segment : LineLike
+    public class Segment : Shape, ILine
     {
-        public Segment(Dot p1, Dot p2) : base(p1, p2)
-        {
+        protected Dot Dot1 => Parents[0] as Dot;
+        protected Dot Dot2 => Parents[1] as Dot;
 
+        public Vector2 Point1 { get => Dot1.Coord; set => Dot1.Coord = value; }
+        public Vector2 Point2 { get => Dot2.Coord; set => Dot2.Coord = value; }
+
+        public float Grad { get; set; }
+        public float Yint { get; set; }
+
+        public override event Action Moved;
+
+        public Segment(Dot p1, Dot p2) : base()
+        {
+            Parents.Clear();
+            Parents.Add(p1);
+            Parents.Add(p2);
         }
         
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            if (!(Enabled && Point1.Enabled && Point2.Enabled)) return;
-            GUI.DrawLine(sb, Point1.Coord, Point2.Coord, Border, Color);
+            if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
+            GUI.DrawLine(sb, Point1, Point2, Border, Color);
         }
 
-        public Line ToLine()
+        public override void Move(Vector2 add)
         {
-            return new Line(Point1, Point2);
+            Point1 += add;
+            Point2 += add;
         }
-
-        public override IParentRule GetNearDot(Dot dot)
-            => new Rules.SegmentRule(dot, this);
     }
     
     public class Vector : Segment
@@ -269,7 +257,7 @@ namespace GCS
         readonly static float arrowlength = 20;
 
         //Point2 가 종점임.
-        public Vector(Dot p1, Dot p2) : base(p1, p2)
+        public Vector(Dot d1, Dot d2) : base(d1, d2)
         {
            
         }
@@ -277,48 +265,37 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            Vector2 del = Point2.Coord - Point1.Coord;
+            Vector2 del = Point2 - Point1;
             Vector2 delta1, delta2;
             float angle = (float)Math.Atan(del.Y/del.X);
-            Vector2 Initvector = new Vector2(Point1.Coord.X + Vector2.Distance(Point1.Coord, Point2.Coord), Point1.Coord.Y);
+            Vector2 Initvector = new Vector2(Point1.X + Vector2.Distance(Point1, Point2), Point1.Y);
             delta1 = new Vector2((float)(Initvector.X - arrowlength*Math.Cos(arrowAngle)) , (float)(Initvector.Y + arrowlength*Math.Sin(arrowAngle)));
             delta2 = new Vector2((float)(Initvector.X - arrowlength * Math.Cos(arrowAngle)), (float)(Initvector.Y - arrowlength * Math.Sin(arrowAngle)));
             if(del.X >0)
             {
-                GUI.DrawLine(sb, Point2.Coord, Point1.Coord + Geometry.Rotate(delta1 - Point1.Coord, angle), Border, Color);
-                GUI.DrawLine(sb, Point2.Coord, Point1.Coord + Geometry.Rotate(delta2 - Point1.Coord, angle), Border, Color);
+                GUI.DrawLine(sb, Point2, Point1 + Geometry.Rotate(delta1 - Point1, angle), Border, Color);
+                GUI.DrawLine(sb, Point2, Point1 + Geometry.Rotate(delta2 - Point1, angle), Border, Color);
             }
             else
             {
-                GUI.DrawLine(sb, Point2.Coord, Point1.Coord - Geometry.Rotate(delta1 - Point1.Coord, angle), Border, Color);
-                GUI.DrawLine(sb, Point2.Coord, Point1.Coord - Geometry.Rotate(delta2 - Point1.Coord, angle), Border, Color);
+                GUI.DrawLine(sb, Point2, Point1 - Geometry.Rotate(delta1 - Point1, angle), Border, Color);
+                GUI.DrawLine(sb, Point2, Point1 - Geometry.Rotate(delta2 - Point1, angle), Border, Color);
             }
 
         }
     }
 
-    public class Dot : Shape
+    public partial class Dot : Shape
     {
         private static readonly float _nearDotDistance = 10;
 
         private Vector2 _coord;
-        public Vector2 Coord { get => _coord; set { MoveTo(_coord); } }
+        public Vector2 Coord { get => _coord; set => _coord = value; }
         public List<Shape> dotParents = new List<Shape>();
-        private IParentRule _rule;
-        public IParentRule Rule
-        {
-            get => _rule;
-            set
-            {
-                if (_rule != null) _rule.MoveTo -= _rule_MoveTo;
-                _rule = value;
-                if (value != null) value.MoveTo += _rule_MoveTo;
-            }
-        }
 
         public override event Action Moved;
 
-        public Dot(Vector2 coord)
+        public Dot(Vector2 coord) : base()
         {
             _coord = coord;
             Color = Color.OrangeRed;
@@ -344,25 +321,9 @@ namespace GCS
             // GUI.DrawPoint(sb, Coord, Border, Color);
         }
 
-        private void _rule_MoveTo(Vector2 obj)
+        public override void MoveTo(Vector2 delta)
         {
-            if (fixed_triggerd) return;
-            MoveTo(obj);
-        }
-
-        bool fixed_triggerd = false;
-        public void MoveTo(Vector2 to)
-        {
-            fixed_triggerd = true;
-            if (Rule != null)
-            {
-                _coord = Rule.FixedCoord(to);
-            }
-            else
-                _coord = to;
-
-            Moved?.Invoke();
-            fixed_triggerd = false;
+            Coord += delta;
         }
 
         public override void Move(Vector2 add)
@@ -370,27 +331,5 @@ namespace GCS
 
         public override bool IsEnoughClose(Vector2 coord)
             => Distance <= _nearDotDistance;
-
-        public override IParentRule GetNearDot(Dot dot)
-        {
-            throw new ArgumentException("Dot에서 이 메서드가 호출되면 안되지 바보야");
-        }
-
-        public void Attach(Dot dot)
-        {
-            dot._coord = this.Coord;
-            Rules.FollowRule rule = new Rules.FollowRule(dot, this);
-        }
-
-        public void Detach(Dot dot)
-        {
-            dot.Rule = null;
-            dot.Rule.Dispose();
-        }
-
-        internal void SetCoordForce(Vector2 coord)
-        {
-            _coord = coord;
-        }
     }
 }
