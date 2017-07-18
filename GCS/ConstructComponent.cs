@@ -146,7 +146,7 @@ namespace GCS
                     Shape sp = null;
                     if (_drawState == DrawState.CIRCLE)
                     {
-                        sp = new Circle(_lastPoint, p);
+                        sp = Circle.FromTwoDots(_lastPoint, p);
                         AddShape(sp);
                     }
                     else if (_drawState == DrawState.SEGMENT)

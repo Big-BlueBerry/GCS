@@ -66,7 +66,7 @@ namespace GCS
         }
     }
 
-    public class Circle : Shape
+    public partial class Circle : Shape
     {
         public static int Sides = 100;
 
@@ -81,12 +81,7 @@ namespace GCS
 
         public override event Action Moved;
 
-        public Circle(Dot center, Dot another) : base()
-        {
-            Parents.Clear();
-            Parents.Add(center);
-            Parents.Add(another);
-        }
+        public Circle() : base() { }
 
         public override void Draw(SpriteBatch sb)
         {
@@ -99,12 +94,20 @@ namespace GCS
         {
             Center += add;
             Another += add;
+            _rule.OnMoved();
         }
 
         public override void MoveTo(Vector2 at)
         {
             var diff = at - Center;
             Move(diff);
+        }
+
+        public static Circle FromTwoDots(Dot center, Dot another)
+        {
+            Circle circle = new Circle();
+            new CircleOnTwoDotsRule(circle, center, another);
+            return circle;
         }
     }
 
