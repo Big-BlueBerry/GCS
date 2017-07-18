@@ -38,10 +38,12 @@ namespace GCS
             if (Selected) Color = Color.Cyan;
         }
         public abstract void Move(Vector2 add);
+        public abstract void MoveTo(Vector2 at);
 
         public Shape()
         {
-
+            Parents.Clear();
+            Childs.Clear();
         }
 
         public virtual bool IsEnoughClose(Vector2 coord)
@@ -62,32 +64,18 @@ namespace GCS
             foreach (var child in Childs)
                 child.Delete();
         }
-        
-        public virtual void MoveTo(Vector2 delta)
-        {
-            _rule?.OnSelfMoved();
-        }
     }
 
-    public interface ICircle
-    {
-        Vector2 Center { get; set; }
-        float Radius { get; set; }
-    }
-
-    public class Circle : Shape, ICircle
+    public class Circle : Shape
     {
         public static int Sides = 100;
 
-        public Dot CenterDot => Parents[0] as Dot;
-        public Dot AnotherDot => Parents[1] as Dot;
-
-        public Vector2 Center { get => CenterDot.Coord; set => CenterDot.Coord = value; }
-        public Vector2 Another { get => AnotherDot.Coord; set => AnotherDot.Coord = value; }
+        public Vector2 Center;
+        public Vector2 Another;
 
         public float Radius
         {
-            get => Vector2.Distance(Center, AnotherDot.Coord);
+            get => Vector2.Distance(Center, Another);
             set => throw new NotSupportedException();
         }
 
@@ -102,7 +90,7 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
-            if (!(Enabled && CenterDot.Enabled && AnotherDot.Enabled)) return;
+            // if (!(Enabled && CenterDot.Enabled && AnotherDot.Enabled)) return;
             base.Draw(sb);
             GUI.DrawCircle(sb, Center, Radius, Border, Color, Sides);
         }
@@ -112,15 +100,6 @@ namespace GCS
             Center += add;
             Another += add;
         }
-    }
-
-    public interface ILine
-    {
-        Vector2 Point1 { get; set; }
-        Vector2 Point2 { get; set; }
-
-        float Grad { get; set; }
-        float Yint { get; set; }
     }
 
     /*
@@ -183,30 +162,25 @@ namespace GCS
     }
     */
 
-    public partial class Line : Shape, ILine
+    public partial class Line : Shape
     {
-        public Dot Dot1 => Parents[0] as Dot;
-        public Dot Dot2 => Parents[1] as Dot;
-
-        public Vector2 Point1 { get => Dot1.Coord; set => Dot1.Coord = value; }
-        public Vector2 Point2 { get => Dot2.Coord; set => Dot2.Coord = value; }
+        public Vector2 Point1 { get; protected set; }
+        public Vector2 Point2 { get; protected set; }
 
         public float Grad { get; set; }
         public float Yint { get; set; }
 
         public override event Action Moved;
 
-        public Line(Dot d1, Dot d2) : base()
+        protected Line() : base()
         {
-            Parents.Clear();
-            Parents.Add(d1);
-            Parents.Add(d2);
+
         }
         
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
+            // if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
             GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
         }
 
@@ -214,33 +188,44 @@ namespace GCS
         {
             Point1 += add;
             Point2 += add;
+
+            _rule.OnMoved();
+        }
+
+        public override void MoveTo(Vector2 at)
+        {
+            var diff = at - Point1;
+            Move(diff);
+        }
+
+        public static Line FromTwoDots(Dot d1, Dot d2)
+        {
+            Line line = new Line();
+            var rule = new LineOnTwoDotsRule(line, d1, d2);
+
+            return line;
         }
     }
 
-    public class Segment : Shape, ILine
+    public class Segment : Shape
     {
-        protected Dot Dot1 => Parents[0] as Dot;
-        protected Dot Dot2 => Parents[1] as Dot;
-
-        public Vector2 Point1 { get => Dot1.Coord; set => Dot1.Coord = value; }
-        public Vector2 Point2 { get => Dot2.Coord; set => Dot2.Coord = value; }
+        public Vector2 Point1;
+        public Vector2 Point2;
 
         public float Grad { get; set; }
         public float Yint { get; set; }
 
         public override event Action Moved;
 
-        public Segment(Dot p1, Dot p2) : base()
+        public Segment() : base()
         {
-            Parents.Clear();
-            Parents.Add(p1);
-            Parents.Add(p2);
+
         }
         
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
+            // if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
             GUI.DrawLine(sb, Point1, Point2, Border, Color);
         }
 
@@ -257,7 +242,7 @@ namespace GCS
         readonly static float arrowlength = 20;
 
         //Point2 가 종점임.
-        public Vector(Dot d1, Dot d2) : base(d1, d2)
+        public Vector() : base()
         {
            
         }
@@ -291,8 +276,6 @@ namespace GCS
 
         private Vector2 _coord;
         public Vector2 Coord { get => _coord; set => _coord = value; }
-        public List<Shape> dotParents = new List<Shape>();
-
         public override event Action Moved;
 
         public Dot(Vector2 coord) : base()

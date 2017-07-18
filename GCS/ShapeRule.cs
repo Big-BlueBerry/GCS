@@ -10,24 +10,24 @@ namespace GCS
     public abstract class ShapeRule
     {
         public Shape Shape { get; }
+        protected bool IsHandling = false;
 
         public ShapeRule(Shape shape)
         {
             Shape = shape;
         }
 
-        public virtual void OnSelfMoved() { }
-        public virtual void OnParentMoved() { }
-        public virtual void OnChildMoved() { }
+        protected abstract void Fix();
+
+        public abstract void OnMoved();
+        public abstract void OnParentMoved();
     }
 
-    public partial class Line
+    public partial class Shape
     {
         public static Shape Parallel(Shape shape, float distance, float angle)
         {
-            throw new WorkWoorimException("라인을 리턴함");
-
-            // 라인하르트! 대령했소이다
+            throw new WorkWoorimException("도형을 리턴함");
         }
     }
 
@@ -46,32 +46,83 @@ namespace GCS
             shape.Parents.Add(parent);
         }
 
-        public override void OnParentMoved()
+        public override void OnMoved()
         {
-            base.OnParentMoved();
-            throw new WorkWoorimException("자기 자신을 움직여야 함");
+            throw new NotImplementedException();
         }
 
-        public override void OnSelfMoved()
+        protected override void Fix()
         {
-            base.OnSelfMoved();
+            throw new NotImplementedException();
         }
     }
 
-    public class DotOnShapeRule : ShapeRule
+    public partial class Line
     {
-        public DotOnShapeRule(Dot dot, Shape parent) : base(dot)
+        public class LineOnTwoDotsRule : ShapeRule
         {
-            dot.Parents.Clear();
-            dot.Parents.Add(parent);
+            public LineOnTwoDotsRule(Line line, Dot d1, Dot d2) : base(line)
+            {
+                d1.Childs.Add(line);
+                d2.Childs.Add(line);
+                line.Parents.Add(d1);
+                line.Parents.Add(d2);
+            }
+
+            public override void OnMoved()
+            {
+                if (IsHandling) return;
+                IsHandling = true;
+
+                var line = Shape as Line;
+
+                Shape.Parents[0].MoveTo(line.Point1);
+                Shape.Parents[1].MoveTo(line.Point2);
+
+                Fix(); // 부모 점이 도형에 의존하여 움직임이 규제된다면 다시 옮겨줘야 함
+
+                foreach (var c in Shape.Childs)
+                    c._rule.OnParentMoved();
+
+                IsHandling = false;
+            }
+
+            public override void OnParentMoved()
+            {
+                Fix();
+                
+                foreach (var c in Shape.Childs)
+                    c._rule.OnParentMoved();
+            }
+
+            protected override void Fix()
+            {
+                var line = Shape as Line;
+                line.Point1 = (line.Parents[0] as Dot).Coord;
+                line.Point2 = (line.Parents[1] as Dot).Coord;
+            }
         }
     }
 
     public partial class Dot
     {
-        public static Dot OnShape(Shape shape, Vector2 coord)
+        public class DotOnShapeRule : ShapeRule
         {
-            throw new WorkWoorimException("점을 리턴함");
+            public DotOnShapeRule(Dot dot, Shape parent) : base(dot)
+            {
+                dot.Parents.Clear();
+                dot.Parents.Add(parent);
+            }
+
+            public override void OnMoved()
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override void Fix()
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
