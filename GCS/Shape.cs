@@ -70,8 +70,8 @@ namespace GCS
     {
         public static int Sides = 100;
 
-        public Vector2 Center;
-        public Vector2 Another;
+        public Vector2 Center { get; protected set; }
+        public Vector2 Another { get; protected set; }
 
         public float Radius
         {
@@ -100,88 +100,26 @@ namespace GCS
             Center += add;
             Another += add;
         }
-    }
 
-    /*
-    public abstract class LineLike : Shape
-    {
-        protected Dot _p1;
-        public Dot Point1 { get => _p1; set { _p1 = value; _p1.Moved += dot_Moved; dot_Moved(); } }
-        protected Dot _p2;
-        public Dot Point2 { get => _p2; set { _p2 = value; _p2.Moved += dot_Moved; dot_Moved(); } }
-        
-
-        protected float _grad;
-        public float Grad { get => _grad; set { _grad = value; dot_Moved(); } }
-        protected float _yint;
-        public float Yint { get => _yint; set { _yint = value; dot_Moved(); } }
-
-        public override event Action Moved;
-
-        public LineLike(ShapeManager manager, Dot p1, Dot p2) : base(manager)
+        public override void MoveTo(Vector2 at)
         {
-            _p1 = p1;
-            _p2 = p2;
-            _p1.Moved += () => { ResetAB(); Moved?.Invoke(); };
-            _p2.Moved += () => { ResetAB(); Moved?.Invoke(); };
-            Point1.dotParents.Add(this);
-            Point2.dotParents.Add(this);
-            ResetAB();
-        }
-
-        protected void dot_Moved()
-        {
-            ResetAB();
-            Moved?.Invoke();
-        }
-
-        protected void ResetAB()
-        {
-            _grad = (Point2.Coord - Point1.Coord).Y / (Point2.Coord - Point1.Coord).X;
-            _yint = (Point1.Coord.Y) - Grad * Point1.Coord.X;
-        }
-
-        protected void ResetPoints()
-        {
-            _p1 = new Dot(0, Yint);
-            _p2 = new Dot(1, Grad + Yint);
-            _p1.Moved += dot_Moved;
-            _p2.Moved += dot_Moved;
-        }
-
-        public override void Move(Vector2 add)
-        {
-            if (!_p1.Selected)
-                _p1.Move(add);
-            if (!_p2.Selected)
-                _p2.Move(add);
-            ResetAB();
-
-            Moved?.Invoke();
+            var diff = at - Center;
+            Move(diff);
         }
     }
-    */
 
-    public partial class Line : Shape
+    public abstract partial class LineLike : Shape
     {
         public Vector2 Point1 { get; protected set; }
         public Vector2 Point2 { get; protected set; }
 
-        public float Grad { get; set; }
-        public float Yint { get; set; }
+        public float Grad => (Point2.Y - Point1.Y) / (Point2.X - Point1.X);
+        public float Yint => Point1.Y - Grad * Point1.X;
 
-        public override event Action Moved;
-
-        protected Line() : base()
+        protected LineLike(Vector2? p1 = null, Vector2? p2 = null)
         {
-
-        }
-        
-        public override void Draw(SpriteBatch sb)
-        {
-            base.Draw(sb);
-            // if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
-            GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
+            Point1 = p1 ?? new Vector2();
+            Point2 = p2 ?? new Vector2();
         }
 
         public override void Move(Vector2 add)
@@ -197,31 +135,39 @@ namespace GCS
             var diff = at - Point1;
             Move(diff);
         }
+    }
+
+    public partial class Line : LineLike
+    {
+        public override event Action Moved;
+
+        protected Line(Vector2? p1 = null, Vector2? p2 = null) : base(p1, p2) { }
+        
+        public override void Draw(SpriteBatch sb)
+        {
+            base.Draw(sb);
+            // if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
+            GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
+        }
 
         public static Line FromTwoDots(Dot d1, Dot d2)
         {
             Line line = new Line();
-            var rule = new LineOnTwoDotsRule(line, d1, d2);
+            var rule = new LineLikeOnTwoDotsRule(line, d1, d2);
 
             return line;
         }
+
+        internal static Line FromTwoPoints(Vector2 p1, Vector2 p2)
+            => new Line(p1, p2);
     }
 
-    public class Segment : Shape
+    public class Segment : LineLike
     {
-        public Vector2 Point1;
-        public Vector2 Point2;
-
-        public float Grad { get; set; }
-        public float Yint { get; set; }
-
         public override event Action Moved;
 
-        public Segment() : base()
-        {
+        protected Segment(Vector2? p1 = null, Vector2? p2 = null) : base(p1, p2) { }
 
-        }
-        
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
@@ -229,10 +175,12 @@ namespace GCS
             GUI.DrawLine(sb, Point1, Point2, Border, Color);
         }
 
-        public override void Move(Vector2 add)
+        public static Segment FromTwoDots(Dot d1, Dot d2)
         {
-            Point1 += add;
-            Point2 += add;
+            var seg = new Segment();
+            var rule = new LineLikeOnTwoDotsRule(seg, d1, d2);
+
+            return seg;
         }
     }
     
@@ -241,11 +189,7 @@ namespace GCS
         readonly static float arrowAngle = (float)Math.PI/6;
         readonly static float arrowlength = 20;
 
-        //Point2 가 종점임.
-        public Vector() : base()
-        {
-           
-        }
+        protected Vector(Vector2? p1 = null, Vector2? p2 = null) : base(p1, p2) { }
 
         public override void Draw(SpriteBatch sb)
         {
@@ -266,7 +210,14 @@ namespace GCS
                 GUI.DrawLine(sb, Point2, Point1 - Geometry.Rotate(delta1 - Point1, angle), Border, Color);
                 GUI.DrawLine(sb, Point2, Point1 - Geometry.Rotate(delta2 - Point1, angle), Border, Color);
             }
+        }
 
+        public new static Vector FromTwoDots(Dot d1, Dot d2)
+        {
+            var vec = new Vector();
+            var rule = new LineLikeOnTwoDotsRule(vec, d1, d2);
+
+            return vec;
         }
     }
 
@@ -278,14 +229,11 @@ namespace GCS
         public Vector2 Coord { get => _coord; set => _coord = value; }
         public override event Action Moved;
 
-        public Dot(Vector2 coord) : base()
+        protected Dot(Vector2 coord) : base()
         {
             _coord = coord;
             Color = Color.OrangeRed;
         }
-
-        public Dot(float x, float y) : this(new Vector2(x, y))
-        { }
 
         public override bool Equals(object obj)
         {
@@ -304,15 +252,29 @@ namespace GCS
             // GUI.DrawPoint(sb, Coord, Border, Color);
         }
 
-        public override void MoveTo(Vector2 delta)
+        public override void MoveTo(Vector2 at)
         {
-            Coord += delta;
+            var diff = at - Coord;
+            Move(diff);
         }
 
-        public override void Move(Vector2 add)
-            => MoveTo(Coord + add);
+        public override void Move(Vector2 delta)
+        {
+            Coord += delta;
+            _rule?.OnMoved();
+        }
 
         public override bool IsEnoughClose(Vector2 coord)
             => Distance <= _nearDotDistance;
+
+        public static Dot FromCoord(Vector2 coord)
+        {
+            var dot = new Dot(coord);
+            new EmptyDotRule(dot);
+            return dot;
+        }
+
+        public static Dot FromCoord(float x, float y)
+            => FromCoord(new Vector2(x, y));
     }
 }

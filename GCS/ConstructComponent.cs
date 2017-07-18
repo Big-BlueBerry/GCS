@@ -26,7 +26,7 @@ namespace GCS
             _shapes = new List<Shape>();
             _nearShapes = new List<Shape>();
             _selectedShapes = new List<Shape>();
-            _lastPoint = new Dot(0, 0);
+            _lastPoint = Dot.FromCoord(0, 0);
             OnCamera = false;
         }
 
@@ -151,17 +151,17 @@ namespace GCS
                     }
                     else if (_drawState == DrawState.SEGMENT)
                     {
-                        sp = new Segment(_lastPoint, p);
+                        sp = Segment.FromTwoDots(_lastPoint, p);
                         AddShape(sp);
                     }
                     else if (_drawState == DrawState.LINE)
                     {
-                        sp = new Line(_lastPoint, p);
+                        sp = Line.FromTwoDots(_lastPoint, p);
                         AddShape(sp);
                     }
                     else if (_drawState == DrawState.VECTOR)
                     {
-                        sp = new Vector(_lastPoint, p);
+                        sp = Vector.FromTwoDots(_lastPoint, p);
                         AddShape(sp);
                     }
                     //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { sp }, null));
@@ -335,7 +335,7 @@ namespace GCS
             if (nearestDot == null) // 가장 가까운게 점이 아니라면
             {
                 if (nears.Count == 0)
-                    return new Dot(coord);
+                    return Dot.FromCoord(coord);
                 if (nears.Count == 1)
                 {
                     return OneShapeRuleDot(nearest, coord);
@@ -349,10 +349,10 @@ namespace GCS
                         if (intersects.Length == 2)
                         {
                             dot = Vector2.Distance(coord, intersects[0]) < Vector2.Distance(intersects[1], coord)
-                                ? new Dot(intersects[0]) : new Dot(intersects[1]);
+                                ? Dot.FromCoord(intersects[0]) : Dot.FromCoord(intersects[1]);
                         }
-                        else dot = new Dot(intersects[0]);
-                        //dot = new Dot(intersects[0]);
+                        else dot = Dot.FromCoord(intersects[0]);
+                        //dot = Dot.FromCoord(intersects[0]);
                         //IntersectRule rule = new IntersectRule(dot, nears[0], nears[1]);
                         //_currentRules.Add(rule);
                         return dot;
@@ -362,12 +362,12 @@ namespace GCS
                 else return OneShapeRuleDot(nearest, coord);
             }
             else if (nearestDot is Dot) return nearestDot as Dot;
-            else return new Dot(coord);
+            else return Dot.FromCoord(coord);
         }
 
         private Dot OneShapeRuleDot(Shape nearest, Vector2 coord)
         {
-            Dot dot = new Dot(Geometry.GetNearest(nearest, coord));
+            Dot dot = Dot.FromCoord(Geometry.GetNearest(nearest, coord));
             //_currentRules.Add(nearest.GetNearDot(dot));
             return dot;
         }
@@ -390,11 +390,11 @@ namespace GCS
                 }
                 else if (_drawState == DrawState.VECTOR)
                 {
-                    new Vector(_lastPoint, new Dot(_pos)).Draw(sb);
+                    Vector.FromTwoDots(_lastPoint, Dot.FromCoord(_pos)).Draw(sb);
                 }
                 else if (_drawState == DrawState.LINE)
                 {
-                    new Line(new Dot(_lastPoint.Coord), new Dot(_pos)).Draw(sb);
+                    Line.FromTwoPoints(_lastPoint.Coord, _pos).Draw(sb);
                 }
                 else if (_drawState == DrawState.DOT)
                 {

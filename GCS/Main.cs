@@ -74,10 +74,10 @@ namespace GCS
 
             MainCamera.AddComponent<Grid.Framework.Components.Movable2DCamera>();
 
-            GameObject test = new GameObject("test");
-            test.AddComponent<GeometryTestComponent>();
-            test.Enabled = false;
-            Instantiate(test);
+            //GameObject test = new GameObject("test");
+            //test.AddComponent<GeometryTestComponent>();
+            //test.Enabled = false;
+            //Instantiate(test);
 
         }
 

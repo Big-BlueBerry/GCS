@@ -19,10 +19,10 @@ namespace GCS
         {
             base.Start();
 
-            v2 = new Circle(new Dot(500, 500), new Dot(100, 200));
+            v2 = new Circle(Dot.FromCoord(500, 500), Dot.FromCoord(100, 200));
             first = Geometry.GetNearest(v2, new Vector2(300, 100));
-            d = new Dot(first);
-            //Circle c = new Circle(new Dot(100, 100), new Dot(100, 200));
+            d = Dot.FromCoord(first);
+            //Circle c = new Circle(Dot.FromCoord(100, 100), Dot.FromCoord(100, 200));
 
         }
         public override void Update()

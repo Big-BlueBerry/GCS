@@ -175,7 +175,7 @@ namespace GCS
                 Vector2 v1 = circle1.Center - circle2.Center;
                 v1 = new Vector2(-v1.Y, v1.X);
                 Vector2 p2 = p1 + v1;
-                return getIntersect(new Line(new Dot(p1), new Dot(p2)), circle1);
+                return getIntersect(Line.FromTwoPoints(p1, p2), circle1);
             }
         }
 
@@ -191,8 +191,8 @@ namespace GCS
         private static Vector2 getNearest(Line line, Vector2 point)
         {
             Vector2 temppoint = point - new Vector2(0, line.Yint);
-            Line templine = new Line(new Dot(line.Point1 - new Vector2(0, line.Yint)), new Dot(line.Point2 - new Vector2(0, line.Yint)));
-            Line orthogonal = new Line(new Dot(temppoint), new Dot(temppoint.X + templine.Grad * 10, temppoint.Y - 10));
+            Line templine = Line.FromTwoPoints(line.Point1 - new Vector2(0, line.Yint), line.Point2 - new Vector2(0, line.Yint));
+            Line orthogonal = Line.FromTwoPoints(temppoint, new Vector2(temppoint.X + templine.Grad * 10, temppoint.Y - 10));
             Vector2 result = getIntersect(templine, orthogonal)[0] + new Vector2(0, line.Yint);
             return result;
         }
@@ -200,8 +200,8 @@ namespace GCS
         private static Vector2 getNearest(Segment line, Vector2 point)
         {
             Vector2 temppoint = point - new Vector2(0, line.Yint);
-            Line templine = new Line(new Dot(line.Point1 - new Vector2(0, line.Yint)), new Dot(line.Point2 - new Vector2(0, line.Yint)));
-            Line orthogonal = new Line(new Dot(temppoint), new Dot(temppoint.X + templine.Grad * 10, temppoint.Y - 10));
+            Line templine = Line.FromTwoPoints(line.Point1 - new Vector2(0, line.Yint), line.Point2 - new Vector2(0, line.Yint));
+            Line orthogonal = Line.FromTwoPoints(temppoint, new Vector2(temppoint.X + templine.Grad * 10, temppoint.Y - 10));
             Vector2 result = getIntersect(templine, orthogonal)[0] + new Vector2(0, line.Yint);
             return Vector2.Clamp(result, Vector2.Min(line.Point1, line.Point2), Vector2.Max(line.Point1, line.Point2));
         }
@@ -209,7 +209,7 @@ namespace GCS
         private static Vector2 getNearest(Circle circle, Vector2 point)
         {
             if (circle.Center == point) { return circle.Center; }
-            Vector2[] res = getIntersect(new Line(circle.CenterDot, new Dot(point)), circle);
+            Vector2[] res = getIntersect(Line.FromTwoPoints(circle.Center, point), circle);
             return Vector2.Distance(res[0], point) < Vector2.Distance(res[1], point) ? res[0] : res[1];
         }
 

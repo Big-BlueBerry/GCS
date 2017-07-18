@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ConstructComponent.cs" />
+    <Compile Include="Dot.ShapeRule.cs" />
     <Compile Include="DrawState.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="GeometryTestComponent.cs" />
@@ -74,6 +75,7 @@
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
     <None Include="app.manifest" />
+    <Compile Include="LineLike.ShapeRule.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
