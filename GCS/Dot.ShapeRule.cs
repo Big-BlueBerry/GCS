@@ -113,5 +113,45 @@ namespace GCS
                 dot.Coord = Geometry.GetNearest(parent, dot.Coord);
             }
         }
+
+        public class DotOnIntersectionRule : ShapeRule
+        {
+            public DotOnIntersectionRule(Dot dot, Shape p1, Shape p2) : base(dot)
+            {
+                dot.Parents.Add(p1);
+                dot.Parents.Add(p2);
+                p1.Childs.Add(dot);
+                p2.Childs.Add(dot);
+
+                Fix();
+            }
+
+            public override void OnMoved()
+            {
+                if (IsHandling) return;
+                IsHandling = true;
+                
+                Fix();
+
+                foreach (var c in Shape.Childs)
+                    c._rule.OnParentMoved();
+
+                IsHandling = false;
+            }
+
+            public override void OnParentMoved()
+            {
+                if (IsHandling) return;
+                Fix();
+
+                foreach (var c in Shape.Childs)
+                    c._rule.OnParentMoved();
+            }
+
+            protected override void Fix()
+            {
+                (Shape as Dot).Coord = Geometry.GetIntersect(Shape.Parents[0], Shape.Parents[1])[0];
+            }
+        }
     }
 }

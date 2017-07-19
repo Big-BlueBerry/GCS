@@ -286,5 +286,12 @@ namespace GCS
             new DotOnShapeRule(dot, shape);
             return dot;
         }
+
+        public static Dot FromIntersection(Shape p1, Shape p2, Vector2 coord)
+        {
+            var dot = new Dot(coord);
+            new DotOnIntersectionRule(dot, p1, p2);
+            return dot;
+        }
     }
 }
