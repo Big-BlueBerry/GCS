@@ -279,5 +279,12 @@ namespace GCS
 
         public static Dot FromCoord(float x, float y)
             => FromCoord(new Vector2(x, y));
+
+        public static Dot FromOneShape(Shape shape, Vector2 coord)
+        {
+            var dot = new Dot(coord);
+            new DotOnShapeRule(dot, shape);
+            return dot;
+        }
     }
 }

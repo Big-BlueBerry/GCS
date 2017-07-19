@@ -367,9 +367,7 @@ namespace GCS
 
         private Dot OneShapeRuleDot(Shape nearest, Vector2 coord)
         {
-            Dot dot = Dot.FromCoord(Geometry.GetNearest(nearest, coord));
-            //_currentRules.Add(nearest.GetNearDot(dot));
-            return dot;
+            return Dot.FromOneShape(nearest, coord);
         }
 
         public override void Draw(SpriteBatch sb)
