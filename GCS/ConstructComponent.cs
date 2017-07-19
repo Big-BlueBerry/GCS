@@ -352,9 +352,6 @@ namespace GCS
                                 ? intersects[0] : intersects[1];
                         }
                         return Dot.FromIntersection(nears[0], nears[1], dot);
-                        //dot = Dot.FromCoord(intersects[0]);
-                        //IntersectRule rule = new IntersectRule(dot, nears[0], nears[1]);
-                        //_currentRules.Add(rule);
                     }
                     else return OneShapeRuleDot(nearest, coord);
                 }

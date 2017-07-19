@@ -116,6 +116,12 @@ namespace GCS
 
         public class DotOnIntersectionRule : ShapeRule
         {
+            /// <summary>
+            /// 교점이 두개일 경우에 대해 방향 결정
+            /// </summary>
+            private int _orientation;
+            private int _firstDirection;
+
             public DotOnIntersectionRule(Dot dot, Shape p1, Shape p2) : base(dot)
             {
                 dot.Parents.Add(p1);
@@ -128,6 +134,7 @@ namespace GCS
 
             public override void OnMoved()
             {
+                /*
                 if (IsHandling) return;
                 IsHandling = true;
                 
@@ -137,6 +144,9 @@ namespace GCS
                     c._rule.OnParentMoved();
 
                 IsHandling = false;
+                */
+
+                Fix();
             }
 
             public override void OnParentMoved()
@@ -150,7 +160,80 @@ namespace GCS
 
             protected override void Fix()
             {
-                (Shape as Dot).Coord = Geometry.GetIntersect(Shape.Parents[0], Shape.Parents[1])[0];
+                var dot = Shape as Dot;
+                var p1 = Shape.Parents[0];
+                var p2 = Shape.Parents[1];
+                var vs = Geometry.GetIntersect(p1, p2);
+
+                if(_orientation == 0)
+                {
+                    if (p1 is Circle && p2 is Circle)
+                    {
+                        var c1 = p1 as Circle;
+                        var c2 = p2 as Circle;
+                        if (_firstDirection == 0) _firstDirection = c2.Center.X < c1.Center.X ? -1 : 1;
+                        _orientation = CheckOrient(dot.Coord, Line.FromTwoPoints(c1.Center, c2.Center));
+                    }
+                    else if (p1 is Circle || p2 is Circle)
+                    {
+                        var c = p1 is Circle ? p1 as Circle : p2 as Circle;
+                        var s = p1 is Circle ? p2 : p1;
+                        if (_firstDirection == 0)
+                        {
+                            _firstDirection = (s as LineLike).Point1.Y < (s as LineLike).Point2.Y ? -1 : 1;
+                            _orientation = CheckOrient(dot.Coord, Line.FromTwoPoints(c.Center, Geometry.GetNearest(s, c.Center)));
+                        }
+                    }
+                }
+
+                if(vs.Length == 0)
+                {
+                    // 점을 비활성화해야함. 당연히 점을 부모로 가지는 모든 도형들을 비활성화 해야 겠지?
+                    return;
+                }
+                
+                if (vs.Length == 1)
+                {
+                    dot.Coord = vs[0];
+                    return;
+                }
+                else
+                {
+                    Vector2 result = Vector2.Zero;
+                    int orient = -1;
+
+                    var c = p1 is Circle ? p1 as Circle : p2 as Circle;
+                    var s = p1 is Circle ? p2 : p1;
+                    int i1 = (_firstDirection + 1) / 2;
+                    int i2 = Math.Abs(i1 - 1);
+
+                    if (s is LineLike)
+                    {
+                        var l = s as LineLike;
+                        orient = CheckOrient(vs[0], Line.FromTwoPoints(c.Center, Geometry.GetNearest(s, c.Center)));
+
+                        if (l.Point1.Y < l.Point2.Y)
+                            result = orient == _orientation ? vs[i1] : vs[i2];
+                        else result = orient == _orientation ? vs[i2] : vs[i1];
+                    }
+                    else if (s is Circle)
+                    {
+                        orient = CheckOrient(vs[0], Line.FromTwoPoints(c.Center, (s as Circle).Center));
+
+                        if((p2 as Circle).Center.X < (p1 as Circle).Center.X)
+                            result = orient == _orientation ? vs[i1] : vs[i2];
+                        else result = orient == _orientation ? vs[i2] : vs[i1];
+                    }
+
+                    dot.Coord = result;
+                    return;
+                }
+            }
+
+            private static int CheckOrient(Vector2 d, Line l)
+            {
+                if (l.Grad * d.X + l.Yint > d.Y) return -1;
+                else return 1;
             }
         }
     }
