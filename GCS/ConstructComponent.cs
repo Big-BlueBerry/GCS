@@ -36,6 +36,7 @@ namespace GCS
 
             _shapeMenuStrip = new MenuStrip();
             _shapeMenuStrip.Items.Add(new MenuStripItem("Delete"));
+            _shapeMenuStrip.Items.Add(new MenuStripItem("Merge"));
             Scene.CurrentScene.GuiManager.GetComponent<GUIManager>().GUIs.Add(_shapeMenuStrip);
         }
 
@@ -53,7 +54,7 @@ namespace GCS
 
         private void Delete(IEnumerable<Shape> target)
         {
-            foreach(var s in target)
+            foreach (var s in target)
             {
                 foreach (var ss in s.Delete())
                     if (_shapes.Contains(ss))
@@ -114,7 +115,6 @@ namespace GCS
 
             UpdateRightClick();
             UpdateAdding();
-            UpdateAttach();
             UpdateSelect();
             UpdateDrag();
         }
@@ -180,18 +180,15 @@ namespace GCS
         {
             if (_drawState == DrawState.NONE)
             {
-                if (Scene.CurrentScene.IsMiddleMouseDown)
+                if (_selectedShapes.Count == 1)
                 {
-                    if (_selectedShapes.Count == 1)
+                    if (_selectedShapes[0] is Dot)
                     {
-                        if (_selectedShapes[0] is Dot)
+                        if (_selectedShapes[0].Parents.Count == 0)
                         {
-                            if (_nearShapes.Count > 0)
-                            {
-                                var parent = GetDot(_pos);
-                                AddShape(parent);
-                                //parent.Attach(_selectedShapes[0] as Dot);
-                            }
+                            var parent = GetDot(_pos);
+                            AddShape(parent);
+                            (_selectedShapes[0] as Dot).AttachTo(parent);
                         }
                     }
                 }
@@ -294,15 +291,19 @@ namespace GCS
                 {
                     if (Scene.CurrentScene.IsRightMouseUp)
                     {
-                        UnselectAll();
-                        Select(_nearShapes[0]);
+                        //UnselectAll();
+                        //Select(_nearShapes[0]);
                         _shapeMenuStrip.Show(Scene.CurrentScene.MousePosition.X, Scene.CurrentScene.MousePosition.Y);
                     }
                 }
 
                 if (_shapeMenuStrip.IsSelected)
+                {
                     if (_shapeMenuStrip.SelectedItem.Text == "Delete")
                         DeleteSelected();
+                    else if (_shapeMenuStrip.SelectedItem.Text == "Merge")
+                        UpdateAttach();
+                }
             }
         }
 

@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Grid.Framework;
 using Grid.Framework.GUIs;
+
+using Button = Grid.Framework.GUIs.Button;
+using MenuStrip = System.Windows.Forms.MenuStrip;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace GCS
 {
@@ -43,6 +49,8 @@ namespace GCS
         protected override void LoadContent()
         {
             base.LoadContent();
+            //BackColor = new Color(133, 182, 203);
+            BackColor = new Color(134, 202, 145);
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
@@ -55,6 +63,7 @@ namespace GCS
 
             Resources.LoadAll();
 
+            /*
             _compassBtn = new ImageButton(10, 10, 80, 80, LoadContent<Texture2D>("icon\\circle"));
             _segmentBtn = new ImageButton(100, 10, 80, 80, LoadContent<Texture2D>("icon\\segment"));
             _vectorBtn = new ImageButton(190, 10, 80, 80, LoadContent<Texture2D>("icon\\vector"));
@@ -71,7 +80,8 @@ namespace GCS
             guiManagerComponent.GUIs.Add(_clearBtn);
             guiManagerComponent.GUIs.Add(_deleteBtn);
             guiManagerComponent.GUIs.Add(_undoBtn);
-
+            */
+            InitGUI();
             MainCamera.AddComponent<Grid.Framework.Components.Movable2DCamera>();
 
             //GameObject test = new GameObject("test");
@@ -80,9 +90,50 @@ namespace GCS
             //Instantiate(test);
 
         }
+        
+        private void InitGUI()
+        {
+            MenuStrip shapeStrip = new MenuStrip()
+            {
+                BackColor = System.Drawing.Color.White,
+                Dock = DockStyle.Left
+            };
+
+            AddStripItem(shapeStrip, @"D:\Image\design\GCS\circle.png").Click += (b, d) => _construct.ChangeState(DrawState.CIRCLE);
+            AddStripItem(shapeStrip, @"D:\Image\design\GCS\segment.png").Click += (b, d) => _construct.ChangeState(DrawState.SEGMENT);
+            AddStripItem(shapeStrip, @"D:\Image\design\GCS\line.png").Click += (b, d) => _construct.ChangeState(DrawState.LINE);
+            AddStripItem(shapeStrip, @"D:\Image\design\GCS\vector.png").Click += (b, d) => _construct.ChangeState(DrawState.VECTOR);
+            AddStripItem(shapeStrip, @"D:\Image\design\GCS\dot.png").Click += (b, d) => _construct.ChangeState(DrawState.DOT);
+
+            var menu = new MenuStrip()
+            {
+                BackColor = System.Drawing.Color.White
+            };
+
+            menu.Items.Add("파일(&F)");
+            menu.Items.Add("편집(&E)");
+            menu.Items.Add("보기(&D)");
+            menu.Items.Add("작도(&C)");
+
+            var control = Control.FromHandle(Window.Handle);
+            control.Controls.Add(shapeStrip);
+            control.Controls.Add(menu);
+        }
+
+        private ToolStripMenuItem AddStripItem(MenuStrip strip, string imgPath)
+        {
+            var imageSize = new Size(60, 60);
+            var item = new ToolStripMenuItem(new Bitmap(Image.FromFile(imgPath), imageSize));
+            item.ImageAlign = ContentAlignment.MiddleCenter;
+            item.ImageScaling = ToolStripItemImageScaling.None;
+            item.AutoSize = true;
+            strip.Items.Add(item);
+            return item;
+        }
 
         private void UpdateDrawState()
         {
+            /*
             if (_compassBtn.IsMouseUp)
                 _construct.ChangeState(DrawState.CIRCLE);
             if (_segmentBtn.IsMouseUp)
@@ -99,6 +150,7 @@ namespace GCS
                 _construct.DeleteSelected();
             if (_undoBtn.IsMouseUp)
                 _construct.Undo();
+                */
         }
 
         protected override void Update(GameTime gameTime)
