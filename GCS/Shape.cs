@@ -28,7 +28,6 @@ namespace GCS
         public Color Color { get; set; } = Color.Black;
         public bool Focused { get; set; } = false;
         public bool Selected { get; set; } = false;
-        public abstract event Action Moved;
         /// <summary>
         /// 마우스를 떼면 Selected가 false가 되어야 하는가?
         /// </summary>
@@ -64,11 +63,12 @@ namespace GCS
                 Focused = false;
         }
 
-        public void Delete()
+        public IEnumerable<Shape> Delete()
         {
-            //_manager.DeleteShapes(Childs);
+            yield return this;
             foreach (var child in Childs)
-                child.Delete();
+                foreach (var c in child.Delete())
+                    yield return c;
         }
     }
 
@@ -84,8 +84,6 @@ namespace GCS
             get => Vector2.Distance(Center, Another);
             set => throw new NotSupportedException();
         }
-
-        public override event Action Moved;
 
         public Circle() : base() { }
 
@@ -114,6 +112,11 @@ namespace GCS
             Circle circle = new Circle();
             new CircleOnTwoDotsRule(circle, center, another);
             return circle;
+        }
+
+        public void DetachRule()
+        {
+            _rule.Detach();
         }
     }
 
@@ -148,8 +151,6 @@ namespace GCS
 
     public partial class Line : LineLike
     {
-        public override event Action Moved;
-
         protected Line(Vector2? p1 = null, Vector2? p2 = null) : base(p1, p2) { }
         
         public override void Draw(SpriteBatch sb)
@@ -173,8 +174,6 @@ namespace GCS
 
     public class Segment : LineLike
     {
-        public override event Action Moved;
-
         protected Segment(Vector2? p1 = null, Vector2? p2 = null) : base(p1, p2) { }
 
         public override void Draw(SpriteBatch sb)
@@ -237,7 +236,6 @@ namespace GCS
 
         private Vector2 _coord;
         public Vector2 Coord { get => _coord; set => _coord = value; }
-        public override event Action Moved;
 
         protected Dot(Vector2 coord) : base()
         {

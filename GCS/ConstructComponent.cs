@@ -53,7 +53,12 @@ namespace GCS
 
         private void Delete(IEnumerable<Shape> target)
         {
-            throw new WorkWoorimException("리팩토링 하느라 구현 안함");
+            foreach(var s in target)
+            {
+                foreach (var ss in s.Delete())
+                    if (_shapes.Contains(ss))
+                        _shapes.Remove(ss);
+            }
         }
 
         public void Undo()
