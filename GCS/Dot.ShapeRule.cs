@@ -186,11 +186,13 @@ namespace GCS
                     }
                 }
 
-                if(vs.Length == 0)
+                if (vs.Length == 0)
                 {
-                    // 점을 비활성화해야함. 당연히 점을 부모로 가지는 모든 도형들을 비활성화 해야 겠지?
+                    dot.Disabled = true;
                     return;
                 }
+                else
+                    dot.Disabled = false;
                 
                 if (vs.Length == 1)
                 {

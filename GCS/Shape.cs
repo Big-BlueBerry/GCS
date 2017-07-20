@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Grid.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,8 +15,13 @@ namespace GCS
         internal List<Shape> Childs { get; private set; } = new List<Shape>();
 
         internal ShapeRule _rule = null;
-
-        public bool Enabled { get; set; } = true;
+        
+        private bool _disabled = false;
+        public bool Disabled
+        {
+            get => _disabled || Parents.Any(p => p.Disabled);
+            set => _disabled = value;
+        }
 
         public string Name { get; set; }
         public float Border { get; set; } = 2f;
@@ -85,7 +91,7 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
-            // if (!(Enabled && CenterDot.Enabled && AnotherDot.Enabled)) return;
+            if (Disabled) return;
             base.Draw(sb);
             GUI.DrawCircle(sb, Center, Radius, Border, Color, Sides);
         }
@@ -148,8 +154,8 @@ namespace GCS
         
         public override void Draw(SpriteBatch sb)
         {
+            if (Disabled) return;
             base.Draw(sb);
-            // if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
             GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
         }
 
@@ -173,8 +179,8 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
+            if (Disabled) return;
             base.Draw(sb);
-            // if (!(Enabled && Dot1.Enabled && Dot2.Enabled)) return;
             GUI.DrawLine(sb, Point1, Point2, Border, Color);
         }
 
@@ -196,6 +202,7 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
+            if (Disabled) return;
             base.Draw(sb);
             Vector2 del = Point2 - Point1;
             Vector2 delta1, delta2;
@@ -249,8 +256,8 @@ namespace GCS
 
         public override void Draw(SpriteBatch sb)
         {
+            if (Disabled) return;
             base.Draw(sb);
-            if (!Enabled) return;
             GUI.DrawCircle(sb, Coord, 4f, Border, Color, 20);
             // GUI.DrawPoint(sb, Coord, Border, Color);
         }
