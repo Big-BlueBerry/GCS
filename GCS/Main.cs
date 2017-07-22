@@ -50,7 +50,7 @@ namespace GCS
         {
             base.LoadContent();
             //BackColor = new Color(133, 182, 203);
-            BackColor = new Color(134, 202, 145);
+            BackColor = new Color(221, 255, 221);
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;

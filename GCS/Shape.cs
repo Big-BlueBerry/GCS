@@ -298,5 +298,10 @@ namespace GCS
             new DotOnIntersectionRule(dot, p1, p2);
             return dot;
         }
+
+        public void AttachTo(Dot parent)
+        {
+            new DotOnDotRule(this, parent);
+        }
     }
 }

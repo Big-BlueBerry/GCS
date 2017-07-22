@@ -238,5 +238,39 @@ namespace GCS
                 else return 1;
             }
         }
+
+        public class DotOnDotRule : ShapeRule
+        {
+            public DotOnDotRule(Dot dot, Dot parent) : base(dot)
+            {
+                dot.Parents.Add(parent);
+                parent.Childs.Add(dot);
+                Fix();
+            }
+
+            public override void OnMoved()
+            {
+                if (IsHandling) return;
+                IsHandling = true;
+
+                var dot = Shape.Parents[0] as Dot;
+                dot.MoveTo((Shape as Dot).Coord);
+
+                Fix();
+
+                IsHandling = false;
+            }
+
+            public override void OnParentMoved()
+            {
+                if (IsHandling) return;
+                Fix();
+            }
+
+            protected override void Fix()
+            {
+                (Shape as Dot).Coord = (Shape.Parents[0] as Dot).Coord;
+            }
+        }
     }
 }

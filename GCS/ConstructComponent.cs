@@ -117,6 +117,7 @@ namespace GCS
             UpdateAdding();
             UpdateSelect();
             UpdateDrag();
+            UpdateShortcuts();
         }
 
         private void UpdateAdding()
@@ -304,6 +305,21 @@ namespace GCS
                     else if (_shapeMenuStrip.SelectedItem.Text == "Merge")
                         UpdateAttach();
                 }
+            }
+        }
+
+        private void UpdateShortcuts()
+        {
+            var state = Keyboard.GetState();
+            if(state.IsKeyDown(Keys.Delete))
+            {
+                DeleteSelected();
+            }
+
+            if (state.IsKeyDown(Keys.LeftControl) && state.IsKeyDown(Keys.A))
+            {
+                foreach (var s in _shapes)
+                    Select(s);
             }
         }
 
