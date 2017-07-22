@@ -26,6 +26,8 @@ namespace GCS
         public string Name { get; set; }
         public float Border { get; set; } = 2f;
         public Color Color { get; set; } = Color.Black;
+        public Color FocusedColor { get; set; } = Color.Orange;
+        public Color SelectedColor { get; set; } = Color.Cyan;
         public bool Focused { get; set; } = false;
         public bool Selected { get; set; } = false;
         /// <summary>
@@ -39,8 +41,8 @@ namespace GCS
         public virtual void Draw(SpriteBatch sb)
         {
             Color = Color.Black;
-            if (Focused) Color = Color.Orange;
-            if (Selected) Color = Color.Cyan;
+            if (Focused) Color = FocusedColor;
+            if (Selected) Color = SelectedColor;
         }
         public abstract void Move(Vector2 add);
         public abstract void MoveTo(Vector2 at);
@@ -256,6 +258,9 @@ namespace GCS
         {
             if (Disabled) return;
             base.Draw(sb);
+            if (_rule != null && _rule is DotOnDotRule)
+                if (Parents[0].Selected)
+                    Color = SelectedColor;
             GUI.DrawCircle(sb, Coord, 4f, Border, Color, 20);
             // GUI.DrawPoint(sb, Coord, Border, Color);
         }
