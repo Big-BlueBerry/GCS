@@ -33,5 +33,11 @@ namespace GCS
             Shape.Parents.Clear();
             Shape._rule = null;
         }
+
+        public void MoveChilds()
+        {
+            foreach (var c in Shape.Childs)
+                c._rule.OnParentMoved();
+        }
     }
 }

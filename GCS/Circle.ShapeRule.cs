@@ -28,9 +28,7 @@ namespace GCS
                 Shape.Parents[1].MoveTo(circle.Another);
 
                 Fix();
-
-                foreach (var c in Shape.Childs)
-                    c._rule.OnParentMoved();
+                MoveChilds();
 
                 IsHandling = false;
             }
@@ -39,9 +37,7 @@ namespace GCS
             {
                 if (IsHandling) return;
                 Fix();
-
-                foreach (var c in Shape.Childs)
-                    c._rule.OnParentMoved();
+                MoveChilds();
             }
 
             protected override void Fix()

@@ -25,9 +25,7 @@
                 Shape.Parents[1].MoveTo(line.Point2);
 
                 Fix(); // 부모 점이 도형에 의존하여 움직임이 규제된다면 다시 옮겨줘야 함
-
-                foreach (var c in Shape.Childs)
-                    c._rule.OnParentMoved();
+                MoveChilds();
 
                 IsHandling = false;
             }
@@ -36,9 +34,7 @@
             {
                 if (IsHandling) return;
                 Fix();
-
-                foreach (var c in Shape.Childs)
-                    c._rule.OnParentMoved();
+                MoveChilds();
             }
 
             protected override void Fix()

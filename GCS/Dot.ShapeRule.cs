@@ -14,8 +14,7 @@ namespace GCS
                 if (IsHandling) return;
                 IsHandling = true;
 
-                foreach (var c in Shape.Childs)
-                    c._rule.OnParentMoved();
+                MoveChilds();
 
                 IsHandling = false;
             }
@@ -53,11 +52,8 @@ namespace GCS
                 IsHandling = true;
 
                 RecalcRatio();
-
                 Fix();
-
-                foreach (var c in Shape.Childs)
-                    c._rule.OnParentMoved();
+                MoveChilds();
 
                 IsHandling = false;
             }
@@ -66,9 +62,7 @@ namespace GCS
             {
                 if (IsHandling) return;
                 Fix();
-
-                foreach (var c in Shape.Childs)
-                    c._rule.OnParentMoved();
+                MoveChilds();
             }
 
             protected void RecalcRatio()
@@ -246,6 +240,7 @@ namespace GCS
                 dot.Parents.Add(parent);
                 parent.Childs.Add(dot);
                 Fix();
+                MoveChilds();
             }
 
             public override void OnMoved()
@@ -255,8 +250,9 @@ namespace GCS
 
                 var dot = Shape.Parents[0] as Dot;
                 dot.MoveTo((Shape as Dot).Coord);
-
+                
                 Fix();
+                MoveChilds();
 
                 IsHandling = false;
             }
@@ -265,6 +261,7 @@ namespace GCS
             {
                 if (IsHandling) return;
                 Fix();
+                MoveChilds();
             }
 
             protected override void Fix()

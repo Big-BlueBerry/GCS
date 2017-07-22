@@ -17,6 +17,8 @@ namespace GCS
         private Dot _lastPoint;
         private List<Shape> _shapes;
         private Vector2 _pos;
+        private Vector2 _rightPos;
+        private List<Shape> _rightNearShapes;
         private List<Shape> _nearShapes;
         private List<Shape> _selectedShapes;
         private MenuStrip _shapeMenuStrip;
@@ -193,7 +195,7 @@ namespace GCS
                     {
                         if (_selectedShapes[0].Parents.Count == 0)
                         {
-                            var parent = GetDot(_pos);
+                            var parent = GetDot(_rightPos, _rightNearShapes);
                             AddShape(parent);
                             (_selectedShapes[0] as Dot).AttachTo(parent);
                         }
@@ -294,23 +296,22 @@ namespace GCS
             // 우선 테스트 정도로 작동 대충 되도록 짜봤음
             if (_drawState == DrawState.NONE)
             {
-                if (_nearShapes.Count == 1)
+                if (Scene.CurrentScene.IsRightMouseUp)
                 {
-                    if (Scene.CurrentScene.IsRightMouseUp)
-                    {
-                        //UnselectAll();
-                        //Select(_nearShapes[0]);
-                        _shapeMenuStrip.Show(Scene.CurrentScene.MousePosition.X, Scene.CurrentScene.MousePosition.Y);
-                    }
+                    //UnselectAll();
+                    //Select(_nearShapes[0]);
+                    _rightPos = _pos;
+                    _rightNearShapes = _nearShapes.ToList();
+                    _shapeMenuStrip.Show(Scene.CurrentScene.MousePosition.X, Scene.CurrentScene.MousePosition.Y);
                 }
+            }
 
-                if (_shapeMenuStrip.IsSelected)
-                {
-                    if (_shapeMenuStrip.SelectedItem.Text == "Delete")
-                        DeleteSelected();
-                    else if (_shapeMenuStrip.SelectedItem.Text == "Merge")
-                        UpdateAttach();
-                }
+            if (_shapeMenuStrip.IsSelected)
+            {
+                if (_shapeMenuStrip.SelectedItem.Text == "Delete")
+                    DeleteSelected();
+                else if (_shapeMenuStrip.SelectedItem.Text == "Merge")
+                    UpdateAttach();
             }
         }
 
@@ -340,7 +341,7 @@ namespace GCS
             Shape nearest = null;
             float distDot = int.MaxValue;
             float dist = int.MaxValue;
-            foreach (var s in _nearShapes)
+            foreach (var s in nears)
             {
                 if (s is Dot)
                 {
