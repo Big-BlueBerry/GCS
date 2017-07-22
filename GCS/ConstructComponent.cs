@@ -193,11 +193,14 @@ namespace GCS
                 {
                     if (_selectedShapes[0] is Dot)
                     {
-                        if (_selectedShapes[0].Parents.Count == 0)
+                        if (_rightNearShapes?.Count > 0)
                         {
-                            var parent = GetDot(_rightPos, _rightNearShapes);
-                            AddShape(parent);
-                            (_selectedShapes[0] as Dot).AttachTo(parent);
+                            if (_selectedShapes[0].Parents.Count == 0)
+                            {
+                                var parent = GetDot(_rightPos, _rightNearShapes);
+                                AddShape(parent);
+                                (_selectedShapes[0] as Dot).AttachTo(parent);
+                            }
                         }
                     }
                 }

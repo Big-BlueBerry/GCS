@@ -52,7 +52,7 @@ namespace GCS
         }
 
         public virtual bool IsEnoughClose(Vector2 coord)
-            => Distance <= _nearDistance;
+            => Geometry.GetNearestDistance(this, coord) <= _nearDistance;
 
         public virtual void Update(Vector2 cursor)
         {
@@ -271,9 +271,6 @@ namespace GCS
             Coord += delta;
             _rule?.OnMoved();
         }
-
-        public override bool IsEnoughClose(Vector2 coord)
-            => Distance <= _nearDotDistance;
 
         public static Dot FromCoord(Vector2 coord)
         {
