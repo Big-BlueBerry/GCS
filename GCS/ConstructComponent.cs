@@ -91,6 +91,12 @@ namespace GCS
             _selectedShapes.Add(shape);
         }
 
+        private void SelectAll()
+        {
+            foreach (var s in _shapes)
+                Select(s);
+        }
+
         private void Unselect(Shape shape)
         {
             shape.UnSelect = true;
@@ -311,15 +317,14 @@ namespace GCS
         private void UpdateShortcuts()
         {
             var state = Keyboard.GetState();
-            if(state.IsKeyDown(Keys.Delete))
+            if (state.IsKeyDown(Keys.Delete))
             {
                 DeleteSelected();
             }
 
             if (state.IsKeyDown(Keys.LeftControl) && state.IsKeyDown(Keys.A))
             {
-                foreach (var s in _shapes)
-                    Select(s);
+                SelectAll();
             }
         }
 
