@@ -25,7 +25,7 @@ namespace GCS
                 _vscroll = value;
                 _vscroll.Scroll += scroll_Scroll;
                 value.Minimum = 0;
-                value.Maximum = Comp.Size.Y - Comp.Bound.Height;
+                value.Maximum = (Comp.Size.Y - Comp.Bound.Height) / 5;
             }
         }
 
@@ -39,7 +39,7 @@ namespace GCS
                 _hscroll = value;
                 _hscroll.Scroll += scroll_Scroll;
                 value.Minimum = 0;
-                value.Maximum = Comp.Size.X - Comp.Bound.Width;
+                value.Maximum = (Comp.Size.X - Comp.Bound.Width) / 5;
             }
         }
         
@@ -60,7 +60,7 @@ namespace GCS
 
         private void scroll_Scroll(object sender, ScrollEventArgs e)
         {
-            Comp.Location = new Vector2(_hscroll.Value, _vscroll.Value);
+            Comp.Location = new Vector2(_hscroll.Value * 5, _vscroll.Value * 5);
         }
     }
 }

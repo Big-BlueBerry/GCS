@@ -12,7 +12,7 @@ namespace GCS
     public class ConstructComponent : Renderable
     {
         public Vector2 Location { get; set; }
-        public Point Size { get; set; } = new Point(2000, 2000);
+        public Point Size { get; set; } = new Point(10000, 10000);
 
         public Rectangle Bound => new Rectangle(Location.ToPoint(), Scene.CurrentScene.ScreenBounds);
 

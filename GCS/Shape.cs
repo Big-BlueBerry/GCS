@@ -23,7 +23,7 @@ namespace GCS
             set => _disabled = value;
         }
 
-        private ConstructComponent _comp;
+        protected ConstructComponent _comp;
         protected Vector2 _drawDelta => -_comp.Location;
 
         public string Name { get; set; }
@@ -165,7 +165,7 @@ namespace GCS
         {
             if (Disabled) return;
             base.Draw(sb);
-            GUI.DrawLine(sb, new Vector2(0, Yint) + _drawDelta, new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint) + _drawDelta, Border, Color);
+            GUI.DrawLine(sb, new Vector2(0, Yint) + _drawDelta, new Vector2(_comp.Size.X, _comp.Size.X * Grad + Yint) + _drawDelta, Border, Color);
         }
 
         public static Line FromTwoDots(Dot d1, Dot d2)
