@@ -23,6 +23,9 @@ namespace GCS
             set => _disabled = value;
         }
 
+        private ConstructComponent _comp;
+        protected Vector2 _drawDelta => -_comp.Location.ToVector2();
+
         public string Name { get; set; }
         public float Border { get; set; } = 2f;
         public Color Color { get; set; } = Color.Black;
@@ -51,6 +54,9 @@ namespace GCS
         {
             Parents.Clear();
             Childs.Clear();
+
+            if (_comp == null)
+                _comp = GameObject.Find("construct").GetComponent<ConstructComponent>();
         }
 
         public virtual bool IsEnoughClose(Vector2 coord)
@@ -93,7 +99,7 @@ namespace GCS
         {
             if (Disabled) return;
             base.Draw(sb);
-            GUI.DrawCircle(sb, Center, Radius, Border, Color, Sides);
+            GUI.DrawCircle(sb, Center + _drawDelta, Radius, Border, Color, Sides);
         }
 
         public override void Move(Vector2 add)
@@ -159,7 +165,7 @@ namespace GCS
         {
             if (Disabled) return;
             base.Draw(sb);
-            GUI.DrawLine(sb, new Vector2(0, Yint), new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint), Border, Color);
+            GUI.DrawLine(sb, new Vector2(0, Yint) + _drawDelta, new Vector2(Scene.CurrentScene.ScreenBounds.X, Scene.CurrentScene.ScreenBounds.X * Grad + Yint) + _drawDelta, Border, Color);
         }
 
         public static Line FromTwoDots(Dot d1, Dot d2)
@@ -182,7 +188,7 @@ namespace GCS
         {
             if (Disabled) return;
             base.Draw(sb);
-            GUI.DrawLine(sb, Point1, Point2, Border, Color);
+            GUI.DrawLine(sb, Point1 + _drawDelta, Point2 + _drawDelta, Border, Color);
         }
 
         public static Segment FromTwoDots(Dot d1, Dot d2)
@@ -213,13 +219,13 @@ namespace GCS
             delta2 = new Vector2((float)(Initvector.X - arrowlength * Math.Cos(arrowAngle)), (float)(Initvector.Y - arrowlength * Math.Sin(arrowAngle)));
             if(del.X >0)
             {
-                GUI.DrawLine(sb, Point2, Point1 + Geometry.Rotate(delta1 - Point1, angle), Border, Color);
-                GUI.DrawLine(sb, Point2, Point1 + Geometry.Rotate(delta2 - Point1, angle), Border, Color);
+                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + Geometry.Rotate(delta1 - Point1, angle) + _drawDelta, Border, Color);
+                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + Geometry.Rotate(delta2 - Point1, angle) + _drawDelta, Border, Color);
             }
             else
             {
-                GUI.DrawLine(sb, Point2, Point1 - Geometry.Rotate(delta1 - Point1, angle), Border, Color);
-                GUI.DrawLine(sb, Point2, Point1 - Geometry.Rotate(delta2 - Point1, angle), Border, Color);
+                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 - Geometry.Rotate(delta1 - Point1, angle) + _drawDelta, Border, Color);
+                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 - Geometry.Rotate(delta2 - Point1, angle) + _drawDelta, Border, Color);
             }
         }
 
@@ -264,7 +270,7 @@ namespace GCS
             if (_rule != null && _rule is DotOnDotRule)
                 if (Parents[0].Selected)
                     Color = SelectedColor;
-            GUI.DrawCircle(sb, Coord, 4f, Border, Color, 20);
+            GUI.DrawCircle(sb, Coord + _drawDelta, 4f, Border, Color, 20);
             // GUI.DrawPoint(sb, Coord, Border, Color);
         }
 

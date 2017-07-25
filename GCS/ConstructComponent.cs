@@ -11,6 +11,11 @@ namespace GCS
 {
     public class ConstructComponent : Renderable
     {
+        public Point Location { get; set; }
+        public Point Size { get; set; } = new Point(2000, 2000);
+
+        public Rectangle Bound => new Rectangle(Location, Scene.CurrentScene.ScreenBounds);
+
         private DrawState _drawState = DrawState.NONE;
         private bool _wasDrawing = false;
         private bool _isDragging = false;
@@ -126,6 +131,10 @@ namespace GCS
             UpdateSelect();
             UpdateDrag();
             UpdateShortcuts();
+
+            Debug.DisplayLine("");
+            Debug.DisplayLine("");
+            Debug.DisplayLine(Location.ToString() + "     ");
         }
 
         private void UpdateAdding()
@@ -407,11 +416,11 @@ namespace GCS
                 if (_drawState == DrawState.CIRCLE)
                 {
                     float radius = (_pos - _lastPoint.Coord).Length();
-                    GUI.DrawCircle(sb, _lastPoint.Coord, radius, 2, Color.DarkGray, 100);
+                    GUI.DrawCircle(sb, _lastPoint.Coord - Location.ToVector2(), radius, 2, Color.DarkGray, 100);
                 }
                 else if (_drawState == DrawState.SEGMENT)
                 {
-                    GUI.DrawLine(sb, _lastPoint.Coord, _pos, 2, Color.DarkGray);
+                    GUI.DrawLine(sb, _lastPoint.Coord - Location.ToVector2(), _pos, 2, Color.DarkGray);
                 }
                 else if (_drawState == DrawState.VECTOR)
                 {

@@ -51,15 +51,17 @@ namespace GCS
             base.LoadContent();
             //BackColor = new Color(133, 182, 203);
             BackColor = new Color(221, 255, 221);
+            BackColor = Color.White;
+            Debugger.Color = Color.Black;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
             GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
             _graphics.PreferMultiSampling = true;
             GameObject con = new GameObject("construct");
+            Instantiate(con);
             _construct = con.AddComponent<ConstructComponent>();
             _construct.Enabled = true;
-            Instantiate(con);
 
             Resources.LoadAll();
 
@@ -105,6 +107,13 @@ namespace GCS
             AddStripItem(shapeStrip, @"D:\Image\design\GCS\vector.png").Click += (b, d) => _construct.ChangeState(DrawState.VECTOR);
             AddStripItem(shapeStrip, @"D:\Image\design\GCS\dot.png").Click += (b, d) => _construct.ChangeState(DrawState.DOT);
 
+            VScrollBar vscroll = new VScrollBar();
+            vscroll.Dock = DockStyle.Right;
+            HScrollBar hscroll = new HScrollBar();
+            hscroll.Dock = DockStyle.Bottom;
+
+            var move = new MoveConstructComponent(GameObject.Find("construct").GetComponent<ConstructComponent>(), vscroll, hscroll);
+
             var menu = new MenuStrip()
             {
                 BackColor = System.Drawing.Color.White
@@ -118,6 +127,8 @@ namespace GCS
             var control = Control.FromHandle(Window.Handle);
             control.Controls.Add(shapeStrip);
             control.Controls.Add(menu);
+            control.Controls.Add(vscroll);
+            control.Controls.Add(hscroll);
         }
 
         private ToolStripMenuItem AddStripItem(MenuStrip strip, string imgPath)
