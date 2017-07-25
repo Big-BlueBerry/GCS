@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Grid.Framework;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace GCS
 {
+    using Keys = Microsoft.Xna.Framework.Input.Keys;
+
     public class MoveConstructComponent : Component
     {
         public ConstructComponent Comp;
@@ -61,6 +64,28 @@ namespace GCS
         private void scroll_Scroll(object sender, ScrollEventArgs e)
         {
             Comp.Location = new Vector2(_hscroll.Value * 5, _vscroll.Value * 5);
+        }
+
+        public void Scroll(int x, int y)
+        {
+            _hscroll.Value = MathHelper.Clamp(_hscroll.Value + x, _hscroll.Minimum, _hscroll.Maximum);
+            _vscroll.Value = MathHelper.Clamp(_vscroll.Value + y, _vscroll.Minimum, _vscroll.Maximum);
+            scroll_Scroll(null, null);
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            var state = Keyboard.GetState();
+            if (state.IsKeyDown(Keys.Down))
+                Scroll(0, 5);
+            if (state.IsKeyDown(Keys.Up))
+                Scroll(0, -5);
+            if (state.IsKeyDown(Keys.Left))
+                Scroll(-5, 0);
+            if (state.IsKeyDown(Keys.Right))
+                Scroll(5, 0);
         }
     }
 }
