@@ -131,11 +131,6 @@ namespace GCS
             UpdateSelect();
             UpdateDrag();
             UpdateShortcuts();
-
-            Debug.DisplayLine("");
-            Debug.DisplayLine("");
-            Debug.DisplayLine(Location.ToString() + "     ");
-            Debug.DisplayLine("Once!");
         }
 
         private void UpdateAdding()
@@ -246,20 +241,7 @@ namespace GCS
                         if (!nearest.Selected)
                         {
                             _selectedShapes.ForEach(s => s.UnSelect = true);
-
-                            NEAR_LOOP:
                             _selectedShapes.Add(nearest);
-                            /*
-                            if (nearest is Dot && (nearest as Dot).Rule is FollowRule)
-                            {
-                                var p = ((nearest as Dot).Rule as FollowRule).Parent;
-                                if (nearest != p)
-                                {
-                                    nearest = p;
-                                    goto NEAR_LOOP;
-                                }
-                            }
-                            */
                             nearest.Selected = true;
                             nearest.UnSelect = false;
                         }
