@@ -420,7 +420,7 @@ namespace GCS
                 }
                 else if (_drawState == DrawState.SEGMENT)
                 {
-                    GUI.DrawLine(sb, _lastPoint.Coord - Location.ToVector2(), _pos, 2, Color.DarkGray);
+                    GUI.DrawLine(sb, _lastPoint.Coord - Location.ToVector2(), _pos - Location.ToVector2(), 2, Color.DarkGray);
                 }
                 else if (_drawState == DrawState.VECTOR)
                 {

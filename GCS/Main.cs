@@ -112,7 +112,14 @@ namespace GCS
             HScrollBar hscroll = new HScrollBar();
             hscroll.Dock = DockStyle.Bottom;
 
-            var move = new MoveConstructComponent(GameObject.Find("construct").GetComponent<ConstructComponent>(), vscroll, hscroll);
+            var construct = GameObject.Find("construct");
+
+            var move = construct.AddComponent<MoveConstructComponent>();
+            move.Comp = construct.GetComponent<ConstructComponent>();
+            move.Hscroll = hscroll;
+            move.Vscroll = vscroll;
+
+            Instantiate(construct);
 
             var menu = new MenuStrip()
             {
