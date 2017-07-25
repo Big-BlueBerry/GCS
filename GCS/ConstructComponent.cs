@@ -121,7 +121,7 @@ namespace GCS
         {
             base.Update();
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
-            _pos = Mouse.GetState().Position.ToVector2();
+            _pos = Mouse.GetState().Position.ToVector2() + Location.ToVector2();
             foreach (var s in _shapes) s.Update(_pos);
             //선택, 가까이있는 점 선택
             _nearShapes = _shapes.Where(s => s.Focused).ToList();
@@ -410,7 +410,7 @@ namespace GCS
         {
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
             sb.BeginAA();
-            _pos = Mouse.GetState().Position.ToVector2();
+            _pos = Mouse.GetState().Position.ToVector2() + Location.ToVector2();
             if (_wasDrawing)
             {
                 if (_drawState == DrawState.CIRCLE)
