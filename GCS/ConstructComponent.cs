@@ -11,10 +11,10 @@ namespace GCS
 {
     public class ConstructComponent : Renderable
     {
-        public Point Location { get; set; }
+        public Vector2 Location { get; set; }
         public Point Size { get; set; } = new Point(2000, 2000);
 
-        public Rectangle Bound => new Rectangle(Location, Scene.CurrentScene.ScreenBounds);
+        public Rectangle Bound => new Rectangle(Location.ToPoint(), Scene.CurrentScene.ScreenBounds);
 
         private DrawState _drawState = DrawState.NONE;
         private bool _wasDrawing = false;
@@ -121,7 +121,7 @@ namespace GCS
         {
             base.Update();
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
-            _pos = Mouse.GetState().Position.ToVector2() + Location.ToVector2();
+            _pos = Mouse.GetState().Position.ToVector2() + Location;
             foreach (var s in _shapes) s.Update(_pos);
             //선택, 가까이있는 점 선택
             _nearShapes = _shapes.Where(s => s.Focused).ToList();
@@ -135,6 +135,7 @@ namespace GCS
             Debug.DisplayLine("");
             Debug.DisplayLine("");
             Debug.DisplayLine(Location.ToString() + "     ");
+            Debug.DisplayLine("Once!");
         }
 
         private void UpdateAdding()
@@ -410,17 +411,17 @@ namespace GCS
         {
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
             sb.BeginAA();
-            _pos = Mouse.GetState().Position.ToVector2() + Location.ToVector2();
+            _pos = Mouse.GetState().Position.ToVector2() + Location;
             if (_wasDrawing)
             {
                 if (_drawState == DrawState.CIRCLE)
                 {
                     float radius = (_pos - _lastPoint.Coord).Length();
-                    GUI.DrawCircle(sb, _lastPoint.Coord - Location.ToVector2(), radius, 2, Color.DarkGray, 100);
+                    GUI.DrawCircle(sb, _lastPoint.Coord - Location, radius, 2, Color.DarkGray, 100);
                 }
                 else if (_drawState == DrawState.SEGMENT)
                 {
-                    GUI.DrawLine(sb, _lastPoint.Coord - Location.ToVector2(), _pos - Location.ToVector2(), 2, Color.DarkGray);
+                    GUI.DrawLine(sb, _lastPoint.Coord - Location, _pos - Location, 2, Color.DarkGray);
                 }
                 else if (_drawState == DrawState.VECTOR)
                 {

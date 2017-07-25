@@ -24,7 +24,7 @@ namespace GCS
         }
 
         private ConstructComponent _comp;
-        protected Vector2 _drawDelta => -_comp.Location.ToVector2();
+        protected Vector2 _drawDelta => -_comp.Location;
 
         public string Name { get; set; }
         public float Border { get; set; } = 2f;

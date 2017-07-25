@@ -60,7 +60,7 @@ namespace GCS
 
         private void scroll_Scroll(object sender, ScrollEventArgs e)
         {
-            Comp.Location = new Point(_hscroll.Value, _vscroll.Value);
+            Comp.Location = new Vector2(_hscroll.Value, _vscroll.Value);
         }
     }
 }

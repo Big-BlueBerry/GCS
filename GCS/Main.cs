@@ -119,8 +119,6 @@ namespace GCS
             move.Hscroll = hscroll;
             move.Vscroll = vscroll;
 
-            Instantiate(construct);
-
             var menu = new MenuStrip()
             {
                 BackColor = System.Drawing.Color.White
