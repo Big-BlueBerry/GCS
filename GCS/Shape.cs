@@ -254,6 +254,9 @@ namespace GCS
         public override int GetHashCode()
             => Coord.GetHashCode();
 
+        public override bool IsEnoughClose(Vector2 coord)
+            => Geometry.GetNearestDistance(this, coord) <= _nearDotDistance;
+
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
