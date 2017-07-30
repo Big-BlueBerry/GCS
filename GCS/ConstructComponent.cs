@@ -19,6 +19,7 @@ namespace GCS
         private DrawState _drawState = DrawState.NONE;
         private DotNaming _dotNamer = new DotNaming();
         private bool _wasDrawing = false;
+        private bool _readyForDrag = false;
         private bool _isDragging = false;
         private Dot _lastPoint;
         private List<Shape> _shapes;
@@ -275,6 +276,18 @@ namespace GCS
         {
             if (_drawState == DrawState.NONE)
             {
+                if (_selectedShapes.Count == 0) return;
+                if (Scene.CurrentScene.IsLeftMouseDown && _selectedShapes.Any(s => s.IsEnoughClose(_pos)))
+                {
+                    _readyForDrag = true;
+                }
+                if (_readyForDrag && Scene.CurrentScene.IsMouseMoved)
+                {
+                    _readyForDrag = false;
+                    if (Scene.CurrentScene.IsLeftMouseClicking)
+                        _isDragging = true;
+                }
+
                 if (_isDragging || Scene.CurrentScene.IsLeftMouseClicking && Scene.CurrentScene.IsMouseMoved)
                 {
                     var diff = Scene.CurrentScene.MousePosition - Scene.CurrentScene.LastMousePosition;
