@@ -11,8 +11,8 @@ namespace GCS
     {
         private static readonly float _nearDistance = 5;
 
-        internal List<Shape> Parents { get; private set; } = new List<Shape>();
-        internal List<Shape> Childs { get; private set; } = new List<Shape>();
+        internal List<Shape> Parents { get; private set; }
+        internal List<Shape> Childs { get; private set; }
 
         internal ShapeRule _rule = null;
         
@@ -26,11 +26,13 @@ namespace GCS
         protected ConstructComponent _comp;
         protected Vector2 _drawDelta => -_comp.Location;
 
+        public bool IsShowingName { get; set; } = true;
         public string Name { get; set; }
         public float Border { get; set; } = 2f;
         public Color Color { get; set; } = Color.Black;
         public Color FocusedColor { get; set; } = Color.Orange;
         public Color SelectedColor { get; set; } = Color.Cyan;
+        public Color TextColor { get; set; } = Color.Black;
         public bool Focused { get; set; } = false;
         public bool Selected { get; set; } = false;
         /// <summary>
@@ -52,8 +54,8 @@ namespace GCS
 
         public Shape()
         {
-            Parents.Clear();
-            Childs.Clear();
+            Parents = new List<Shape>();
+            Childs = new List<Shape>();
 
             if (_comp == null)
                 _comp = GameObject.Find("construct").GetComponent<ConstructComponent>();
@@ -271,7 +273,18 @@ namespace GCS
                 if (Parents[0].Selected)
                     Color = SelectedColor;
             GUI.DrawCircle(sb, Coord + _drawDelta, 4f, Border, Color, 20);
-            // GUI.DrawPoint(sb, Coord, Border, Color);
+            // GUI.DrawPoint(sb, Coord, Border, Color);\
+            if (IsShowingName && Name != null)
+            {
+                var size = Resources.Font.MeasureString(Name).ToPoint();
+                GUI.DrawString(sb,
+                    Resources.Font,
+                    Name,
+                    Alignment.Left | Alignment.Bottom,
+                    new Rectangle((Coord - _comp.Location).ToPoint() - size, size),
+                    TextColor,
+                    0f);
+            }
         }
 
         public override void MoveTo(Vector2 at)

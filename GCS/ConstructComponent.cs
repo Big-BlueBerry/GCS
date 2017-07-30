@@ -17,6 +17,7 @@ namespace GCS
         public Rectangle Bound => new Rectangle(Location.ToPoint(), Scene.CurrentScene.ScreenBounds);
 
         private DrawState _drawState = DrawState.NONE;
+        private DotNaming _dotNamer = new DotNaming();
         private bool _wasDrawing = false;
         private bool _isDragging = false;
         private Dot _lastPoint;
@@ -88,6 +89,8 @@ namespace GCS
         private void AddShape(Shape shape)
         {
             if (_shapes.Contains(shape)) return;
+            if (shape is Dot)
+                shape.Name = _dotNamer.GetCurrent();
             _shapes.Add(shape);
         }
 

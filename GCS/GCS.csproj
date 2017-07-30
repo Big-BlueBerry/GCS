@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="ConstructComponent.cs" />
     <Compile Include="Dot.ShapeRule.cs" />
+    <Compile Include="DotNaming.cs" />
     <Compile Include="DrawState.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="Main.cs" />
