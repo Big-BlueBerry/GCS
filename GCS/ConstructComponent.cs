@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+using ContextMenuStrip = System.Windows.Forms.ContextMenuStrip;
+
 namespace GCS
 {
     public class ConstructComponent : Renderable
@@ -28,7 +30,12 @@ namespace GCS
         private List<Shape> _rightNearShapes;
         private List<Shape> _nearShapes;
         private List<Shape> _selectedShapes;
-        private MenuStrip _shapeMenuStrip;
+        private ContextMenuStrip _menuStrip;
+
+        private bool _isAnyGuiUseMouse => _menuStrip.Focused;
+        private bool _isLeftMouseDown => Scene.CurrentScene.IsLeftMouseDown && _isAnyGuiUseMouse;
+        private bool _isLeftMouseUp => Scene.CurrentScene.IsLeftMouseUp && _isAnyGuiUseMouse;
+        private bool _isLeftMouseClicking => Scene.CurrentScene.IsLeftMouseClicking && _isAnyGuiUseMouse;
 
         public ConstructComponent()
         {
@@ -37,16 +44,19 @@ namespace GCS
             _selectedShapes = new List<Shape>();
             _lastPoint = Dot.FromCoord(0, 0);
             OnCamera = false;
+
+            InitMenuStrip();
         }
 
-        public override void Start()
+        private void InitMenuStrip()
         {
-            base.Start();
+            _menuStrip = new ContextMenuStrip();
+            _menuStrip.Items.Add("제거");
 
-            _shapeMenuStrip = new MenuStrip();
-            _shapeMenuStrip.Items.Add(new MenuStripItem("Delete"));
-            _shapeMenuStrip.Items.Add(new MenuStripItem("Merge"));
-            Scene.CurrentScene.GuiManager.GetComponent<GUIManager>().GUIs.Add(_shapeMenuStrip);
+            _menuStrip.Items.Add("여기로 병합");
+
+            _menuStrip.Items[0].Click += (s, e) => DeleteSelected();
+            _menuStrip.Items[1].Click += (s, e) => UpdateAttach();
         }
 
         public void Clear()
@@ -139,6 +149,7 @@ namespace GCS
 
         private void UpdateAdding()
         {
+            if (_isAnyGuiUseMouse) return;
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 if (_drawState != DrawState.NONE)
@@ -218,6 +229,7 @@ namespace GCS
 
         private void UpdateSelect()
         {
+            if (_isAnyGuiUseMouse) return;
             if (_drawState == DrawState.NONE)
             {
                 if (_nearShapes.Count > 0)
@@ -313,10 +325,12 @@ namespace GCS
                     //Select(_nearShapes[0]);
                     _rightPos = _pos;
                     _rightNearShapes = _nearShapes.ToList();
-                    _shapeMenuStrip.Show(Scene.CurrentScene.MousePosition.X, Scene.CurrentScene.MousePosition.Y);
+                    _menuStrip.Show(System.Windows.Forms.Control.FromHandle(Scene.CurrentScene.Window.Handle),
+                        Scene.CurrentScene.MousePosition.X, Scene.CurrentScene.MousePosition.Y);
                 }
             }
 
+            /*
             if (_shapeMenuStrip.IsSelected)
             {
                 if (_shapeMenuStrip.SelectedItem.Text == "Delete")
@@ -324,6 +338,7 @@ namespace GCS
                 else if (_shapeMenuStrip.SelectedItem.Text == "Merge")
                     UpdateAttach();
             }
+            */
         }
 
         private void UpdateShortcuts()
