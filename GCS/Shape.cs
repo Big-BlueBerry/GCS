@@ -135,8 +135,10 @@ namespace GCS
         public Vector2 Point1 { get; protected set; }
         public Vector2 Point2 { get; protected set; }
 
-        public float Grad => (Point2.Y - Point1.Y) / (Point2.X - Point1.X);
-        public float Yint => Point1.Y - Grad * Point1.X;
+        private float _grad;
+        public float Grad { get => _grad; protected set => _grad = value; }
+        private float _yint;
+        public float Yint { get => _yint; protected set => _yint = value; }
 
         protected LineLike(Vector2? p1 = null, Vector2? p2 = null)
         {
@@ -148,6 +150,9 @@ namespace GCS
         {
             Point1 += add;
             Point2 += add;
+
+            Grad = (Point2.Y - Point1.Y) / (Point2.X - Point1.X);
+            Yint = Point1.Y - Grad * Point1.X;
 
             _rule.OnMoved();
         }
@@ -180,6 +185,14 @@ namespace GCS
 
         internal static Line FromTwoPoints(Vector2 p1, Vector2 p2)
             => new Line(p1, p2);
+
+        public static Line ParallelLine(LineLike original, Dot on)
+        {
+            Line line = new Line();
+            new ParallelLineRule(line, original, on);
+
+            return line;
+        }
     }
 
     public class Segment : LineLike
