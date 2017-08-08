@@ -104,10 +104,11 @@ namespace GCS
                 BackColor = System.Drawing.Color.White
             };
 
-            menu.Items.Add("파일(&F)");
-            menu.Items.Add("편집(&E)");
-            menu.Items.Add("보기(&D)");
-            menu.Items.Add("작도(&C)");
+            var con = new ToolStripMenuItem("작도(&C)");
+            con.DropDownItems.Add("평행선");
+            con.DropDownItems[0].Click += (s, e) => _construct.SelectConstruct(ConstructType.ParallelLine);
+            
+            menu.Items.Add(con);
 
             var control = Control.FromHandle(Window.Handle);
             control.Controls.Add(shapeStrip);

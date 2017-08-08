@@ -76,6 +76,7 @@ namespace GCS
                 dot.Move(delta);
 
                 MoveChilds();
+                Fix();
 
                 _last = line.Point1;
                 IsHandling = false;
@@ -91,9 +92,9 @@ namespace GCS
             protected override void Fix()
             {
                 var line = Shape as Line;
+                var dot = (line.Parents[1] as Dot);
                 line.Grad = (line.Parents[0] as LineLike).Grad;
-                //line.Yint = line.Grad
-                // TODO: 여기서 yint 설정하기
+                line.Yint = dot.Coord.Y - line.Grad * dot.Coord.X;
             }
         }
     }

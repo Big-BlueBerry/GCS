@@ -453,5 +453,19 @@ namespace GCS
             UpdateLists(sb);
             sb.End();
         }
+
+        public void SelectConstruct(ConstructType type)
+        {
+            if(_selectedShapes.Count == 2)
+            {
+                if(_selectedShapes[0] is LineLike && _selectedShapes[1] is Dot
+                || _selectedShapes[0] is Dot && _selectedShapes[1] is LineLike)
+                {
+                    var line = _selectedShapes[0] as LineLike ?? _selectedShapes[1] as LineLike;
+                    var dot = _selectedShapes[0] as Dot ?? _selectedShapes[1] as Dot;
+                    _shapes.Add(Line.ParallelLine(line, dot));
+                }
+            }
+        }
     }
 }

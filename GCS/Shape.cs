@@ -135,15 +135,19 @@ namespace GCS
         public Vector2 Point1 { get; protected set; }
         public Vector2 Point2 { get; protected set; }
 
-        private float _grad;
-        public float Grad { get => _grad; protected set => _grad = value; }
-        private float _yint;
-        public float Yint { get => _yint; protected set => _yint = value; }
+        private float? _grad;
+        public float Grad { get => _grad ?? (Point2.Y - Point1.Y) / (Point2.X - Point1.X);
+            protected set => _grad = value; }
+        private float? _yint;
+        public float Yint { get => _yint ?? Point1.Y - Grad * Point1.X;
+            protected set => _yint = value; }
 
         protected LineLike(Vector2? p1 = null, Vector2? p2 = null)
         {
             Point1 = p1 ?? new Vector2();
             Point2 = p2 ?? new Vector2();
+
+            Move(Vector2.Zero);
         }
 
         public override void Move(Vector2 add)
@@ -151,10 +155,10 @@ namespace GCS
             Point1 += add;
             Point2 += add;
 
-            Grad = (Point2.Y - Point1.Y) / (Point2.X - Point1.X);
-            Yint = Point1.Y - Grad * Point1.X;
+            //Grad = (Point2.Y - Point1.Y) / (Point2.X - Point1.X);
+            //Yint = Point1.Y - Grad * Point1.X;
 
-            _rule.OnMoved();
+            _rule?.OnMoved();
         }
 
         public override void MoveTo(Vector2 at)
