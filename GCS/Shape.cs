@@ -193,6 +193,14 @@ namespace GCS
 
             return line;
         }
+
+        public static Line PerpendicularLine(LineLike original, Dot on)
+        {
+            Line line = new Line();
+            new PerpendicularLineRule(line, original, on);
+
+            return line;
+        }
     }
 
     public class Segment : LineLike

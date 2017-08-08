@@ -9,6 +9,7 @@ namespace GCS
     public enum ConstructType
     {
         None,
-        ParallelLine
+        ParallelLine,
+        PerpendicularLine
     }
 }

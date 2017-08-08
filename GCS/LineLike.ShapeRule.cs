@@ -102,5 +102,60 @@ namespace GCS
                 _last = line.Point1;
             }
         }
+
+        public class PerpendicularLineRule : ShapeRule
+        {
+            private Vector2 _last = new Vector2();
+            public PerpendicularLineRule(Line line, LineLike original, Dot on) : base(line)
+            {
+                original.Childs.Add(line);
+                on.Childs.Add(line);
+                line.Parents.Add(original);
+                line.Parents.Add(on);
+
+                Fix();
+            }
+
+            public override void OnMoved()
+            {
+                if (IsHandling) return;
+                IsHandling = true;
+
+                var line = Shape as Line;
+                var delta = line.Point1 - _last;
+
+                var dot = line.Parents[1] as Dot;
+                dot.Move(delta);
+
+                MoveChilds();
+                Fix();
+                IsHandling = false;
+            }
+
+            public override void OnParentMoved()
+            {
+                if (IsHandling) return;
+                Fix();
+                MoveChilds();
+            }
+
+            protected override void Fix()
+            {
+                var line = Shape as Line;
+                var parent = (line.Parents[0] as LineLike);
+                var dot = (line.Parents[1] as Dot).Coord;
+
+                var gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
+                                      dot.Y - (parent.Point1.Y + parent.Point2.Y) / 2);
+
+                var p1 = Geometry.Rotate(parent.Point1 + gap - dot, MathHelper.ToRadians(90)) + dot;
+                var p2 = Geometry.Rotate(parent.Point2 + gap - dot, MathHelper.ToRadians(90)) + dot;
+
+                line.Point1 = p1;
+                line.Point2 = p2;
+
+                _last = line.Point1;
+            }
+        }
     }
 }
