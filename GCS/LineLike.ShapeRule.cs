@@ -77,8 +77,6 @@ namespace GCS
 
                 MoveChilds();
                 Fix();
-
-                _last = line.Point1;
                 IsHandling = false;
             }
 
@@ -92,9 +90,16 @@ namespace GCS
             protected override void Fix()
             {
                 var line = Shape as Line;
-                var dot = (line.Parents[1] as Dot);
-                line.Grad = (line.Parents[0] as LineLike).Grad;
-                line.Yint = dot.Coord.Y - line.Grad * dot.Coord.X;
+                var parent = (line.Parents[0] as LineLike);
+                var dot = (line.Parents[1] as Dot).Coord;
+
+                var gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
+                                      dot.Y - (parent.Point1.Y + parent.Point2.Y) / 2);
+
+                line.Point1 = parent.Point1 + gap;
+                line.Point2 = parent.Point2 + gap;
+
+                _last = line.Point1;
             }
         }
     }

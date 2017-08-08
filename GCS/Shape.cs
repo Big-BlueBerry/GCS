@@ -134,13 +134,9 @@ namespace GCS
     {
         public Vector2 Point1 { get; protected set; }
         public Vector2 Point2 { get; protected set; }
-
-        private float? _grad;
-        public float Grad { get => _grad ?? (Point2.Y - Point1.Y) / (Point2.X - Point1.X);
-            protected set => _grad = value; }
-        private float? _yint;
-        public float Yint { get => _yint ?? Point1.Y - Grad * Point1.X;
-            protected set => _yint = value; }
+        
+        public float Grad => (Point2.Y - Point1.Y) / (Point2.X - Point1.X);
+        public float Yint => Point1.Y - Grad * Point1.X;
 
         protected LineLike(Vector2? p1 = null, Vector2? p2 = null)
         {
