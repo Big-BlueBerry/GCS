@@ -21,7 +21,7 @@ namespace GCS
                 }
                 else 
                 {
-                    return string.Concat(I2S( _current % 26 + 'A'), I2S(_labelnum + '1'));
+                    return string.Concat(I2S( _current % 26 + 'A'), Convert.ToString(_labelnum + 1));
                     if (_current % 26 == 0) _labelnum++;
                 }
             }
