@@ -9,21 +9,21 @@ namespace GCS
     public class DotNaming
     {
         private int _current = 0;
+        private int _labelnum = 0;
 
         public string GetCurrent()
         {
             try
             {
-                if (_current < 25) // 'A' ~ 'Z'
+                if (_current < 26) // 'A' ~ 'Z'
                 {
                     return I2S(_current + 'A');
                 }
-                else if (_current < 25 + 25 * 25)
+                else 
                 {
-                    return string.Concat(I2S((_current - 25) / 25 + 'A'), I2S(_current % 25));
+                    return string.Concat(I2S( _current % 26 + 'A'), I2S(_labelnum + '1'));
+                    if (_current % 26 == 0) _labelnum++;
                 }
-                else
-                    throw new OverflowException("이거 그냥 반복문 돌리면 되는데 그걸 하기엔 너모 귀찮다 꺄륵..");
             }
             finally
             {
