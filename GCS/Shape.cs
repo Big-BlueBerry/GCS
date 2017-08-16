@@ -127,7 +127,7 @@ namespace GCS
 
         public override object Clone()
         {
-            return new Circle() { Center = this.Center, Radius = this.Radius };
+            return new Circle() { Center = this.Center, Another = this.Another };
         }
     }
 
