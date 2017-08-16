@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace GCS
 {
-    public abstract partial class Shape
+    public abstract partial class Shape : ICloneable
     {
         private static readonly float _nearDistance = 5;
 
@@ -51,6 +51,7 @@ namespace GCS
         }
         public abstract void Move(Vector2 add);
         public abstract void MoveTo(Vector2 at);
+        public abstract object Clone();
 
         public Shape()
         {
@@ -123,6 +124,11 @@ namespace GCS
             new CircleOnTwoDotsRule(circle, center, another);
             return circle;
         }
+
+        public override object Clone()
+        {
+            return new Circle() { Center = this.Center, Radius = this.Radius };
+        }
     }
 
     public partial class Ellipse : Shape
@@ -161,6 +167,11 @@ namespace GCS
             Ellipse ellipse = new Ellipse();
             new EllipseOnThreeDotsRule(ellipse, f1, f2, pin);
             return ellipse;
+        }
+
+        public override object Clone()
+        {
+            return new Ellipse { Focus1 = this.Focus1, Focus2 = this.Focus2, PinPoint = this.PinPoint };
         }
     }
 
@@ -235,6 +246,11 @@ namespace GCS
 
             return line;
         }
+
+        public override object Clone()
+        {
+            return new Line(Point1, Point2);
+        }
     }
 
     public class Segment : LineLike
@@ -254,6 +270,11 @@ namespace GCS
             var rule = new LineLikeOnTwoDotsRule(seg, d1, d2);
 
             return seg;
+        }
+
+        public override object Clone()
+        {
+            return new Segment(Point1, Point2);
         }
     }
     
@@ -292,6 +313,11 @@ namespace GCS
             var rule = new LineLikeOnTwoDotsRule(vec, d1, d2);
 
             return vec;
+        }
+
+        public override object Clone()
+        {
+            return new Vector(Point1, Point2);
         }
     }
 
@@ -381,6 +407,11 @@ namespace GCS
         public void AttachTo(Dot parent)
         {
             new DotOnDotRule(this, parent);
+        }
+
+        public override object Clone()
+        {
+            return new Dot(Coord);
         }
     }
 }
