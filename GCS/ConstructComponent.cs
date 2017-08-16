@@ -32,6 +32,7 @@ namespace GCS
         private List<Shape> _nearShapes;
         private List<Shape> _selectedShapes;
         private ContextMenuStrip _menuStrip;
+        private Shape Clipboard;
 
         private bool _isAnyGuiUseMouse => _menuStrip.Focused || (Scene.CurrentScene as Main).GetFocused();
         private bool _isLeftMouseDown => Scene.CurrentScene.IsLeftMouseDown && _isAnyGuiUseMouse;
@@ -362,10 +363,17 @@ namespace GCS
             {
                 DeleteSelected();
             }
-
-            if (state.IsKeyDown(Keys.LeftControl) && state.IsKeyDown(Keys.A))
+            else if (state.IsKeyDown(Keys.LeftControl) && state.IsKeyDown(Keys.A))
             {
                 SelectAll();
+            }
+            else if (state.IsKeyDown(Keys.LeftControl) && state.IsKeyDown(Keys.C))
+            {
+                CopySelected();
+            }
+            else if (state.IsKeyDown(Keys.LeftControl) && state.IsKeyDown(Keys.V))
+            {
+                Paste();
             }
         }
 
@@ -520,6 +528,31 @@ namespace GCS
                         break;
                     }
             }
+        }
+
+        private void CopySelected()
+        {
+            /*
+             * 여기서 도형이 여러개면 Rule도 유지한채로 복사되야됨..
+             */
+            if (_selectedShapes.Count == 1)
+                Copy(_selectedShapes[0]);
+        }
+
+        private void Copy(Shape shape)
+        {
+            /*
+             * 도형 복사 붙여넣기는 가장 기본적인 rule 아니면 rule을 Detach해서 Clone
+             * 기본적인 rule은 TwoDotsOn..Rule 같은 것들
+             */
+
+            Clipboard = shape.Clone() as Shape;
+        }
+
+        private void Paste()
+        {
+            Clipboard.Move(new Vector2(25, 25));
+            AddShape(Clipboard);
         }
     }
 }
