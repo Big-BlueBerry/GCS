@@ -47,6 +47,11 @@
     <Compile Include="DotNaming.cs" />
     <Compile Include="DrawState.cs" />
     <Compile Include="Geometry.cs" />
+    <Compile Include="Icon.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Icon.resx</DependentUpon>
+    </Compile>
     <Compile Include="Main.cs" />
     <Compile Include="MoveConstructComponent.cs" />
     <Compile Include="Program.cs" />
@@ -75,6 +80,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon.ico" />
+    <None Include="Resources\vector.png" />
+    <None Include="Resources\segment.png" />
+    <None Include="Resources\line.png" />
+    <None Include="Resources\halfline.png" />
+    <None Include="Resources\ellipse.png" />
+    <None Include="Resources\dot.png" />
+    <None Include="Resources\circle.png" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
@@ -83,6 +95,12 @@
     <Compile Include="Circle.ShapeRule.cs" />
     <Compile Include="Ellipse.ShapeRule.cs" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icon.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Icon.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />

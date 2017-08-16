@@ -133,6 +133,15 @@ namespace GCS
         public Vector2 Focus2 { get; protected set; }
         public Vector2 PinPoint { get; protected set; }
 
+        protected Ellipse() : base() { }
+
+        public override void Draw(SpriteBatch sb)
+        {
+            if (Disabled) return;
+            base.Draw(sb);
+            GUI.DrawEllipse(sb, Focus1 + _drawDelta, Focus2 + _drawDelta, PinPoint + _drawDelta, Border, Color, Sides);
+        }
+
         public override void Move(Vector2 add)
         {
             Focus1 += add;
@@ -146,8 +155,6 @@ namespace GCS
             var diff = at - PinPoint;
             Move(diff);
         }
-
-        protected Ellipse() : base() { }
 
         public static Ellipse FromThreeDots(Dot f1, Dot f2, Dot pin)
         {

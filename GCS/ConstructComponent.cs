@@ -23,6 +23,7 @@ namespace GCS
         private bool _wasDrawing = false;
         private bool _readyForDrag = false;
         private bool _isDragging = false;
+        private Dot _ellipseLastPoint;
         private Dot _lastPoint;
         private List<Shape> _shapes;
         private Vector2 _pos;
@@ -159,7 +160,7 @@ namespace GCS
                         _lastPoint = GetDot(_pos);
                         _wasDrawing = true;
                     }
-                    else if (_drawState == DrawState.DOT)
+                    else if (_drawState == DrawState.DOT || _drawState == DrawState.ELLIPSE)
                         _lastPoint.MoveTo(_pos);
                 }
             }
@@ -169,6 +170,13 @@ namespace GCS
                 {
                     AddShape(_lastPoint);
                     //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
+                }
+                else if (_drawState == DrawState.ELLIPSE)
+                {
+                    _ellipseLastPoint = _lastPoint;
+                    _drawState = DrawState.ELLIPSE_POINT;
+                    _wasDrawing = false;
+                    return;
                 }
                 else
                 {
@@ -196,6 +204,12 @@ namespace GCS
                     else if (_drawState == DrawState.VECTOR)
                     {
                         sp = Vector.FromTwoDots(_lastPoint, p);
+                        AddShape(sp);
+                    }
+                    else if (_drawState == DrawState.ELLIPSE_POINT)
+                    {
+                        AddShape(_ellipseLastPoint);
+                        sp = Ellipse.FromThreeDots(_ellipseLastPoint, _lastPoint, p);
                         AddShape(sp);
                     }
                     //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { sp }, null));
@@ -425,12 +439,21 @@ namespace GCS
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
             sb.BeginAA();
             _pos = Mouse.GetState().Position.ToVector2() + Location;
-            if (_wasDrawing)
+            if (_wasDrawing || _drawState == DrawState.ELLIPSE_POINT)
             {
                 if (_drawState == DrawState.CIRCLE)
                 {
                     float radius = (_pos - _lastPoint.Coord).Length();
                     GUI.DrawCircle(sb, _lastPoint.Coord - Location, radius, 2, Color.DarkGray, 100);
+                }
+                else if (_drawState == DrawState.ELLIPSE)
+                {
+                    _lastPoint.Draw(sb);
+                }
+                else if (_drawState == DrawState.ELLIPSE_POINT)
+                {
+                    _ellipseLastPoint.Draw(sb);
+                    Ellipse.FromThreeDots(_ellipseLastPoint, _lastPoint, Dot.FromCoord(_pos)).Draw(sb);
                 }
                 else if (_drawState == DrawState.SEGMENT)
                 {

@@ -93,11 +93,12 @@ namespace GCS
                 Dock = DockStyle.Left
             };
 
-            AddStripItem(shapeStrip, @"D:\Image\design\GCS\circle.png").Click += (b, d) => _construct.ChangeState(DrawState.CIRCLE);
-            AddStripItem(shapeStrip, @"D:\Image\design\GCS\segment.png").Click += (b, d) => _construct.ChangeState(DrawState.SEGMENT);
-            AddStripItem(shapeStrip, @"D:\Image\design\GCS\line.png").Click += (b, d) => _construct.ChangeState(DrawState.LINE);
-            AddStripItem(shapeStrip, @"D:\Image\design\GCS\vector.png").Click += (b, d) => _construct.ChangeState(DrawState.VECTOR);
-            AddStripItem(shapeStrip, @"D:\Image\design\GCS\dot.png").Click += (b, d) => _construct.ChangeState(DrawState.DOT);
+            AddStripItem(shapeStrip, Icon.circle).Click += (b, d) => _construct.ChangeState(DrawState.CIRCLE);
+            AddStripItem(shapeStrip, Icon.ellipse).Click += (b, d) => _construct.ChangeState(DrawState.ELLIPSE);
+            AddStripItem(shapeStrip, Icon.segment).Click += (b, d) => _construct.ChangeState(DrawState.SEGMENT);
+            AddStripItem(shapeStrip, Icon.line).Click += (b, d) => _construct.ChangeState(DrawState.LINE);
+            AddStripItem(shapeStrip, Icon.vector).Click += (b, d) => _construct.ChangeState(DrawState.VECTOR);
+            AddStripItem(shapeStrip, Icon.dot).Click += (b, d) => _construct.ChangeState(DrawState.DOT);
 
             VScrollBar vscroll = new VScrollBar();
             vscroll.Dock = DockStyle.Right;
@@ -132,10 +133,10 @@ namespace GCS
             control.Controls.Add(hscroll);
         }
 
-        private ToolStripMenuItem AddStripItem(MenuStrip strip, string imgPath)
+        private ToolStripMenuItem AddStripItem(MenuStrip strip, Image img)
         {
             var imageSize = new Size(60, 60);
-            var item = new ToolStripMenuItem(new Bitmap(Image.FromFile(imgPath), imageSize));
+            var item = new ToolStripMenuItem(new Bitmap(img, imageSize));
             item.ImageAlign = ContentAlignment.MiddleCenter;
             item.ImageScaling = ToolStripItemImageScaling.None;
             item.AutoSize = true;

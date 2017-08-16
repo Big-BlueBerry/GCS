@@ -10,6 +10,8 @@ namespace GCS
     {
         NONE,
         CIRCLE,
+        ELLIPSE,
+        ELLIPSE_POINT,
         SEGMENT,
         LINE,
         VECTOR,
