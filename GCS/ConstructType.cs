@@ -10,6 +10,7 @@ namespace GCS
     {
         None,
         ParallelLine,
-        PerpendicularLine
+        PerpendicularLine,
+        Ellipse
     }
 }

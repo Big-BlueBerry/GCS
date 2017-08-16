@@ -20,6 +20,18 @@ namespace GCS
     public class Main : Scene
     {
         private ConstructComponent _construct;
+        private MenuStrip shapeStrip;
+        private MenuStrip menu;
+
+        public bool GetFocused()
+        {
+            foreach (ToolStripMenuItem item in shapeStrip.Items)
+                if (item.IsOnDropDown ) return true;
+            foreach (ToolStripMenuItem item in menu.Items)
+                if (item.IsOnDropDown) return true;
+            return false;
+        }
+
         protected override void Initialize()
         {
             base.Initialize();
@@ -75,7 +87,7 @@ namespace GCS
         
         private void InitGUI()
         {
-            MenuStrip shapeStrip = new MenuStrip()
+            shapeStrip = new MenuStrip()
             {
                 BackColor = System.Drawing.Color.White,
                 Dock = DockStyle.Left
@@ -99,7 +111,7 @@ namespace GCS
             move.Hscroll = hscroll;
             move.Vscroll = vscroll;
 
-            var menu = new MenuStrip()
+            menu = new MenuStrip()
             {
                 BackColor = System.Drawing.Color.White
             };
@@ -107,8 +119,10 @@ namespace GCS
             var con = new ToolStripMenuItem("작도(&C)");
             con.DropDownItems.Add("평행선(&E)");
             con.DropDownItems.Add("수선(&P)");
+            con.DropDownItems.Add("타원(&L)");
             con.DropDownItems[0].Click += (s, e) => _construct.SelectConstruct(ConstructType.ParallelLine);
             con.DropDownItems[1].Click += (s, e) => _construct.SelectConstruct(ConstructType.PerpendicularLine);
+            con.DropDownItems[2].Click += (s, e) => _construct.SelectConstruct(ConstructType.Ellipse);
             menu.Items.Add(con);
 
             var control = Control.FromHandle(Window.Handle);

@@ -95,7 +95,7 @@ namespace GCS
             set => throw new NotSupportedException();
         }
 
-        public Circle() : base() { }
+        protected Circle() : base() { }
 
         public override void Draw(SpriteBatch sb)
         {
@@ -108,7 +108,7 @@ namespace GCS
         {
             Center += add;
             Another += add;
-            _rule.OnMoved();
+            _rule?.OnMoved();
         }
 
         public override void MoveTo(Vector2 at)
@@ -123,10 +123,37 @@ namespace GCS
             new CircleOnTwoDotsRule(circle, center, another);
             return circle;
         }
+    }
 
-        public void DetachRule()
+    public partial class Ellipse : Shape
+    {
+        public static int Sides = 100;
+
+        public Vector2 Focus1 { get; protected set; }
+        public Vector2 Focus2 { get; protected set; }
+        public Vector2 PinPoint { get; protected set; }
+
+        public override void Move(Vector2 add)
         {
-            _rule.Detach();
+            Focus1 += add;
+            Focus2 += add;
+            PinPoint += add;
+            _rule?.OnMoved();
+        }
+
+        public override void MoveTo(Vector2 at)
+        {
+            var diff = at - PinPoint;
+            Move(diff);
+        }
+
+        protected Ellipse() : base() { }
+
+        public static Ellipse FromThreeDots(Dot f1, Dot f2, Dot pin)
+        {
+            Ellipse ellipse = new Ellipse();
+            new EllipseOnThreeDotsRule(ellipse, f1, f2, pin);
+            return ellipse;
         }
     }
 

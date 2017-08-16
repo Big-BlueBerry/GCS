@@ -60,7 +60,7 @@
   <ItemGroup>
     <Reference Include="Grid, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\dsm2016\Grid\Grid\bin\Windows\x86\Debug\Grid.exe</HintPath>
+      <HintPath>..\..\Grid\Grid\bin\Windows\x86\Debug\Grid.exe</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
@@ -81,6 +81,7 @@
     <None Include="app.manifest" />
     <Compile Include="LineLike.ShapeRule.cs" />
     <Compile Include="Circle.ShapeRule.cs" />
+    <Compile Include="Ellipse.ShapeRule.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

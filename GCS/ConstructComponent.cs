@@ -32,7 +32,7 @@ namespace GCS
         private List<Shape> _selectedShapes;
         private ContextMenuStrip _menuStrip;
 
-        private bool _isAnyGuiUseMouse => _menuStrip.Focused;
+        private bool _isAnyGuiUseMouse => _menuStrip.Focused || (Scene.CurrentScene as Main).GetFocused();
         private bool _isLeftMouseDown => Scene.CurrentScene.IsLeftMouseDown && _isAnyGuiUseMouse;
         private bool _isLeftMouseUp => Scene.CurrentScene.IsLeftMouseUp && _isAnyGuiUseMouse;
         private bool _isLeftMouseClicking => Scene.CurrentScene.IsLeftMouseClicking && _isAnyGuiUseMouse;
@@ -482,6 +482,20 @@ namespace GCS
                         }
                     }
                     break;
+                case ConstructType.Ellipse:
+                    {
+                        if (_selectedShapes.Count == 3)
+                        {
+                            var f1 = _selectedShapes[0] as Dot;
+                            var f2 = _selectedShapes[1] as Dot;
+                            var pin = _selectedShapes[2] as Dot;
+                            if (f1 == null) return;
+                            if (f2 == null) return;
+                            if (pin == null) return;
+                            AddShape(Ellipse.FromThreeDots(f1, f2, pin));
+                        }
+                        break;
+                    }
             }
         }
     }
