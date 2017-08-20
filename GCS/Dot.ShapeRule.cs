@@ -69,7 +69,7 @@ namespace GCS
             {
                 var dot = Shape as Dot;
                 var parent = Shape.Parents[0];
-
+                //타원이라고 다를 건 없음. 다만 로테이션을 신경써주면 될 뿐
                 if (parent is Circle)
                 {
                     var circle = parent as Circle;

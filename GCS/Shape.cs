@@ -133,6 +133,11 @@ namespace GCS
         public Vector2 Focus2 { get; protected set; }
         public Vector2 PinPoint { get; protected set; }
 
+        public float Sublength=> Vector2.Distance(Focus1, Focus2) / 2;//c 
+        public float Semimajor => (Vector2.Distance(Focus1, PinPoint) + Vector2.Distance(Focus2, PinPoint)) / 2;//a
+        public float Semiminor => (float)Math.Sqrt(Semimajor * Semimajor - Sublength * Sublength);//b
+        //center ?
+
         protected Ellipse() : base() { }
 
         public override void Draw(SpriteBatch sb)
