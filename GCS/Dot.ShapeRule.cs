@@ -70,11 +70,22 @@ namespace GCS
                 var dot = Shape as Dot;
                 var parent = Shape.Parents[0];
                 //타원이라고 다를 건 없음. 다만 로테이션을 신경써주면 될 뿐
-                if (parent is Circle)
+                if (parent is Circle )
                 {
                     var circle = parent as Circle;
                     _ratio = (float)Math.Atan2(circle.Center.Y - dot.Coord.Y,
                                                -dot.Coord.X + circle.Center.X) + (float)Math.PI;
+                }
+                else if (parent is Ellipse)
+                {
+                    Ellipse ellipse = parent as Ellipse;
+                    Vector2 diff = ellipse.Focus1 - ellipse.Focus2;
+                    float angle = (float)Math.Atan2(diff.Y, diff.X);
+                    Ellipse elp = Ellipse.FromThreeDots(Dot.FromCoord(Geometry.Rotate(ellipse.Focus1, -angle)),
+                        Dot.FromCoord(Geometry.Rotate(ellipse.Focus2, -angle)),
+                        Dot.FromCoord(Geometry.Rotate(ellipse.PinPoint, -angle)));
+                    Vector2 center = (elp.Focus1 + elp.Focus2) / 2;
+                    _ratio = (float)Math.Atan2(dot.Coord.Y - center.Y, -dot.Coord.X + center.X) + (float)Math.PI;
                 }
                 else if (parent is LineLike)
                 {
