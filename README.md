@@ -1,7 +1,7 @@
 # GCS
 Geometric Construction Simulator, 작도 시뮬레이션 프로그램
 
-![진행 상황](screenshot/sample.png)
+![진행 상황](screenshot/sample2.png)
 
 # 사용 방법
 
