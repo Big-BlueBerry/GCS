@@ -157,5 +157,87 @@ namespace GCS
                 _last = line.Point1;
             }
         }
+
+        public class TangentLineRule : ShapeRule
+        {
+            private Vector2 _last = new Vector2();
+            public TangentLineRule(Line line, Circle original, Dot on) : base(line)
+            {
+                original.Childs.Add(line);
+                on.Childs.Add(line);
+                line.Parents.Add(original);
+                line.Parents.Add(on);
+
+                Fix();
+            }
+
+            public TangentLineRule(Line line, Ellipse original, Dot on) : base(line)
+            {
+                original.Childs.Add(line);
+                on.Childs.Add(line);
+                line.Parents.Add(original);
+                line.Parents.Add(on);
+
+                Fix();
+            }
+
+            public override void OnMoved()
+            {
+                if (IsHandling) return;
+                IsHandling = true;
+
+                var line = Shape as Line;
+                var delta = line.Point1 - _last;
+
+                var dot = line.Parents[1] as Dot;
+                dot.Move(delta);
+
+                MoveChilds();
+                Fix();
+                IsHandling = false;
+            }
+
+            public override void OnParentMoved()
+            {
+                if (IsHandling) return;
+                Fix();
+                MoveChilds();
+            }
+
+            protected override void Fix()
+            {
+                var line = Shape as Line;
+                var dot = (line.Parents[1] as Dot).Coord;
+                if(line.Parents[0] is Ellipse)
+                {
+                    var parent = (line.Parents[0] as Ellipse);
+                    Vector2 diff = parent.Focus1 - parent.Focus2;
+                    float angle = (float)Math.Atan2(diff.Y, diff.X);
+                    var tempcenter = Geometry.Rotate(parent.Center, -angle);
+                    var tempdot = Geometry.Rotate(dot, -angle);
+                    
+                    float tempgrad = (parent.Semiminor * parent.Semiminor * (tempcenter.X - tempdot.X))/
+                        (parent.Semimajor * parent.Semimajor * (tempdot.Y - tempcenter.Y ) );
+                    float grad = (float)((tempgrad + Math.Tan(angle)) / (1 - tempgrad * Math.Tan(angle)));
+                    //tangent 덧셈 정리
+                    line.Point1 = dot;
+                    line.Point2 = dot + new Vector2(1, grad);
+
+                }
+                else
+                {
+                    var parent = (line.Parents[0] as Circle);
+                    float grad = (parent.Center.X - dot.X) / (dot.Y - parent.Center.Y);
+                    //float Weight = (float)Math.Sqrt(parent.Radius/(grad*grad+1));
+                    line.Point1 = dot;
+                    line.Point2 = dot + new Vector2(1, grad); // or (Weight, Weight * grad)
+                    //Weight 는 Point1 과 Point2 사이의 거리를 Radius 로 뽑아줄 때 쓰면 됨.
+                }
+
+                _last = line.Point1;
+            }
+
+        }
+
     }
 }

@@ -46,42 +46,41 @@ namespace GCS
                 Vector2[] result=new Vector2[] { };
                 Ellipse elp = shape1 as Ellipse;
                 Vector2 diff = elp.Focus1 - elp.Focus2;
-                Vector2 center = (elp.Focus1 + elp.Focus2) / 2;
                 float angle = (float)Math.Atan2(diff.Y, diff.X);
-                Ellipse ellipse = Ellipse.FromThreeDots(Dot.FromCoord(Rotate(elp.Focus1, -angle) - center),
-                    Dot.FromCoord(Rotate(elp.Focus2, -angle) - center), Dot.FromCoord(Rotate(elp.PinPoint, -angle) - center));
+                Ellipse ellipse = Ellipse.FromThreeDots(Dot.FromCoord(Rotate(elp.Focus1, -angle) - elp.Center),
+                    Dot.FromCoord(Rotate(elp.Focus2, -angle) - elp.Center), Dot.FromCoord(Rotate(elp.PinPoint, -angle) - elp.Center));
                 if(shape2 is Segment)
                 {
                     Segment seg = shape2 as Segment;
-                    Segment segment = Segment.FromTwoDots(Dot.FromCoord(Rotate(seg.Point1, -angle) - center),
-                        Dot.FromCoord(Rotate(seg.Point1, -angle) - center));
+                    Segment segment = Segment.FromTwoDots(Dot.FromCoord(Rotate(seg.Point1, -angle) - elp.Center),
+                        Dot.FromCoord(Rotate(seg.Point1, -angle) - elp.Center));
                     result = getIntersect(ellipse, segment);
                 }
                 else if(shape2 is Line)
                 {
                     Line lin = shape2 as Line;
-                    Line line = Line.FromTwoDots(Dot.FromCoord(Rotate(lin.Point1, -angle) - center), 
-                        Dot.FromCoord(Rotate(lin.Point1, -angle) - center));
+                    Line line = Line.FromTwoDots(Dot.FromCoord(Rotate(lin.Point1, -angle) - elp.Center), 
+                        Dot.FromCoord(Rotate(lin.Point1, -angle) - elp.Center));
                     result = getIntersect(ellipse, line);
                 }
                 else if(shape2 is Circle)
                 {
                     Circle cir = shape2 as Circle;
-                    Circle circle = Circle.FromTwoDots(Dot.FromCoord(Rotate(cir.Center, -angle) - center),
-                        Dot.FromCoord(Rotate(cir.Another, -angle) - center));
+                    Circle circle = Circle.FromTwoDots(Dot.FromCoord(Rotate(cir.Center, -angle) - elp.Center),
+                        Dot.FromCoord(Rotate(cir.Another, -angle) - elp.Center));
                     result = getIntersect(ellipse, circle);
                 }
                 else if(shape2 is Ellipse)
                 {
                     Ellipse elps = shape2 as Ellipse;
-                    Ellipse ellipse2 = Ellipse.FromThreeDots(Dot.FromCoord(Rotate(elps.Focus1, -angle) - center),
-                        Dot.FromCoord(Rotate(elps.Focus2, -angle) - center),
-                        Dot.FromCoord(Rotate(elps.PinPoint, -angle) - center));
+                    Ellipse ellipse2 = Ellipse.FromThreeDots(Dot.FromCoord(Rotate(elps.Focus1, -angle) - elp.Center),
+                        Dot.FromCoord(Rotate(elps.Focus2, -angle) - elp.Center),
+                        Dot.FromCoord(Rotate(elps.PinPoint, -angle) - elp.Center));
                     result = getIntersect(ellipse, ellipse2);
                 }
                 for(int i =0; i< result.Length; i++)
                 {
-                    result[i] = Rotate(result[i] + center ,angle);
+                    result[i] = Rotate(result[i] + elp.Center, angle);
                 }
                 return result;
             }
@@ -217,7 +216,7 @@ namespace GCS
                 return getIntersect(Line.FromTwoPoints(p1, p2), circle1);
             }
         }
-        //타원 초점의 x좌표가 서로 같을때 예외를 발생해 줘야 함.
+        //타원 초점의 x좌표가 서로 같을때 예외를 발생해 줘야 함. 근데 귀차늠 ^^
         private static Vector2[] getIntersect(Ellipse ellipse1, Line line1)
         {
             float a = ellipse1.Semimajor;
@@ -314,7 +313,7 @@ namespace GCS
         private static Vector2 getNearest(Ellipse ellipse, Vector2 point)
         {
             Vector2 center = (ellipse.Focus1 + ellipse.Focus2) / 2;
-            throw new WorkWoorimException("내일 하쟝");
+            throw new WorkWoorimException("어떠케 하는지 생각은 났음. 다만 확실한지?");
         }
 
         public static float GetNearestDistance(Shape shape, Vector2 point)
@@ -348,5 +347,11 @@ namespace GCS
             else return new Vector2((-b + (float)Math.Sqrt(d)) / (2 * a), (-b - (float)Math.Sqrt(d)) / (2 * a));
             
         }
+        /* 
+        public static float [] solveNEq()
+        {
+            
+        }
+        */
     }
 }

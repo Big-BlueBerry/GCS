@@ -15,7 +15,6 @@ namespace GCS
     {
         public Vector2 Location { get; set; }
         public Point Size { get; set; } = new Point(10000, 10000);
-
         public Rectangle Bound => new Rectangle(Location.ToPoint(), Scene.CurrentScene.ScreenBounds);
 
         private DrawState _drawState = DrawState.NONE;
@@ -243,6 +242,7 @@ namespace GCS
 
         private void UpdateSelect()
         {
+
             if (_isAnyGuiUseMouse) return;
             if (_drawState == DrawState.NONE)
             {
@@ -505,6 +505,25 @@ namespace GCS
                         }
                     }
                     break;
+                case ConstructType.Tangent:
+                    if (_selectedShapes.Count == 2)
+                    {
+                        if (_selectedShapes[0] is Circle && _selectedShapes[1] is Dot
+                        || _selectedShapes[0] is Dot && _selectedShapes[1] is Circle)
+                        {
+                            var cir = _selectedShapes[0] as Circle ?? _selectedShapes[1] as Circle;
+                            var dot = _selectedShapes[0] as Dot ?? _selectedShapes[1] as Dot;
+                            _shapes.Add(Line.TangentLine(cir, dot));
+                        }
+                        else if (_selectedShapes[0] is Ellipse && _selectedShapes[1] is Dot
+                        || _selectedShapes[0] is Dot && _selectedShapes[1] is Ellipse)
+                        {
+                            var elp = _selectedShapes[0] as Ellipse ?? _selectedShapes[1] as Ellipse;
+                            var dot = _selectedShapes[0] as Dot ?? _selectedShapes[1] as Dot;
+                            _shapes.Add(Line.TangentLine(elp, dot));
+                        }
+                    }
+                    break;   
                 case ConstructType.Ellipse:
                     {
                         if (_selectedShapes.Count == 3)
