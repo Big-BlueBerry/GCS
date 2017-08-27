@@ -9,7 +9,7 @@ namespace GCS
 {
     public static class Geometry
     {
-        
+        //주의 ) Ellipse 에 대해서는 항상 GetIntersect 로 호출
         public static Vector2[] GetIntersect(Shape shape1, Shape shape2)
         {
             if (shape2 is Ellipse) return GetIntersect(shape2, shape1);
@@ -47,40 +47,41 @@ namespace GCS
                 Ellipse elp = shape1 as Ellipse;
                 Vector2 diff = elp.Focus1 - elp.Focus2;
                 float angle = (float)Math.Atan2(diff.Y, diff.X);
-                Ellipse ellipse = Ellipse.FromThreeDots(Dot.FromCoord(Rotate(elp.Focus1, -angle) - elp.Center),
-                    Dot.FromCoord(Rotate(elp.Focus2, -angle) - elp.Center), Dot.FromCoord(Rotate(elp.PinPoint, -angle) - elp.Center));
+                Vector2 cent = Rotate(elp.Center, -angle);
+                Ellipse ellipse = Ellipse.FromThreeDots(Dot.FromCoord(Rotate(elp.Focus1, -angle) - cent),
+                    Dot.FromCoord(Rotate(elp.Focus2, -angle) - Rotate(elp.Center, -angle)), Dot.FromCoord(Rotate(elp.PinPoint, -angle) - cent));
                 if(shape2 is Segment)
                 {
                     Segment seg = shape2 as Segment;
-                    Segment segment = Segment.FromTwoDots(Dot.FromCoord(Rotate(seg.Point1, -angle) - elp.Center),
-                        Dot.FromCoord(Rotate(seg.Point1, -angle) - elp.Center));
+                    Segment segment = Segment.FromTwoDots(Dot.FromCoord(Rotate(seg.Point1, -angle) - cent),
+                        Dot.FromCoord(Rotate(seg.Point2, -angle) - Rotate(elp.Center, -angle)));
                     result = getIntersect(ellipse, segment);
                 }
                 else if(shape2 is Line)
                 {
                     Line lin = shape2 as Line;
-                    Line line = Line.FromTwoDots(Dot.FromCoord(Rotate(lin.Point1, -angle) - elp.Center), 
-                        Dot.FromCoord(Rotate(lin.Point1, -angle) - elp.Center));
+                    Line line = Line.FromTwoDots(Dot.FromCoord(Rotate(lin.Point1, -angle) - cent), 
+                        Dot.FromCoord(Rotate(lin.Point2, -angle) - cent));
                     result = getIntersect(ellipse, line);
                 }
                 else if(shape2 is Circle)
                 {
                     Circle cir = shape2 as Circle;
-                    Circle circle = Circle.FromTwoDots(Dot.FromCoord(Rotate(cir.Center, -angle) - elp.Center),
-                        Dot.FromCoord(Rotate(cir.Another, -angle) - elp.Center));
+                    Circle circle = Circle.FromTwoDots(Dot.FromCoord(Rotate(cir.Center, -angle) - cent),
+                        Dot.FromCoord(Rotate(cir.Another, -angle) - cent));
                     result = getIntersect(ellipse, circle);
                 }
                 else if(shape2 is Ellipse)
                 {
                     Ellipse elps = shape2 as Ellipse;
-                    Ellipse ellipse2 = Ellipse.FromThreeDots(Dot.FromCoord(Rotate(elps.Focus1, -angle) - elp.Center),
-                        Dot.FromCoord(Rotate(elps.Focus2, -angle) - elp.Center),
-                        Dot.FromCoord(Rotate(elps.PinPoint, -angle) - elp.Center));
+                    Ellipse ellipse2 = Ellipse.FromThreeDots(Dot.FromCoord(Rotate(elps.Focus1, -angle) - cent),
+                        Dot.FromCoord(Rotate(elps.Focus2, -angle) - cent),
+                        Dot.FromCoord(Rotate(elps.PinPoint, -angle) - cent));
                     result = getIntersect(ellipse, ellipse2);
                 }
                 for(int i =0; i< result.Length; i++)
                 {
-                    result[i] = Rotate(result[i] + elp.Center, angle);
+                    result[i] = Rotate(result[i] + cent, angle);
                 }
                 return result;
             }
@@ -218,19 +219,19 @@ namespace GCS
         }
         //타원 초점의 x좌표가 서로 같을때 예외를 발생해 줘야 함. 근데 귀차늠 ^^
         private static Vector2[] getIntersect(Ellipse ellipse1, Line line1)
-        {
+        {   
             float a = ellipse1.Semimajor;
             float b = ellipse1.Semiminor;
             float c = line1.Grad;
             float d = line1.Yint;
             try
             {
-                Vector2 xvec = solve2Eq(a * a * c * c + b * b, 2 * a * a * c * d, a * a * (d * d - b * b));
-                if (xvec.X == xvec.Y) return new[] { new Vector2(xvec.X, c * xvec.X + d) };
+                float [] xvec = MathMatics.solve2Eq(a * a * c * c + b * b, 2 * a * a * c * d, a * a * (d * d - b * b));
+                if (xvec[0] == xvec[1]) return new[] { new Vector2(xvec[0], c * xvec[0] + d) };
                 else return new[]
                 {
-                    new Vector2(xvec.X , c * xvec.X + d ),
-                    new Vector2(xvec.Y , c * xvec.Y + d)
+                    new Vector2(xvec[0] , c * xvec[0] + d ),
+                    new Vector2(xvec[1] , c * xvec[1] + d)
                 };
 
             }
@@ -281,6 +282,7 @@ namespace GCS
             if (shape is Segment) return getNearest(shape as Segment, point);
             if (shape is Line) return getNearest(shape as Line, point);
             if (shape is Circle) return getNearest(shape as Circle, point);
+            if (shape is Ellipse) return getNearest(shape as Ellipse, point);
             if (shape is Dot) return (shape as Dot).Coord;
             throw new ArgumentException("뀨우;");
         }
@@ -312,8 +314,19 @@ namespace GCS
 
         private static Vector2 getNearest(Ellipse ellipse, Vector2 point)
         {
-            Vector2 center = (ellipse.Focus1 + ellipse.Focus2) / 2;
-            throw new WorkWoorimException("어떠케 하는지 생각은 났음. 다만 확실한지?");
+            Line lin1 = Line.FromTwoDots(Dot.FromCoord(ellipse.Focus1), Dot.FromCoord(point));
+            Line lin2 = Line.FromTwoDots(Dot.FromCoord(ellipse.Focus2), Dot.FromCoord(point));
+            Vector2[] intersects1 = GetIntersect(ellipse, lin1);
+            Vector2[] intersects2 = GetIntersect(ellipse, lin2);
+            Vector2 intersect1 = Vector2.Distance(intersects1[0], point) < Vector2.Distance(intersects1[1], point) ? intersects1[0] : intersects1[1];
+            Vector2 intersect2 = Vector2.Distance(intersects2[0], point) < Vector2.Distance(intersects2[1], point) ? intersects2[0] : intersects2[1];
+            Line seg1 = Line.FromTwoDots(Dot.FromCoord(ellipse.Focus1), Dot.FromCoord(intersect2));
+            Line seg2 = Line.FromTwoDots(Dot.FromCoord(ellipse.Focus2), Dot.FromCoord(intersect1));
+            Vector2 intersect3 = getIntersect(seg1, seg2)[0];
+            Vector2[] intersects3 = GetIntersect(ellipse, Line.FromTwoDots(Dot.FromCoord(intersect3), Dot.FromCoord(point)));
+            Vector2 near = Vector2.Distance(intersects3[0], point) < Vector2.Distance(intersects3[1], point) ? intersects3[0] : intersects3[1];
+            return near;
+            throw new WorkWoorimException("엄밀한 증명 없이 쓴 알고리즘이지만 내가 증명하면 되니까 ㄱㅊ.");
         }
 
         public static float GetNearestDistance(Shape shape, Vector2 point)
@@ -323,13 +336,14 @@ namespace GCS
                 Line line = (Line)shape;
                 return (float)(Math.Abs(line.Grad * point.X - point.Y + line.Yint) / Math.Sqrt(line.Grad * line.Grad + 1));
             }
-            if (shape is Segment)
+            else if (shape is Segment)
             {
                 Segment line = (Segment)shape;
                 return Vector2.Distance(point, getNearest(line, point));
             }
-            if (shape is Circle) return Math.Abs(Vector2.Distance((shape as Circle).Center, point) - ((shape as Circle).Radius));
-            if (shape is Dot) return Vector2.Distance(point, (shape as Dot).Coord);
+            else if (shape is Circle) return Math.Abs(Vector2.Distance((shape as Circle).Center, point) - ((shape as Circle).Radius));
+            else if (shape is Ellipse) return Vector2.Distance(getNearest(shape as Ellipse , point), point);
+            else if (shape is Dot) return Vector2.Distance(point, (shape as Dot).Coord);
 
             throw new ArgumentException("뀨우;;;");
         }
@@ -338,20 +352,6 @@ namespace GCS
         {
             return new Vector2((float)(vec.X * Math.Cos(angle) - vec.Y * Math.Sin(angle)), (float)(vec.X * Math.Sin(angle) + vec.Y * Math.Cos(angle)));
         }
-
-        public static Vector2 solve2Eq(float a, float b, float c)
-        {
-            float d = b * b - 4 * a * c;
-            if (d < 0) throw new ArithmeticException("해 없음");
-            else if (d == 0) return new Vector2(-b / (2 * a), -b / (2 * a));
-            else return new Vector2((-b + (float)Math.Sqrt(d)) / (2 * a), (-b - (float)Math.Sqrt(d)) / (2 * a));
-            
-        }
-        /* 
-        public static float [] solveNEq()
-        {
-            
-        }
-        */
+                
     }
 }

@@ -54,6 +54,7 @@
       <DependentUpon>Icon.resx</DependentUpon>
     </Compile>
     <Compile Include="Main.cs" />
+    <Compile Include="MathMatics.cs" />
     <Compile Include="MoveConstructComponent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

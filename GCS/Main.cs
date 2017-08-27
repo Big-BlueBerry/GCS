@@ -80,9 +80,9 @@ namespace GCS
             /*
             GameObject test = new GameObject("test");
             test.AddComponent<GeometrytestComponent>();
-            test.Enabled = false;
-            Instantiate(test);
-            */
+            test.Enabled = true;
+            Instantiate(test);*/
+            
         }
         
         private void InitGUI()
@@ -147,3 +147,6 @@ namespace GCS
         }
     }
 }
+/* 테스트 컴포넌트를 작성할 때는
+ 75 줄 false
+ 80 ~ 85 줄 주석해제 */
