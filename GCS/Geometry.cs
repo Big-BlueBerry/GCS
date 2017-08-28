@@ -224,19 +224,17 @@ namespace GCS
             float b = ellipse1.Semiminor;
             float c = line1.Grad;
             float d = line1.Yint;
-            try
-            {
-                float [] xvec = MathMatics.solve2Eq(a * a * c * c + b * b, 2 * a * a * c * d, a * a * (d * d - b * b));
-                if (xvec[0] == xvec[1]) return new[] { new Vector2(xvec[0], c * xvec[0] + d) };
-                else return new[]
-                {
+
+            float [] xvec = MathMatics.solve2Eq(a * a * c * c + b * b, 2 * a * a * c * d, a * a * (d * d - b * b));
+            if (xvec.Length == 0) return new Vector2[] { };
+            if (xvec[0] == xvec[1]) return new[] { new Vector2(xvec[0], c * xvec[0] + d) };
+            else return new[]
+              {
                     new Vector2(xvec[0] , c * xvec[0] + d ),
                     new Vector2(xvec[1] , c * xvec[1] + d)
-                };
+              };
 
-            }
-            catch (ArithmeticException arith) { return new Vector2[] { }; }
-                 
+
         }
 
         private static Vector2[] getIntersect(Ellipse ellipse1, Segment segment1)

@@ -85,8 +85,9 @@ namespace GCS
                     Ellipse elp = Ellipse.FromThreeDots(Dot.FromCoord(Geometry.Rotate(ellipse.Focus1, -angle)),
                         Dot.FromCoord(Geometry.Rotate(ellipse.Focus2, -angle)),
                         Dot.FromCoord(Geometry.Rotate(ellipse.PinPoint, -angle)));
-                    
-                    _ratio = (float)Math.Atan2(dot.Coord.Y - ellipse.Center.Y, -dot.Coord.X + ellipse.Center.X) + (float)Math.PI;
+                    Vector2 dotc = Geometry.Rotate(dot.Coord, -angle);
+
+                    _ratio = (float)Math.Atan2(dotc.Y - elp.Center.Y, -dotc.X + elp.Center.X) + (float)Math.PI;
                 }
                 else if (parent is LineLike)
                 {
@@ -109,15 +110,16 @@ namespace GCS
                 else if(parent is Ellipse)
                 {
                     var ellipse = parent as Ellipse;
+                    
                     Vector2 diff = ellipse.Focus1 - ellipse.Focus2;
                     float angle = (float)Math.Atan2(diff.Y, diff.X);
                     Ellipse elp = Ellipse.FromThreeDots(Dot.FromCoord(Geometry.Rotate(ellipse.Focus1, -angle)),
                         Dot.FromCoord(Geometry.Rotate(ellipse.Focus2, -angle)),
                         Dot.FromCoord(Geometry.Rotate(ellipse.PinPoint, -angle)));
-
+                        
                     float grad = (float)Math.Tan(_ratio);
                     Line lin = Line.FromTwoPoints(elp.Center, elp.Center + new Vector2(1, grad));
-                    Vector2 [] stdpoints = Geometry.GetIntersect(ellipse, lin);
+                    Vector2 [] stdpoints = Geometry.GetIntersect(elp, lin);
 
                     float dist = Vector2.Distance(stdpoints[0] , elp.Center);
                     dot.Coord = Geometry.Rotate(new Vector2(elp.Center.X + (float)Math.Cos(_ratio) * dist,
