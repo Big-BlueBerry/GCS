@@ -320,10 +320,17 @@ namespace GCS
             Vector2 intersect2 = Vector2.Distance(intersects2[0], point) < Vector2.Distance(intersects2[1], point) ? intersects2[0] : intersects2[1];
             Line seg1 = Line.FromTwoDots(Dot.FromCoord(ellipse.Focus1), Dot.FromCoord(intersect2));
             Line seg2 = Line.FromTwoDots(Dot.FromCoord(ellipse.Focus2), Dot.FromCoord(intersect1));
-            Vector2 intersect3 = getIntersect(seg1, seg2)[0];
-            Vector2[] intersects3 = GetIntersect(ellipse, Line.FromTwoDots(Dot.FromCoord(intersect3), Dot.FromCoord(point)));
-            Vector2 near = Vector2.Distance(intersects3[0], point) < Vector2.Distance(intersects3[1], point) ? intersects3[0] : intersects3[1];
-            return near;
+            try
+            {
+                Vector2 intersect3 = getIntersect(seg1, seg2)[0];
+                Vector2[] intersects3 = GetIntersect(ellipse, Line.FromTwoDots(Dot.FromCoord(intersect3), Dot.FromCoord(point)));
+                Vector2 near = Vector2.Distance(intersects3[0], point) < Vector2.Distance(intersects3[1], point) ? intersects3[0] : intersects3[1];
+                return near;
+            }
+            catch (NotFiniteNumberException inf) {
+                Vector2[] intsc = GetIntersect(ellipse, seg1);
+                return Vector2.Distance(intsc[0], point) < Vector2.Distance(intsc[1], point) ? intsc[0] : intsc[1];
+            }
             throw new WorkWoorimException("엄밀한 증명 없이 쓴 알고리즘이지만 내가 증명하면 되니까 ㄱㅊ.");
         }
 
