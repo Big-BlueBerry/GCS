@@ -74,7 +74,7 @@ namespace GCS
                 {
                     var circle = parent as Circle;
                     _ratio = (float)Math.Atan2(circle.Center.Y - dot.Coord.Y,
-                                               -dot.Coord.X + circle.Center.X) + (float)Math.PI;
+                                               -dot.Coord.X + circle.Center.X);// + (float)Math.PI;
                     //tan(theta + pi) = tan(theta);
                 }
                 else if (parent is Ellipse)
@@ -120,10 +120,11 @@ namespace GCS
                     float grad = (float)Math.Tan(_ratio);
                     Line lin = Line.FromTwoPoints(elp.Center, elp.Center + new Vector2(1, grad));
                     Vector2 [] stdpoints = Geometry.GetIntersect(elp, lin);
-
+                    
                     float dist = Vector2.Distance(stdpoints[0] , elp.Center);
-                    dot.Coord = Geometry.Rotate(new Vector2(elp.Center.X + (float)Math.Cos(_ratio) * dist,
-                                            elp.Center.Y + (float)Math.Sin(_ratio) * dist), angle);                  
+                    dot.Coord = Geometry.Rotate(new Vector2(elp.Center.X + (float)Math.Cos(-_ratio ) * dist,
+                                            elp.Center.Y + (float)Math.Sin(-_ratio ) * dist), angle);//어케 수정할지 1도 모르겠다
+                    if (true) { };
                 }
                 else if (parent is LineLike)
                 {
