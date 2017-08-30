@@ -56,6 +56,7 @@ namespace GCS
             Window.AllowUserResizing = true;
             */
         }
+
         protected override void InitSize()
         {
             base.InitSize();
@@ -83,6 +84,7 @@ namespace GCS
             Resources.LoadAll();
             InitGUI();
             MainCamera.AddComponent<Grid.Framework.Components.Movable2DCamera>();
+
             /*
              * GameObject test = new GameObject("test");
              * test.AddComponent<GeometrytestComponent>();
@@ -149,6 +151,7 @@ namespace GCS
             item.ImageScaling = ToolStripItemImageScaling.None;
             item.AutoSize = true;
             strip.Items.Add(item);
+
             return item;
         }
     }

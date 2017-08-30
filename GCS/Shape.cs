@@ -46,6 +46,7 @@ namespace GCS
         public virtual void Draw(SpriteBatch sb)
         {
             Color = Color.Black;
+
             if (Focused) Color = FocusedColor;
             if (Selected) Color = SelectedColor;
         }
@@ -107,6 +108,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             GUI.DrawCircle(sb, Center + _drawDelta, Radius, Border, Color, Sides);
         }
@@ -128,6 +130,7 @@ namespace GCS
         {
             Circle circle = new Circle();
             new CircleOnTwoDotsRule(circle, center, another);
+
             return circle;
         }
     }
@@ -141,16 +144,17 @@ namespace GCS
         public Vector2 PinPoint { get; protected set; }
 
         public Vector2 Center => (Focus1 + Focus2) / 2;
-        
 
         public float Sublength => Vector2.Distance(Focus1, Focus2) / 2; // c 
         public float Semimajor => (Vector2.Distance(Focus1, PinPoint) + Vector2.Distance(Focus2, PinPoint)) / 2; // a
         public float Semiminor => (float)Math.Sqrt(Semimajor * Semimajor - Sublength * Sublength); // b
+        
         protected Ellipse() : base() { }
 
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             GUI.DrawEllipse(sb, Focus1 + _drawDelta, Focus2 + _drawDelta, PinPoint + _drawDelta, Border, Color, Sides);
         }
@@ -173,6 +177,7 @@ namespace GCS
         {
             Ellipse ellipse = new Ellipse();
             new EllipseOnThreeDotsRule(ellipse, f1, f2, pin);
+
             return ellipse;
         }
     }
@@ -218,6 +223,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             GUI.DrawLine(sb, new Vector2(0, Yint) + _drawDelta, new Vector2(_comp.Size.X, _comp.Size.X * Grad + Yint) + _drawDelta, Border, Color);
         }
@@ -273,6 +279,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             GUI.DrawLine(sb, Point1 + _drawDelta, Point2 + _drawDelta, Border, Color);
         }
@@ -296,6 +303,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             Vector2 del = Point2 - Point1;
             float angle = (float)Math.Atan(del.Y/del.X);
@@ -319,7 +327,6 @@ namespace GCS
         }
     }
  
-
     public partial class Dot : Shape
     {
         private static readonly float _nearDotDistance = 10;
@@ -336,6 +343,7 @@ namespace GCS
         public override bool Equals(object obj)
         {
             Dot o = obj as Dot;
+
             return o == null ? false : Coord.Equals(o.Coord);
         }
 
@@ -348,15 +356,19 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
+
             if (_rule != null && _rule is DotOnDotRule)
                 if (Parents[0].Selected)
                     Color = SelectedColor;
             GUI.DrawCircle(sb, Coord + _drawDelta, 4f, Border, Color, 20);
             // GUI.DrawPoint(sb, Coord, Border, Color);\
+
             if (IsShowingName && Name != null)
             {
                 Point size = Resources.Font.MeasureString(Name).ToPoint();
+
                 GUI.DrawString(sb,
                     Resources.Font,
                     Name,
@@ -370,12 +382,14 @@ namespace GCS
         public override void MoveTo(Vector2 at)
         {
             Vector2 diff = at - Coord;
+
             Move(diff);
         }
 
         public override void Move(Vector2 delta)
         {
             Coord += delta;
+
             _rule?.OnMoved();
         }
 
@@ -383,6 +397,7 @@ namespace GCS
         {
             Dot dot = new Dot(coord);
             new EmptyDotRule(dot);
+
             return dot;
         }
 
@@ -393,6 +408,7 @@ namespace GCS
         {
             Dot dot = new Dot(coord);
             new DotOnShapeRule(dot, shape);
+
             return dot;
         }
 
@@ -400,6 +416,7 @@ namespace GCS
         {
             Dot dot = new Dot(coord);
             new DotOnIntersectionRule(dot, p1, p2);
+
             return dot;
         }
 

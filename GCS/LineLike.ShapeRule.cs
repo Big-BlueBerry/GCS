@@ -11,6 +11,7 @@ namespace GCS
             {
                 d1.Childs.Add(line);
                 d2.Childs.Add(line);
+
                 line.Parents.Add(d1);
                 line.Parents.Add(d2);
 
@@ -20,6 +21,7 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
                 LineLike line = Shape as LineLike;
@@ -36,6 +38,7 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
@@ -54,6 +57,7 @@ namespace GCS
         public class ParallelLineRule : ShapeRule
         {
             private Vector2 _last = new Vector2();
+
             public ParallelLineRule(Line line, LineLike original, Dot on) : base(line)
             {
                 original.Childs.Add(line);
@@ -67,6 +71,7 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
                 Line line = Shape as Line;
@@ -83,6 +88,7 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
@@ -106,6 +112,7 @@ namespace GCS
         public class PerpendicularLineRule : ShapeRule
         {
             private Vector2 _last = new Vector2();
+
             public PerpendicularLineRule(Line line, LineLike original, Dot on) : base(line)
             {
                 original.Childs.Add(line);
@@ -119,6 +126,7 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
                 Line line = Shape as Line;
@@ -135,6 +143,7 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
@@ -161,6 +170,7 @@ namespace GCS
         public class TangentLineRule : ShapeRule
         {
             private Vector2 _last = new Vector2();
+
             public TangentLineRule(Line line, Circle original, Dot on) : base(line)
             {
                 original.Childs.Add(line);
@@ -184,6 +194,7 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
                 Line line = Shape as Line;
@@ -200,6 +211,7 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
@@ -223,11 +235,11 @@ namespace GCS
                     // tangent 덧셈 정리
                     line.Point1 = dot;
                     line.Point2 = dot + new Vector2(1, grad);
-
                 }
                 else
                 {
                     Circle parent = (line.Parents[0] as Circle);
+
                     float grad = (parent.Center.X - dot.X) / (dot.Y - parent.Center.Y);
                     // float Weight = (float)Math.Sqrt(parent.Radius/(grad*grad+1));
 
@@ -238,8 +250,6 @@ namespace GCS
 
                 _last = line.Point1;
             }
-
         }
-
     }
 }

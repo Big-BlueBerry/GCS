@@ -45,7 +45,6 @@ namespace GCS
                 value.Maximum = (Comp.Size.X - Comp.Bound.Width) / 5;
             }
         }
-        
 
         // OnLiU: could we erase this?
         public MoveConstructComponent()
@@ -56,6 +55,7 @@ namespace GCS
         public override void Start()
         {
             base.Start();
+
             _vscroll.Value = _vscroll.Maximum / 2;
             _hscroll.Value = _hscroll.Maximum / 2;
 
@@ -79,6 +79,7 @@ namespace GCS
             base.Update();
 
             KeyboardState state = Keyboard.GetState();
+            
             if (state.IsKeyDown(Keys.Down))
                 Scroll(0, 5);
             if (state.IsKeyDown(Keys.Up))

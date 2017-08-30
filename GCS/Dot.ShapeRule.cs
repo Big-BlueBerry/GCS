@@ -12,6 +12,7 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
                 MoveChilds();
@@ -49,6 +50,7 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
                 RecalcRatio();
@@ -61,6 +63,7 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
@@ -69,6 +72,7 @@ namespace GCS
             {
                 Dot dot = Shape as Dot;
                 Shape parent = Shape.Parents[0];
+
                 // 타원이라고 다를 건 없음. 다만 로테이션을 신경써주면 될 뿐
                 if (parent is Circle)
                 {
@@ -152,6 +156,7 @@ namespace GCS
             {
                 dot.Parents.Add(p1);
                 dot.Parents.Add(p2);
+
                 p1.Childs.Add(dot);
                 p2.Childs.Add(dot);
 
@@ -178,6 +183,7 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
 
                 foreach (Shape c in Shape.Childs)
@@ -197,6 +203,7 @@ namespace GCS
                     {
                         Circle c1 = p1 as Circle;
                         Circle c2 = p2 as Circle;
+
                         if (_firstDirection == 0)
                             _firstDirection = (c2.Center.X < c1.Center.X) ? -1 : 1;
                         _orientation = CheckOrient(dot.Coord, Line.FromTwoPoints(c1.Center, c2.Center));
@@ -205,6 +212,7 @@ namespace GCS
                     {
                         Circle c = (p1 is Circle ? p1 : p2) as Circle;
                         Shape s = p1 is Circle ? p2 : p1;
+
                         if (_firstDirection == 0)
                         {
                             _firstDirection = (s as LineLike).Point1.Y < (s as LineLike).Point2.Y ? -1 : 1;
@@ -233,6 +241,7 @@ namespace GCS
 
                     Circle c = (p1 is Circle ? p1 : p2) as Circle;
                     Shape s = p1 is Circle ? p2 : p1;
+
                     int i1 = (_firstDirection + 1) / 2;
                     int i2 = Math.Abs(i1 - 1);
 
@@ -282,6 +291,7 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
                 Dot dot = Shape.Parents[0] as Dot;
@@ -296,6 +306,7 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }

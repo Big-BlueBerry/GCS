@@ -31,6 +31,7 @@ namespace GCS
                 return new float[] { result, result };
             }
         }
+ 
         // 근이 - Upperbound, Upperbound 안에 있다고 가정, 충분히 큰 Upperbound 를 주면 됨
         public static float[] solveNEq(float[] polynorm, int accuracy = 3)
         {
@@ -42,6 +43,7 @@ namespace GCS
             else
                 while (coef.First() == 0)
                     coef.Remove(0);
+
             if (coef.Count <= 1) return new float[] { };
             else if (coef.Count == 2) return new float[] { -coef[0] / coef[1] };
             else if (coef.Count == 3) return Solve2Eq(coef[0], coef[1], coef[2]);
@@ -68,6 +70,7 @@ namespace GCS
                     else if (applyPolynormialFunc(coef, extreme_vals[j]) * applyPolynormialFunc(coef, extreme_vals[j + 1]) < 0)
                     {
                         float[] interval = new float[] { extreme_vals[j], extreme_vals[j + 1] };
+
                         while (Math.Abs(applyPolynormialFunc(coef, interval[0])) > Math.Pow(10, -accuracy))
                         {
                             int index = (applyPolynormialFunc(coef, interval[0]) * applyPolynormialFunc(coef, (interval[0] + interval[1]) / 2) < 0)
@@ -79,9 +82,9 @@ namespace GCS
 
                         answer.Add(interval[0]);
                     }
-
                 }
                 answer.ForEach(x => Math.Round(x, accuracy));
+
                 return answer.ToArray();
             }
         }
@@ -89,10 +92,11 @@ namespace GCS
         private static float applyPolynormialFunc(List<float> polynorm, float x)
         {
             float sum = 0;
+
             for (int i = 0; i < polynorm.Count; i++)
                 sum += (float)Math.Pow(x, polynorm.Count - 1 - i) * polynorm[i];
+
             return sum;
         }
     }
-
 }

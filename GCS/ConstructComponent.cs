@@ -75,6 +75,7 @@ namespace GCS
         public void DeleteSelected()
         {
             if (_selectedShapes.Count == 0) return;
+
             Delete(_selectedShapes);
             _selectedShapes.Clear();
         }
@@ -82,6 +83,7 @@ namespace GCS
         private void Delete(IEnumerable<Shape> target)
         {
             List<Shape> sh = new List<Shape>();
+
             foreach (Shape s in target)
             {
                 foreach (Shape ss in s.Delete())
@@ -98,7 +100,9 @@ namespace GCS
         public void Undo()
         {
             if (_recodes.Count == 0) return;
+
             ConstructRecode r = _recodes.Last();
+
             switch (r.type)
             {
                 case RecodeType.CREATE:
@@ -137,8 +141,10 @@ namespace GCS
         private void AddShape(Shape shape)
         {
             if (_shapes.Contains(shape)) return;
+
             if (shape is Dot && string.IsNullOrEmpty(shape.Name))
                 shape.Name = _dotNamer.GetCurrent();
+
             shape.InitializeProperties();
             _shapes.Add(shape);
             _recodes.Add(new ConstructRecode(RecodeType.CREATE, new List<Shape>() { shape }));
@@ -189,9 +195,11 @@ namespace GCS
         private void UpdateAdding()
         {
             if (_isAnyGuiUseMouse) return;
+
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 if (_drawState == DrawState.NONE) return;
+
                 if (!_wasDrawing)
                 {
                     _lastPoint = GetDot(_pos);
@@ -200,6 +208,7 @@ namespace GCS
                 else if (_drawState == DrawState.DOT || _drawState == DrawState.ELLIPSE)
                     _lastPoint.MoveTo(_pos);
             }
+
             if (_wasDrawing && Mouse.GetState().LeftButton == ButtonState.Released)
             {
                 if (_drawState == DrawState.DOT)
@@ -216,8 +225,10 @@ namespace GCS
                 else
                 {
                     Dot p = GetDot(_pos);
+
                     AddShape(p);
                     AddShape(_lastPoint);
+
                     Shape sp = null;
 
                     switch (_drawState)
@@ -245,6 +256,7 @@ namespace GCS
                             break;
                     }
                 }
+
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
             }
@@ -266,15 +278,14 @@ namespace GCS
 
         private void UpdateSelect()
         {
-
             if (_isAnyGuiUseMouse) return;
             if (_drawState == DrawState.NONE)
             {
                 if (_nearShapes.Count > 0)
                 {
                     Shape nearest = _nearShapes[0];
-
                     float dist = int.MaxValue;
+
                     foreach (Shape s in _nearShapes)
                     {
                         if (s is Dot)
@@ -283,6 +294,7 @@ namespace GCS
                             nearest = s;
                             break;
                         }
+
                         if (dist > s.Distance)
                         {
                             nearest = s;
@@ -386,15 +398,12 @@ namespace GCS
         private void UpdateShortcuts()
         {
             KeyboardState state = Keyboard.GetState();
+
             if (state.IsKeyDown(Keys.Delete))
-            {
                 DeleteSelected();
-            }
 
             if (state.IsKeyDown(Keys.LeftControl) && state.IsKeyDown(Keys.A))
-            {
                 SelectAll();
-            }
         }
 
         private Dot GetDot(Vector2 coord)
@@ -407,8 +416,10 @@ namespace GCS
         {
             Dot nearestDot = null;
             Shape nearest = null;
+
             float distDot = int.MaxValue;
             float dist = int.MaxValue;
+
             foreach (Shape s in nears)
             {
                 if (s is Dot)
@@ -428,6 +439,7 @@ namespace GCS
                     }
                 }
             }
+
             if (nearestDot == null) // 가장 가까운게 점이 아니라면
             {
                 if (nears.Count == 0)
@@ -437,17 +449,22 @@ namespace GCS
                 else if (nears.Count == 2)
                 {
                     Vector2[] intersects = Geometry.GetIntersect(nears[0], nears[1]);
+
                     if (intersects.Length != 0)
                     {
                         Vector2 dot = intersects[0];
+
                         if (intersects.Length == 2)
                             dot = Vector2.Distance(coord, intersects[0]) < Vector2.Distance(intersects[1], coord)
                                 ? intersects[0]
                                 : intersects[1];
+
                         return Dot.FromIntersection(nears[0], nears[1], dot);
                     }
+
                     return OneShapeRuleDot(nearest, coord);
                 }
+
                 return OneShapeRuleDot(nearest, coord);
             }
             else if (nearestDot is Dot) return nearestDot as Dot;
@@ -462,8 +479,10 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
+
             sb.BeginAA();
             _pos = Mouse.GetState().Position.ToVector2() + Location;
+
             if (_wasDrawing || _drawState == DrawState.ELLIPSE_POINT)
             {
                 switch (_drawState)
@@ -522,6 +541,7 @@ namespace GCS
                     {
                         LineLike line = (_selectedShapes[0] ?? _selectedShapes[1]) as LineLike;
                         Dot dot = (_selectedShapes[0] ?? _selectedShapes[1]) as Dot;
+
                         _shapes.Add(Line.PerpendicularLine(line, dot));
                     }
                     break;
@@ -533,6 +553,7 @@ namespace GCS
                     {
                         Circle cir = (_selectedShapes[0] ?? _selectedShapes[1]) as Circle;
                         Dot dot = (_selectedShapes[0] ?? _selectedShapes[1]) as Dot;
+
                         _shapes.Add(Line.TangentLine(cir, dot));
                     }
                     else if (_selectedShapes[0] is Ellipse && _selectedShapes[1] is Dot
@@ -540,6 +561,7 @@ namespace GCS
                     {
                         Ellipse elp = (_selectedShapes[0] ?? _selectedShapes[1]) as Ellipse;
                         Dot dot = (_selectedShapes[0] ?? _selectedShapes[1]) as Dot;
+
                         _shapes.Add(Line.TangentLine(elp, dot));
                     }
                     break;
@@ -549,9 +571,11 @@ namespace GCS
                     Dot f1 = _selectedShapes[0] as Dot;
                     Dot f2 = _selectedShapes[1] as Dot;
                     Dot pin = _selectedShapes[2] as Dot;
+
                     if (f1 == null) return;
                     if (f2 == null) return;
                     if (pin == null) return;
+
                     AddShape(Ellipse.FromThreeDots(f1, f2, pin));
                     break;
             }
