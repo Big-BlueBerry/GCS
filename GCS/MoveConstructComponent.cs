@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using Grid.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -24,9 +19,9 @@ namespace GCS
             set
             {
                 if (_vscroll != null)
-                    _vscroll.Scroll -= scroll_Scroll;
+                    _vscroll.Scroll -= Scroll_Scroll;
                 _vscroll = value;
-                _vscroll.Scroll += scroll_Scroll;
+                _vscroll.Scroll += Scroll_Scroll;
                 value.Minimum = 0;
                 value.Maximum = (Comp.Size.Y - Comp.Bound.Height) / 5;
             }
@@ -38,15 +33,15 @@ namespace GCS
             set
             {
                 if (_hscroll != null)
-                    _hscroll.Scroll -= scroll_Scroll;
+                    _hscroll.Scroll -= Scroll_Scroll;
                 _hscroll = value;
-                _hscroll.Scroll += scroll_Scroll;
+                _hscroll.Scroll += Scroll_Scroll;
                 value.Minimum = 0;
                 value.Maximum = (Comp.Size.X - Comp.Bound.Width) / 5;
             }
         }
-        
 
+        // OnLiU: could we erase this?
         public MoveConstructComponent()
         {
 
@@ -55,13 +50,14 @@ namespace GCS
         public override void Start()
         {
             base.Start();
+
             _vscroll.Value = _vscroll.Maximum / 2;
             _hscroll.Value = _hscroll.Maximum / 2;
 
-            scroll_Scroll(null, null);
+            Scroll_Scroll(null, null);
         }
 
-        private void scroll_Scroll(object sender, ScrollEventArgs e)
+        private void Scroll_Scroll(object sender, ScrollEventArgs e)
         {
             Comp.Location = new Vector2(_hscroll.Value * 5, _vscroll.Value * 5);
         }
@@ -70,14 +66,15 @@ namespace GCS
         {
             _hscroll.Value = MathHelper.Clamp(_hscroll.Value + x, _hscroll.Minimum, _hscroll.Maximum);
             _vscroll.Value = MathHelper.Clamp(_vscroll.Value + y, _vscroll.Minimum, _vscroll.Maximum);
-            scroll_Scroll(null, null);
+            Scroll_Scroll(null, null);
         }
 
         public override void Update()
         {
             base.Update();
 
-            var state = Keyboard.GetState();
+            KeyboardState state = Keyboard.GetState();
+            
             if (state.IsKeyDown(Keys.Down))
                 Scroll(0, 5);
             if (state.IsKeyDown(Keys.Up))

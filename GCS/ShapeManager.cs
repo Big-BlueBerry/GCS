@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace GCS
 {
@@ -17,14 +13,14 @@ namespace GCS
 
         public void DeleteShape(Shape shape)
         {
-            if (!_shapes.Contains(shape))
-                return;
+            if (!_shapes.Contains(shape)) return;
+
             _shapes.Remove(shape);
         }
 
         public void DeleteShapes(IEnumerable<Shape> shapes)
         {
-            foreach (var s in shapes)
+            foreach (Shape s in shapes)
                 _shapes.Remove(s);
         }
     }

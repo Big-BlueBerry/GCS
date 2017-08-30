@@ -11,6 +11,7 @@ namespace GCS
             {
                 d1.Childs.Add(line);
                 d2.Childs.Add(line);
+
                 line.Parents.Add(d1);
                 line.Parents.Add(d2);
 
@@ -20,9 +21,10 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
-                var line = Shape as LineLike;
+                LineLike line = Shape as LineLike;
 
                 Shape.Parents[0].MoveTo(line.Point1);
                 Shape.Parents[1].MoveTo(line.Point2);
@@ -36,13 +38,14 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
 
             protected override void Fix()
             {
-                var line = Shape as LineLike;
+                LineLike line = Shape as LineLike;
                 line.Point1 = (line.Parents[0] as Dot).Coord;
                 line.Point2 = (line.Parents[1] as Dot).Coord;
             }
@@ -54,6 +57,7 @@ namespace GCS
         public class ParallelLineRule : ShapeRule
         {
             private Vector2 _last = new Vector2();
+
             public ParallelLineRule(Line line, LineLike original, Dot on) : base(line)
             {
                 original.Childs.Add(line);
@@ -67,12 +71,13 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
-                var line = Shape as Line;
-                var delta = line.Point1 - _last;
+                Line line = Shape as Line;
+                Vector2 delta = line.Point1 - _last;
 
-                var dot = line.Parents[1] as Dot;
+                Dot dot = line.Parents[1] as Dot;
                 dot.Move(delta);
 
                 MoveChilds();
@@ -83,17 +88,18 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
 
             protected override void Fix()
             {
-                var line = Shape as Line;
-                var parent = (line.Parents[0] as LineLike);
-                var dot = (line.Parents[1] as Dot).Coord;
+                Line line = Shape as Line;
+                LineLike parent = (line.Parents[0] as LineLike);
+                Vector2 dot = (line.Parents[1] as Dot).Coord;
 
-                var gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
+                Vector2 gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
                                       dot.Y - (parent.Point1.Y + parent.Point2.Y) / 2);
 
                 line.Point1 = parent.Point1 + gap;
@@ -106,6 +112,7 @@ namespace GCS
         public class PerpendicularLineRule : ShapeRule
         {
             private Vector2 _last = new Vector2();
+
             public PerpendicularLineRule(Line line, LineLike original, Dot on) : base(line)
             {
                 original.Childs.Add(line);
@@ -119,12 +126,13 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
-                var line = Shape as Line;
-                var delta = line.Point1 - _last;
+                Line line = Shape as Line;
+                Vector2 delta = line.Point1 - _last;
 
-                var dot = line.Parents[1] as Dot;
+                Dot dot = line.Parents[1] as Dot;
                 dot.Move(delta);
 
                 MoveChilds();
@@ -135,21 +143,22 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
 
             protected override void Fix()
             {
-                var line = Shape as Line;
-                var parent = (line.Parents[0] as LineLike);
-                var dot = (line.Parents[1] as Dot).Coord;
+                Line line = Shape as Line;
+                LineLike parent = (line.Parents[0] as LineLike);
+                Vector2 dot = (line.Parents[1] as Dot).Coord;
 
-                var gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
+                Vector2 gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
                                       dot.Y - (parent.Point1.Y + parent.Point2.Y) / 2);
 
-                var p1 = Geometry.Rotate(parent.Point1 + gap - dot, MathHelper.ToRadians(90)) + dot;
-                var p2 = Geometry.Rotate(parent.Point2 + gap - dot, MathHelper.ToRadians(90)) + dot;
+                Vector2 p1 = Geometry.Rotate(parent.Point1 + gap - dot, MathHelper.ToRadians(90)) + dot;
+                Vector2 p2 = Geometry.Rotate(parent.Point2 + gap - dot, MathHelper.ToRadians(90)) + dot;
 
                 line.Point1 = p1;
                 line.Point2 = p2;
@@ -161,6 +170,7 @@ namespace GCS
         public class TangentLineRule : ShapeRule
         {
             private Vector2 _last = new Vector2();
+
             public TangentLineRule(Line line, Circle original, Dot on) : base(line)
             {
                 original.Childs.Add(line);
@@ -184,12 +194,13 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
-                var line = Shape as Line;
-                var delta = line.Point1 - _last;
+                Line line = Shape as Line;
+                Vector2 delta = line.Point1 - _last;
 
-                var dot = line.Parents[1] as Dot;
+                Dot dot = line.Parents[1] as Dot;
                 dot.Move(delta);
 
                 MoveChilds();
@@ -200,44 +211,45 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
 
             protected override void Fix()
             {
-                var line = Shape as Line;
-                var dot = (line.Parents[1] as Dot).Coord;
-                if(line.Parents[0] is Ellipse)
+                Line line = Shape as Line;
+                Vector2 dot = (line.Parents[1] as Dot).Coord;
+
+                if (line.Parents[0] is Ellipse)
                 {
-                    var parent = (line.Parents[0] as Ellipse);
+                    Ellipse parent = (line.Parents[0] as Ellipse);
                     Vector2 diff = parent.Focus1 - parent.Focus2;
                     float angle = (float)Math.Atan2(diff.Y, diff.X);
-                    var tempcenter = Geometry.Rotate(parent.Center, -angle);
-                    var tempdot = Geometry.Rotate(dot, -angle);
+                    Vector2 tempcenter = Geometry.Rotate(parent.Center, -angle);
+                    Vector2 tempdot = Geometry.Rotate(dot, -angle);
                     
                     float tempgrad = (parent.Semiminor * parent.Semiminor * (tempcenter.X - tempdot.X))/
                         (parent.Semimajor * parent.Semimajor * (tempdot.Y - tempcenter.Y ) );
                     float grad = (float)((tempgrad + Math.Tan(angle)) / (1 - tempgrad * Math.Tan(angle)));
-                    //tangent 덧셈 정리
+                    // tangent 덧셈 정리
                     line.Point1 = dot;
                     line.Point2 = dot + new Vector2(1, grad);
-
                 }
                 else
                 {
-                    var parent = (line.Parents[0] as Circle);
+                    Circle parent = (line.Parents[0] as Circle);
+
                     float grad = (parent.Center.X - dot.X) / (dot.Y - parent.Center.Y);
-                    //float Weight = (float)Math.Sqrt(parent.Radius/(grad*grad+1));
+                    // float Weight = (float)Math.Sqrt(parent.Radius/(grad*grad+1));
+
                     line.Point1 = dot;
                     line.Point2 = dot + new Vector2(1, grad); // or (Weight, Weight * grad)
-                    //Weight 는 Point1 과 Point2 사이의 거리를 Radius 로 뽑아줄 때 쓰면 됨.
+                    // Weight 는 Point1 과 Point2 사이의 거리를 Radius 로 뽑아줄 때 쓰면 됨.
                 }
 
                 _last = line.Point1;
             }
-
         }
-
     }
 }

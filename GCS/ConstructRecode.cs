@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace GCS
@@ -15,13 +11,13 @@ namespace GCS
 
         public ConstructRecode(RecodeType Type, List<Shape> Target)
         {
-            this.targetshapes = Target;
-            this.type = Type;
+            targetshapes = Target;
+            type = Type;
         }
         
         public void WriteMoveRecode(Vector2 diff)
         {
-            this.moveRecode = -diff;
+            moveRecode = -diff;
         }
     }
 }

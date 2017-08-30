@@ -46,6 +46,7 @@ namespace GCS
         public virtual void Draw(SpriteBatch sb)
         {
             Color = Color.Black;
+
             if (Focused) Color = FocusedColor;
             if (Selected) Color = SelectedColor;
         }
@@ -74,7 +75,6 @@ namespace GCS
 
         public virtual void Update(Vector2 cursor)
         {
-            Distance = Geometry.GetNearestDistance(this, cursor);
             if (IsEnoughClose(cursor))
                 Focused = true;
             else if (Focused)
@@ -84,8 +84,8 @@ namespace GCS
         public IEnumerable<Shape> Delete()
         {
             yield return this;
-            foreach (var child in Childs)
-                foreach (var c in child.Delete())
+            foreach (Shape child in Childs)
+                foreach (Shape c in child.Delete())
                     yield return c;
         }
     }
@@ -108,6 +108,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             GUI.DrawCircle(sb, Center + _drawDelta, Radius, Border, Color, Sides);
         }
@@ -121,7 +122,7 @@ namespace GCS
 
         public override void MoveTo(Vector2 at)
         {
-            var diff = at - Center;
+            Vector2 diff = at - Center;
             Move(diff);
         }
 
@@ -129,6 +130,7 @@ namespace GCS
         {
             Circle circle = new Circle();
             new CircleOnTwoDotsRule(circle, center, another);
+
             return circle;
         }
     }
@@ -142,16 +144,17 @@ namespace GCS
         public Vector2 PinPoint { get; protected set; }
 
         public Vector2 Center => (Focus1 + Focus2) / 2;
-        public float Sublength => Vector2.Distance(Focus1, Focus2) / 2;//c 
-        public float Semimajor => (Vector2.Distance(Focus1, PinPoint) + Vector2.Distance(Focus2, PinPoint)) / 2;//a
-        public float Semiminor => (float)Math.Sqrt(Semimajor * Semimajor - Sublength * Sublength);//b
-        
 
+        public float Sublength => Vector2.Distance(Focus1, Focus2) / 2; // c 
+        public float Semimajor => (Vector2.Distance(Focus1, PinPoint) + Vector2.Distance(Focus2, PinPoint)) / 2; // a
+        public float Semiminor => (float)Math.Sqrt(Semimajor * Semimajor - Sublength * Sublength); // b
+        
         protected Ellipse() : base() { }
 
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             GUI.DrawEllipse(sb, Focus1 + _drawDelta, Focus2 + _drawDelta, PinPoint + _drawDelta, Border, Color, Sides);
         }
@@ -166,7 +169,7 @@ namespace GCS
 
         public override void MoveTo(Vector2 at)
         {
-            var diff = at - PinPoint;
+            Vector2 diff = at - PinPoint;
             Move(diff);
         }
 
@@ -174,6 +177,7 @@ namespace GCS
         {
             Ellipse ellipse = new Ellipse();
             new EllipseOnThreeDotsRule(ellipse, f1, f2, pin);
+
             return ellipse;
         }
     }
@@ -207,7 +211,7 @@ namespace GCS
 
         public override void MoveTo(Vector2 at)
         {
-            var diff = at - Point1;
+            Vector2 diff = at - Point1;
             Move(diff);
         }
     }
@@ -219,6 +223,7 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             GUI.DrawLine(sb, new Vector2(0, Yint) + _drawDelta, new Vector2(_comp.Size.X, _comp.Size.X * Grad + Yint) + _drawDelta, Border, Color);
         }
@@ -226,7 +231,7 @@ namespace GCS
         public static Line FromTwoDots(Dot d1, Dot d2)
         {
             Line line = new Line();
-            var rule = new LineLikeOnTwoDotsRule(line, d1, d2);
+            new LineLikeOnTwoDotsRule(line, d1, d2);
 
             return line;
         }
@@ -274,14 +279,15 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             GUI.DrawLine(sb, Point1 + _drawDelta, Point2 + _drawDelta, Border, Color);
         }
 
         public static Segment FromTwoDots(Dot d1, Dot d2)
         {
-            var seg = new Segment();
-            var rule = new LineLikeOnTwoDotsRule(seg, d1, d2);
+            Segment seg = new Segment();
+            new LineLikeOnTwoDotsRule(seg, d1, d2);
 
             return seg;
         }
@@ -297,35 +303,30 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
             Vector2 del = Point2 - Point1;
-            Vector2 delta1, delta2;
             float angle = (float)Math.Atan(del.Y/del.X);
             Vector2 Initvector = new Vector2(Point1.X + Vector2.Distance(Point1, Point2), Point1.Y);
-            delta1 = new Vector2((float)(Initvector.X - arrowlength*Math.Cos(arrowAngle)) , (float)(Initvector.Y + arrowlength*Math.Sin(arrowAngle)));
-            delta2 = new Vector2((float)(Initvector.X - arrowlength * Math.Cos(arrowAngle)), (float)(Initvector.Y - arrowlength * Math.Sin(arrowAngle)));
-            if(del.X >0)
-            {
-                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + Geometry.Rotate(delta1 - Point1, angle) + _drawDelta, Border, Color);
-                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + Geometry.Rotate(delta2 - Point1, angle) + _drawDelta, Border, Color);
-            }
-            else
-            {
-                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 - Geometry.Rotate(delta1 - Point1, angle) + _drawDelta, Border, Color);
-                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 - Geometry.Rotate(delta2 - Point1, angle) + _drawDelta, Border, Color);
-            }
+
+            Vector2 delta1 = new Vector2((float)(Initvector.X - arrowlength*Math.Cos(arrowAngle)) , (float)(Initvector.Y + arrowlength*Math.Sin(arrowAngle)));
+            Vector2 delta2 = new Vector2((float)(Initvector.X - arrowlength * Math.Cos(arrowAngle)), (float)(Initvector.Y - arrowlength * Math.Sin(arrowAngle)));
+
+            int direction = (del.X > 0) ? 1 : -1;
+
+            GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + direction * Geometry.Rotate(delta1 - Point1, angle) + _drawDelta, Border, Color);
+            GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + direction * Geometry.Rotate(delta2 - Point1, angle) + _drawDelta, Border, Color);
         }
 
         public new static Vector FromTwoDots(Dot d1, Dot d2)
         {
-            var vec = new Vector();
-            var rule = new LineLikeOnTwoDotsRule(vec, d1, d2);
+            Vector vec = new Vector();
+            new LineLikeOnTwoDotsRule(vec, d1, d2);
 
             return vec;
         }
     }
  
-
     public partial class Dot : Shape
     {
         private static readonly float _nearDotDistance = 10;
@@ -341,7 +342,8 @@ namespace GCS
 
         public override bool Equals(object obj)
         {
-            var o = obj as Dot;
+            Dot o = obj as Dot;
+
             return o == null ? false : Coord.Equals(o.Coord);
         }
 
@@ -354,15 +356,19 @@ namespace GCS
         public override void Draw(SpriteBatch sb)
         {
             if (Disabled) return;
+
             base.Draw(sb);
+
             if (_rule != null && _rule is DotOnDotRule)
                 if (Parents[0].Selected)
                     Color = SelectedColor;
             GUI.DrawCircle(sb, Coord + _drawDelta, 4f, Border, Color, 20);
             // GUI.DrawPoint(sb, Coord, Border, Color);\
+
             if (IsShowingName && Name != null)
             {
-                var size = Resources.Font.MeasureString(Name).ToPoint();
+                Point size = Resources.Font.MeasureString(Name).ToPoint();
+
                 GUI.DrawString(sb,
                     Resources.Font,
                     Name,
@@ -375,20 +381,23 @@ namespace GCS
 
         public override void MoveTo(Vector2 at)
         {
-            var diff = at - Coord;
+            Vector2 diff = at - Coord;
+
             Move(diff);
         }
 
         public override void Move(Vector2 delta)
         {
             Coord += delta;
+
             _rule?.OnMoved();
         }
 
         public static Dot FromCoord(Vector2 coord)
         {
-            var dot = new Dot(coord);
+            Dot dot = new Dot(coord);
             new EmptyDotRule(dot);
+
             return dot;
         }
 
@@ -397,15 +406,17 @@ namespace GCS
 
         public static Dot FromOneShape(Shape shape, Vector2 coord)
         {
-            var dot = new Dot(coord);
+            Dot dot = new Dot(coord);
             new DotOnShapeRule(dot, shape);
+
             return dot;
         }
 
         public static Dot FromIntersection(Shape p1, Shape p2, Vector2 coord)
         {
-            var dot = new Dot(coord);
+            Dot dot = new Dot(coord);
             new DotOnIntersectionRule(dot, p1, p2);
+
             return dot;
         }
 

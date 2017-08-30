@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GCS
+﻿namespace GCS
 {
     public partial class Circle
     {
@@ -20,9 +18,10 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
-                var circle = Shape as Circle;
+                Circle circle = Shape as Circle;
 
                 Shape.Parents[0].MoveTo(circle.Center);
                 Shape.Parents[1].MoveTo(circle.Another);
@@ -36,13 +35,15 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
 
             protected override void Fix()
             {
-                var circle = Shape as Circle;
+                Circle circle = Shape as Circle;
+
                 circle.Center = (circle.Parents[0] as Dot).Coord;
                 circle.Another = (circle.Parents[1] as Dot).Coord;
             }

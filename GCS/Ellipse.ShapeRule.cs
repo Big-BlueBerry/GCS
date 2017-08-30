@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-
-namespace GCS
+﻿namespace GCS
 {
     public partial class Ellipse
     {
@@ -12,6 +9,7 @@ namespace GCS
                 ellipse.Parents.Add(f1);
                 ellipse.Parents.Add(f2);
                 ellipse.Parents.Add(pin);
+
                 f1.Childs.Add(ellipse);
                 f2.Childs.Add(ellipse);
                 pin.Childs.Add(ellipse);
@@ -22,9 +20,10 @@ namespace GCS
             public override void OnMoved()
             {
                 if (IsHandling) return;
+
                 IsHandling = true;
 
-                var ellipse = Shape as Ellipse;
+                Ellipse ellipse = Shape as Ellipse;
 
                 ellipse.Parents[0].MoveTo(ellipse.Focus1);
                 ellipse.Parents[1].MoveTo(ellipse.Focus2);
@@ -39,13 +38,15 @@ namespace GCS
             public override void OnParentMoved()
             {
                 if (IsHandling) return;
+
                 Fix();
                 MoveChilds();
             }
 
             protected override void Fix()
             {
-                var ellipse = Shape as Ellipse;
+                Ellipse ellipse = Shape as Ellipse;
+
                 ellipse.Focus1 = (ellipse.Parents[0] as Dot).Coord;
                 ellipse.Focus2 = (ellipse.Parents[1] as Dot).Coord;
                 ellipse.PinPoint = (ellipse.Parents[2] as Dot).Coord;
