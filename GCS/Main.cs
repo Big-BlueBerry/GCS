@@ -111,9 +111,9 @@ namespace GCS
             HScrollBar hscroll = new HScrollBar();
             hscroll.Dock = DockStyle.Bottom;
 
-            var construct = GameObject.Find("construct");
+            GameObject construct = GameObject.Find("construct");
 
-            var move = construct.AddComponent<MoveConstructComponent>();
+            MoveConstructComponent move = construct.AddComponent<MoveConstructComponent>();
             move.Comp = construct.GetComponent<ConstructComponent>();
             move.Hscroll = hscroll;
             move.Vscroll = vscroll;
@@ -123,7 +123,7 @@ namespace GCS
                 BackColor = System.Drawing.Color.White
             };
 
-            var con = new ToolStripMenuItem("작도(&C)");
+            ToolStripMenuItem con = new ToolStripMenuItem("작도(&C)");
             con.DropDownItems.Add("평행선(&E)");
             con.DropDownItems.Add("수선(&P)");
             con.DropDownItems.Add("접선(&T)");
@@ -134,7 +134,7 @@ namespace GCS
             con.DropDownItems[3].Click += (s, e) => _construct.SelectConstruct(ConstructType.Ellipse);
             menu.Items.Add(con);
 
-            var control = Control.FromHandle(Window.Handle);
+            Control control = Control.FromHandle(Window.Handle);
             control.Controls.Add(shapeStrip);
             control.Controls.Add(menu);
             control.Controls.Add(vscroll);
@@ -143,8 +143,8 @@ namespace GCS
 
         private ToolStripMenuItem AddStripItem(MenuStrip strip, Image img)
         {
-            var imageSize = new Size(60, 60);
-            var item = new ToolStripMenuItem(new Bitmap(img, imageSize));
+            Size imageSize = new Size(60, 60);
+            ToolStripMenuItem item = new ToolStripMenuItem(new Bitmap(img, imageSize));
             item.ImageAlign = ContentAlignment.MiddleCenter;
             item.ImageScaling = ToolStripItemImageScaling.None;
             item.AutoSize = true;

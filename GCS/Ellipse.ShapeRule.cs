@@ -24,7 +24,7 @@ namespace GCS
                 if (IsHandling) return;
                 IsHandling = true;
 
-                var ellipse = Shape as Ellipse;
+                Ellipse ellipse = Shape as Ellipse;
 
                 ellipse.Parents[0].MoveTo(ellipse.Focus1);
                 ellipse.Parents[1].MoveTo(ellipse.Focus2);
@@ -45,7 +45,7 @@ namespace GCS
 
             protected override void Fix()
             {
-                var ellipse = Shape as Ellipse;
+                Ellipse ellipse = Shape as Ellipse;
                 ellipse.Focus1 = (ellipse.Parents[0] as Dot).Coord;
                 ellipse.Focus2 = (ellipse.Parents[1] as Dot).Coord;
                 ellipse.PinPoint = (ellipse.Parents[2] as Dot).Coord;

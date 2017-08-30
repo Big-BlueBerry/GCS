@@ -77,7 +77,7 @@ namespace GCS
         {
             base.Update();
 
-            var state = Keyboard.GetState();
+            KeyboardState state = Keyboard.GetState();
             if (state.IsKeyDown(Keys.Down))
                 Scroll(0, 5);
             if (state.IsKeyDown(Keys.Up))

@@ -82,9 +82,9 @@ namespace GCS
         private void Delete(IEnumerable<Shape> target)
         {
             List<Shape> sh = new List<Shape>();
-            foreach (var s in target)
+            foreach (Shape s in target)
             {
-                foreach (var ss in s.Delete())
+                foreach (Shape ss in s.Delete())
                     if (_shapes.Contains(ss))
                     {
                         sh.Add(ss);
@@ -102,14 +102,14 @@ namespace GCS
             switch (r.type)
             {
                 case RecodeType.CREATE:
-                    foreach (var s in r.targetshapes)
+                    foreach (Shape s in r.targetshapes)
                     {
                         _shapes.Remove(s);
                     }
                     break;
 
                 case RecodeType.DELETE:
-                    foreach (var s in r.targetshapes)
+                    foreach (Shape s in r.targetshapes)
                         AddShape(s);
                     break;
 
@@ -128,7 +128,7 @@ namespace GCS
 
         private void UpdateLists(SpriteBatch sb)
         {
-            foreach (var s in _shapes)
+            foreach (Shape s in _shapes)
             {
                 s.Draw(sb);
             }
@@ -153,7 +153,7 @@ namespace GCS
 
         private void SelectAll()
         {
-            foreach (var s in _shapes)
+            foreach (Shape s in _shapes)
                 Select(s);
         }
 
@@ -175,7 +175,7 @@ namespace GCS
             base.Update();
             //_pos = Camera.Current.GetRay(Mouse.GetState().Position.ToVector2());
             _pos = Mouse.GetState().Position.ToVector2() + Location;
-            foreach (var s in _shapes) s.Update(_pos);
+            foreach (Shape s in _shapes) s.Update(_pos);
             //선택, 가까이있는 점 선택
             _nearShapes = _shapes.Where(s => s.Focused).ToList();
 
@@ -215,7 +215,7 @@ namespace GCS
                 }
                 else
                 {
-                    var p = GetDot(_pos);
+                    Dot p = GetDot(_pos);
                     AddShape(p);
                     AddShape(_lastPoint);
                     Shape sp = null;
@@ -275,7 +275,7 @@ namespace GCS
                     Shape nearest = _nearShapes[0];
 
                     float dist = int.MaxValue;
-                    foreach (var s in _nearShapes)
+                    foreach (Shape s in _nearShapes)
                     {
                         if (s is Dot)
                         {
@@ -385,7 +385,7 @@ namespace GCS
 
         private void UpdateShortcuts()
         {
-            var state = Keyboard.GetState();
+            KeyboardState state = Keyboard.GetState();
             if (state.IsKeyDown(Keys.Delete))
             {
                 DeleteSelected();
@@ -409,7 +409,7 @@ namespace GCS
             Shape nearest = null;
             float distDot = int.MaxValue;
             float dist = int.MaxValue;
-            foreach (var s in nears)
+            foreach (Shape s in nears)
             {
                 if (s is Dot)
                 {

@@ -22,7 +22,7 @@ namespace GCS
                 if (IsHandling) return;
                 IsHandling = true;
 
-                var line = Shape as LineLike;
+                LineLike line = Shape as LineLike;
 
                 Shape.Parents[0].MoveTo(line.Point1);
                 Shape.Parents[1].MoveTo(line.Point2);
@@ -42,7 +42,7 @@ namespace GCS
 
             protected override void Fix()
             {
-                var line = Shape as LineLike;
+                LineLike line = Shape as LineLike;
                 line.Point1 = (line.Parents[0] as Dot).Coord;
                 line.Point2 = (line.Parents[1] as Dot).Coord;
             }
@@ -69,10 +69,10 @@ namespace GCS
                 if (IsHandling) return;
                 IsHandling = true;
 
-                var line = Shape as Line;
-                var delta = line.Point1 - _last;
+                Line line = Shape as Line;
+                Vector2 delta = line.Point1 - _last;
 
-                var dot = line.Parents[1] as Dot;
+                Dot dot = line.Parents[1] as Dot;
                 dot.Move(delta);
 
                 MoveChilds();
@@ -89,11 +89,11 @@ namespace GCS
 
             protected override void Fix()
             {
-                var line = Shape as Line;
-                var parent = (line.Parents[0] as LineLike);
-                var dot = (line.Parents[1] as Dot).Coord;
+                Line line = Shape as Line;
+                LineLike parent = (line.Parents[0] as LineLike);
+                Vector2 dot = (line.Parents[1] as Dot).Coord;
 
-                var gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
+                Vector2 gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
                                       dot.Y - (parent.Point1.Y + parent.Point2.Y) / 2);
 
                 line.Point1 = parent.Point1 + gap;
@@ -121,10 +121,10 @@ namespace GCS
                 if (IsHandling) return;
                 IsHandling = true;
 
-                var line = Shape as Line;
-                var delta = line.Point1 - _last;
+                Line line = Shape as Line;
+                Vector2 delta = line.Point1 - _last;
 
-                var dot = line.Parents[1] as Dot;
+                Dot dot = line.Parents[1] as Dot;
                 dot.Move(delta);
 
                 MoveChilds();
@@ -141,15 +141,15 @@ namespace GCS
 
             protected override void Fix()
             {
-                var line = Shape as Line;
-                var parent = (line.Parents[0] as LineLike);
-                var dot = (line.Parents[1] as Dot).Coord;
+                Line line = Shape as Line;
+                LineLike parent = (line.Parents[0] as LineLike);
+                Vector2 dot = (line.Parents[1] as Dot).Coord;
 
-                var gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
+                Vector2 gap = new Vector2(dot.X - (parent.Point1.X + parent.Point2.X) / 2,
                                       dot.Y - (parent.Point1.Y + parent.Point2.Y) / 2);
 
-                var p1 = Geometry.Rotate(parent.Point1 + gap - dot, MathHelper.ToRadians(90)) + dot;
-                var p2 = Geometry.Rotate(parent.Point2 + gap - dot, MathHelper.ToRadians(90)) + dot;
+                Vector2 p1 = Geometry.Rotate(parent.Point1 + gap - dot, MathHelper.ToRadians(90)) + dot;
+                Vector2 p2 = Geometry.Rotate(parent.Point2 + gap - dot, MathHelper.ToRadians(90)) + dot;
 
                 line.Point1 = p1;
                 line.Point2 = p2;
@@ -186,10 +186,10 @@ namespace GCS
                 if (IsHandling) return;
                 IsHandling = true;
 
-                var line = Shape as Line;
-                var delta = line.Point1 - _last;
+                Line line = Shape as Line;
+                Vector2 delta = line.Point1 - _last;
 
-                var dot = line.Parents[1] as Dot;
+                Dot dot = line.Parents[1] as Dot;
                 dot.Move(delta);
 
                 MoveChilds();
@@ -206,15 +206,16 @@ namespace GCS
 
             protected override void Fix()
             {
-                var line = Shape as Line;
-                var dot = (line.Parents[1] as Dot).Coord;
-                if(line.Parents[0] is Ellipse)
+                Line line = Shape as Line;
+                Vector2 dot = (line.Parents[1] as Dot).Coord;
+
+                if (line.Parents[0] is Ellipse)
                 {
-                    var parent = (line.Parents[0] as Ellipse);
+                    Ellipse parent = (line.Parents[0] as Ellipse);
                     Vector2 diff = parent.Focus1 - parent.Focus2;
                     float angle = (float)Math.Atan2(diff.Y, diff.X);
-                    var tempcenter = Geometry.Rotate(parent.Center, -angle);
-                    var tempdot = Geometry.Rotate(dot, -angle);
+                    Vector2 tempcenter = Geometry.Rotate(parent.Center, -angle);
+                    Vector2 tempdot = Geometry.Rotate(dot, -angle);
                     
                     float tempgrad = (parent.Semiminor * parent.Semiminor * (tempcenter.X - tempdot.X))/
                         (parent.Semimajor * parent.Semimajor * (tempdot.Y - tempcenter.Y ) );
@@ -226,7 +227,7 @@ namespace GCS
                 }
                 else
                 {
-                    var parent = (line.Parents[0] as Circle);
+                    Circle parent = (line.Parents[0] as Circle);
                     float grad = (parent.Center.X - dot.X) / (dot.Y - parent.Center.Y);
                     // float Weight = (float)Math.Sqrt(parent.Radius/(grad*grad+1));
 

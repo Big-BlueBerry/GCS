@@ -25,7 +25,7 @@ namespace GCS
 
         public virtual void Detach()
         {
-            foreach(var p in Shape.Parents)
+            foreach(Shape p in Shape.Parents)
             {
                 p.Childs.Remove(Shape);
             }
@@ -36,7 +36,7 @@ namespace GCS
 
         public void MoveChilds()
         {
-            foreach (var c in Shape.Childs)
+            foreach (Shape c in Shape.Childs)
                 c._rule.OnParentMoved();
         }
     }

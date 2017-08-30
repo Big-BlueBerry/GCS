@@ -6,7 +6,7 @@ namespace GCS
     {
         public static void BeginAA(this SpriteBatch sb)
         {
-            var state = new RasterizerState { MultiSampleAntiAlias = true };
+            RasterizerState state = new RasterizerState { MultiSampleAntiAlias = true };
             sb.Begin(rasterizerState: state);
         }
     }

@@ -74,7 +74,6 @@ namespace GCS
 
         public virtual void Update(Vector2 cursor)
         {
-            Distance = Geometry.GetNearestDistance(this, cursor);
             if (IsEnoughClose(cursor))
                 Focused = true;
             else if (Focused)
@@ -84,8 +83,8 @@ namespace GCS
         public IEnumerable<Shape> Delete()
         {
             yield return this;
-            foreach (var child in Childs)
-                foreach (var c in child.Delete())
+            foreach (Shape child in Childs)
+                foreach (Shape c in child.Delete())
                     yield return c;
         }
     }
@@ -121,7 +120,7 @@ namespace GCS
 
         public override void MoveTo(Vector2 at)
         {
-            var diff = at - Center;
+            Vector2 diff = at - Center;
             Move(diff);
         }
 
@@ -142,11 +141,11 @@ namespace GCS
         public Vector2 PinPoint { get; protected set; }
 
         public Vector2 Center => (Focus1 + Focus2) / 2;
-        public float Sublength => Vector2.Distance(Focus1, Focus2) / 2;//c 
-        public float Semimajor => (Vector2.Distance(Focus1, PinPoint) + Vector2.Distance(Focus2, PinPoint)) / 2;//a
-        public float Semiminor => (float)Math.Sqrt(Semimajor * Semimajor - Sublength * Sublength);//b
         
 
+        public float Sublength => Vector2.Distance(Focus1, Focus2) / 2; // c 
+        public float Semimajor => (Vector2.Distance(Focus1, PinPoint) + Vector2.Distance(Focus2, PinPoint)) / 2; // a
+        public float Semiminor => (float)Math.Sqrt(Semimajor * Semimajor - Sublength * Sublength); // b
         protected Ellipse() : base() { }
 
         public override void Draw(SpriteBatch sb)
@@ -166,7 +165,7 @@ namespace GCS
 
         public override void MoveTo(Vector2 at)
         {
-            var diff = at - PinPoint;
+            Vector2 diff = at - PinPoint;
             Move(diff);
         }
 
@@ -207,7 +206,7 @@ namespace GCS
 
         public override void MoveTo(Vector2 at)
         {
-            var diff = at - Point1;
+            Vector2 diff = at - Point1;
             Move(diff);
         }
     }
@@ -226,7 +225,7 @@ namespace GCS
         public static Line FromTwoDots(Dot d1, Dot d2)
         {
             Line line = new Line();
-            var rule = new LineLikeOnTwoDotsRule(line, d1, d2);
+            new LineLikeOnTwoDotsRule(line, d1, d2);
 
             return line;
         }
@@ -280,8 +279,8 @@ namespace GCS
 
         public static Segment FromTwoDots(Dot d1, Dot d2)
         {
-            var seg = new Segment();
-            var rule = new LineLikeOnTwoDotsRule(seg, d1, d2);
+            Segment seg = new Segment();
+            new LineLikeOnTwoDotsRule(seg, d1, d2);
 
             return seg;
         }
@@ -313,8 +312,8 @@ namespace GCS
 
         public new static Vector FromTwoDots(Dot d1, Dot d2)
         {
-            var vec = new Vector();
-            var rule = new LineLikeOnTwoDotsRule(vec, d1, d2);
+            Vector vec = new Vector();
+            new LineLikeOnTwoDotsRule(vec, d1, d2);
 
             return vec;
         }
@@ -336,7 +335,7 @@ namespace GCS
 
         public override bool Equals(object obj)
         {
-            var o = obj as Dot;
+            Dot o = obj as Dot;
             return o == null ? false : Coord.Equals(o.Coord);
         }
 
@@ -357,7 +356,7 @@ namespace GCS
             // GUI.DrawPoint(sb, Coord, Border, Color);\
             if (IsShowingName && Name != null)
             {
-                var size = Resources.Font.MeasureString(Name).ToPoint();
+                Point size = Resources.Font.MeasureString(Name).ToPoint();
                 GUI.DrawString(sb,
                     Resources.Font,
                     Name,
@@ -370,7 +369,7 @@ namespace GCS
 
         public override void MoveTo(Vector2 at)
         {
-            var diff = at - Coord;
+            Vector2 diff = at - Coord;
             Move(diff);
         }
 
@@ -382,7 +381,7 @@ namespace GCS
 
         public static Dot FromCoord(Vector2 coord)
         {
-            var dot = new Dot(coord);
+            Dot dot = new Dot(coord);
             new EmptyDotRule(dot);
             return dot;
         }
@@ -392,14 +391,14 @@ namespace GCS
 
         public static Dot FromOneShape(Shape shape, Vector2 coord)
         {
-            var dot = new Dot(coord);
+            Dot dot = new Dot(coord);
             new DotOnShapeRule(dot, shape);
             return dot;
         }
 
         public static Dot FromIntersection(Shape p1, Shape p2, Vector2 coord)
         {
-            var dot = new Dot(coord);
+            Dot dot = new Dot(coord);
             new DotOnIntersectionRule(dot, p1, p2);
             return dot;
         }

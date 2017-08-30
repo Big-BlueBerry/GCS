@@ -24,7 +24,7 @@ namespace GCS
 
         public void DeleteShapes(IEnumerable<Shape> shapes)
         {
-            foreach (var s in shapes)
+            foreach (Shape s in shapes)
                 _shapes.Remove(s);
         }
     }

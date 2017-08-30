@@ -34,7 +34,7 @@ namespace GCS
             else if (coef.Count == 3) return Solve2Eq(coef[0], coef[1], coef[2]);
             else
             {
-                var diff = new float[coef.Count - 1];
+                float[] diff = new float[coef.Count - 1];
                 for (int i = 0; i < coef.Count - 1; i++)
                 {
                     diff[i] = (coef.Count - 1 - i) * coef[i]; // 극값을 구한 후

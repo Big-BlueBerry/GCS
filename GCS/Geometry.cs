@@ -43,7 +43,7 @@ namespace GCS
             }
             else if (shape1 is Ellipse)
             {
-                Vector2[] result=new Vector2[] { };
+                Vector2[] result;
                 Ellipse elp = shape1 as Ellipse;
                 Vector2 diff = elp.Focus1 - elp.Focus2;
                 float angle = (float)Math.Atan2(diff.Y, diff.X);
@@ -65,14 +65,14 @@ namespace GCS
                         Dot.FromCoord(Rotate(lin.Point2, -angle) - cent));
                     result = getIntersect(ellipse, line);
                 }
-                else if(shape2 is Circle)
+                else if (shape2 is Circle)
                 {
                     Circle cir = shape2 as Circle;
                     Circle circle = Circle.FromTwoDots(Dot.FromCoord(Rotate(cir.Center, -angle) - cent),
                         Dot.FromCoord(Rotate(cir.Another, -angle) - cent));
                     result = getIntersect(ellipse, circle);
                 }
-                else if(shape2 is Ellipse)
+                else if (shape2 is Ellipse)
                 {
                     Ellipse elps = shape2 as Ellipse;
                     Ellipse ellipse2 = Ellipse.FromThreeDots(Dot.FromCoord(Rotate(elps.Focus1, -angle) - cent),
@@ -112,7 +112,7 @@ namespace GCS
             {
                 return new Vector2[] { intersect };
             }
-            else return new Vector2[] { };
+            return new Vector2[] { };
         }
 
         private static Vector2[] getIntersect(Line line1, Segment line2)
@@ -131,8 +131,8 @@ namespace GCS
             {
                 return new Vector2[] { intersect };
             }
-            else return new Vector2[] { };
 
+            return new Vector2[] { };
         }
 
         private static Vector2[] getIntersect(Line line1, Line line2)
@@ -160,7 +160,7 @@ namespace GCS
             if (discriminant < 0)
                 return new Vector2[] { };
             else if (discriminant == 0)
-                return new[] { new Vector2(D * d.Y / (dr * dr) + circle.Center.X, -D * d.X / (dr * dr) + circle.Center.Y) };
+                return new Vector2[] { new Vector2(D * d.Y / (dr * dr) + circle.Center.X, -D * d.X / (dr * dr) + circle.Center.Y) };
             else
             {
                 float x = D * d.Y / (dr * dr) + circle.Center.X;
@@ -169,7 +169,7 @@ namespace GCS
                 float xd = sgnDy * d.X * (float)Math.Sqrt(discriminant) / (dr * dr);
                 float yd = Math.Abs(d.Y) * (float)Math.Sqrt(discriminant) / (dr * dr);
 
-                return new[]
+                return new Vector2[]
                 {
                     new Vector2(x + xd, y + yd),
                     new Vector2(x - xd, y - yd)
@@ -230,9 +230,9 @@ namespace GCS
 
                 float x = (d * d + r1 * r1 - r2 * r2) / (2 * d);
 
-                Vector2 p1 = circle1.Center + (circle2.Center - circle1.Center) * x / d;
                 Vector2 v1 = circle1.Center - circle2.Center;
                 v1 = new Vector2(-v1.Y, v1.X);
+                Vector2 p1 = circle1.Center + (circle2.Center - circle1.Center) * x / d;
                 Vector2 p2 = p1 + v1;
                 return getIntersect(Line.FromTwoPoints(p1, p2), circle1);
             }
@@ -245,11 +245,11 @@ namespace GCS
             float c = line1.Grad;
             float d = line1.Yint;
 
-            float [] xvec = MathMatics.solve2Eq(a * a * c * c + b * b, 2 * a * a * c * d, a * a * (d * d - b * b));
+            float [] xvec = MathMatics.Solve2Eq(a * a * c * c + b * b, 2 * a * a * c * d, a * a * (d * d - b * b));
             if (xvec.Length == 0) return new Vector2[] { };
-            if (xvec[0] == xvec[1]) return new[] { new Vector2(xvec[0], c * xvec[0] + d) };
-            else return new[]
-              {
+            if (xvec[0] == xvec[1]) return new Vector2[] { new Vector2(xvec[0], c * xvec[0] + d) };
+            else return new Vector2[]
+            {
                     new Vector2(xvec[0] , c * xvec[0] + d ),
                     new Vector2(xvec[1] , c * xvec[1] + d)
               };
