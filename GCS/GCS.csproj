@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ConstructComponent.cs" />
+    <Compile Include="ConstructRecode.cs" />
     <Compile Include="ConstructType.cs" />
     <Compile Include="Dot.ShapeRule.cs" />
     <Compile Include="DotNaming.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="MoveConstructComponent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RecodeType.cs" />
     <Compile Include="Shape.cs" />
     <Compile Include="ShapeManager.cs" />
     <Compile Include="ShapeRule.cs" />
