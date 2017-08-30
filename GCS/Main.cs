@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Grid.Framework;
-using Grid.Framework.GUIs;
 
-using Button = Grid.Framework.GUIs.Button;
 using MenuStrip = System.Windows.Forms.MenuStrip;
 using Color = Microsoft.Xna.Framework.Color;
 

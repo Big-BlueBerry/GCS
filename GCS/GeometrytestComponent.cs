@@ -1,13 +1,6 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-using Grid.Framework;
-using Grid.Framework.Components;
-using Grid.Framework.GUIs;
+﻿using Grid.Framework.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
-using ContextMenuStrip = System.Windows.Forms.ContextMenuStrip;
 
 namespace GCS
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-
-namespace GCS
+﻿namespace GCS
 {
     public partial class Ellipse
     {

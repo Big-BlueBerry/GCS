@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Grid.Framework;
 using Grid.Framework.Components;
-using Grid.Framework.GUIs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
