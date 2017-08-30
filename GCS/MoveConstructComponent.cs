@@ -47,6 +47,7 @@ namespace GCS
         }
         
 
+        // OnLiU: could we erase this?
         public MoveConstructComponent()
         {
 
