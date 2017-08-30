@@ -316,6 +316,7 @@ namespace GCS
             return vec;
         }
     }
+ 
 
     public partial class Dot : Shape
     {

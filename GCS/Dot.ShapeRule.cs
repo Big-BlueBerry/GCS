@@ -74,7 +74,7 @@ namespace GCS
                 {
                     var circle = parent as Circle;
                     _ratio = (float)Math.Atan2(circle.Center.Y - dot.Coord.Y,
-                                               -dot.Coord.X + circle.Center.X);// + (float)Math.PI;
+                                               -dot.Coord.X + circle.Center.X) + (float)Math.PI;
                     //tan(theta + pi) = tan(theta);
                 }
                 else if (parent is Ellipse)

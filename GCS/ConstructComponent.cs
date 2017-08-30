@@ -16,7 +16,7 @@ namespace GCS
         public Vector2 Location { get; set; }
         public Point Size { get; set; } = new Point(10000, 10000);
         public Rectangle Bound => new Rectangle(Location.ToPoint(), Scene.CurrentScene.ScreenBounds);
-
+        
         private DrawState _drawState = DrawState.NONE;
         private DotNaming _dotNamer = new DotNaming();
         private bool _wasDrawing = false;
@@ -31,17 +31,22 @@ namespace GCS
         private List<Shape> _nearShapes;
         private List<Shape> _selectedShapes;
         private ContextMenuStrip _menuStrip;
+        private List<ConstructRecode> _recodes;
 
         private bool _isAnyGuiUseMouse => _menuStrip.Focused || (Scene.CurrentScene as Main).GetFocused();
         private bool _isLeftMouseDown => Scene.CurrentScene.IsLeftMouseDown && _isAnyGuiUseMouse;
         private bool _isLeftMouseUp => Scene.CurrentScene.IsLeftMouseUp && _isAnyGuiUseMouse;
         private bool _isLeftMouseClicking => Scene.CurrentScene.IsLeftMouseClicking && _isAnyGuiUseMouse;
 
+        private Dot samplepoint = Dot.FromCoord(0, 0);
+        private Vector2 _lastpos;
+
         public ConstructComponent()
         {
             _shapes = new List<Shape>();
             _nearShapes = new List<Shape>();
             _selectedShapes = new List<Shape>();
+            _recodes = new List<ConstructRecode>();
             _lastPoint = Dot.FromCoord(0, 0);
             OnCamera = false;
 
@@ -54,9 +59,11 @@ namespace GCS
             _menuStrip.Items.Add("제거");
 
             _menuStrip.Items.Add("여기로 병합");
+            _menuStrip.Items.Add("실행 취소");
 
             _menuStrip.Items[0].Click += (s, e) => DeleteSelected();
             _menuStrip.Items[1].Click += (s, e) => UpdateAttach();
+            _menuStrip.Items[2].Click += (s, e) => Undo();
         }
 
         public void Clear()
@@ -73,17 +80,45 @@ namespace GCS
 
         private void Delete(IEnumerable<Shape> target)
         {
+            List<Shape> sh= new List<Shape>();
             foreach (var s in target)
             {
                 foreach (var ss in s.Delete())
                     if (_shapes.Contains(ss))
+                    {
+                        sh.Add(ss);
                         _shapes.Remove(ss);
+                    }
+
             }
+            _recodes.Add(new ConstructRecode(RecodeType.DELETE, sh));
         }
 
         public void Undo()
         {
-            throw new WorkWoorimException("리팩토링 하느라 구현 안함");
+            if (_recodes.Count == 0) return;
+            ConstructRecode r = _recodes.Last();
+            switch (r.type)
+            {
+                case RecodeType.CREATE:
+                    foreach(var s in r.targetshapes)
+                    {
+                        _shapes.Remove(s);
+                    }
+                    break;
+
+                case RecodeType.DELETE:
+                    _shapes.AddRange(r.targetshapes);
+                    break;
+
+                case RecodeType.MOVE:
+                    foreach (Shape s in r.targetshapes)
+                    {
+                        s.Move(r.moveRecode);
+                    }
+                    break;
+            }
+            _recodes.RemoveAt(_recodes.Count -1);
         }
 
         public void ChangeState(DrawState state)
@@ -103,6 +138,7 @@ namespace GCS
             if (shape is Dot)
                 shape.Name = _dotNamer.GetCurrent();
             _shapes.Add(shape);
+            _recodes.Add(new ConstructRecode(RecodeType.CREATE, new List<Shape>() { shape })); 
         }
 
         private void Select(Shape shape)
@@ -168,7 +204,6 @@ namespace GCS
                 if (_drawState == DrawState.DOT)
                 {
                     AddShape(_lastPoint);
-                    //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
                 }
                 else if (_drawState == DrawState.ELLIPSE)
                 {
@@ -182,8 +217,6 @@ namespace GCS
                     var p = GetDot(_pos);
                     AddShape(p);
                     AddShape(_lastPoint);
-                    //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { p }, null));
-                    //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { _lastPoint }, null));
                     Shape sp = null;
                     if (_drawState == DrawState.CIRCLE)
                     {
@@ -211,7 +244,6 @@ namespace GCS
                         sp = Ellipse.FromThreeDots(_ellipseLastPoint, _lastPoint, p);
                         AddShape(sp);
                     }
-                    //_doneActions.Push(new ImportantAction(userActions.CREATE, new Shape[] { sp }, null));
                 }
                 _wasDrawing = false;
                 _drawState = DrawState.NONE;
@@ -310,6 +342,9 @@ namespace GCS
                 if (_readyForDrag && Scene.CurrentScene.IsMouseMoved)
                 {
                     _readyForDrag = false;
+                    ConstructRecode r = new ConstructRecode(RecodeType.MOVE, _selectedShapes);
+                    _recodes.Add(r);
+                    _lastpos = samplepoint.Coord;
                     if (Scene.CurrentScene.IsLeftMouseClicking)
                         _isDragging = true;
                 }
@@ -321,9 +356,15 @@ namespace GCS
                     {
                         if (!_isDragging) _isDragging = true;
                         _selectedShapes.ForEach(s => { s.UnSelect = false; s.Move(diff.ToVector2()); });
+                        samplepoint.Move(diff.ToVector2());
                     }
                     if (Scene.CurrentScene.IsLeftMouseUp)
+                    {
                         _isDragging = false;
+                        _recodes.Last().WriteMoveRecode(samplepoint.Coord - _lastpos);
+                        return;
+                    }
+    
                 }
             }
         }
