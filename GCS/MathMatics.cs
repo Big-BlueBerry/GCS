@@ -14,10 +14,22 @@ namespace GCS
         public static float [] Solve2Eq(float a, float b, float c)
         {
             float d = b * b - 4 * a * c;
-            if (d < 0) return new float[] { };
-            else if (d == 0) return new float[] { -b / (2 * a), -b / (2 * a) };
-            else return new float[] { (-b + (float)Math.Sqrt(d)) / (2 * a), (-b - (float)Math.Sqrt(d)) / (2 * a) };
+            float result;
 
+            if (d < 0)
+                return new float[] { };
+            else if (d == 0)
+            {
+                result = -b / (2 * a);
+
+                return new float[] { result, result };
+            }
+            else
+            {
+                result = (-b + (float)Math.Sqrt(d)) / (2 * a);
+
+                return new float[] { result, result };
+            }
         }
         // 근이 - Upperbound, Upperbound 안에 있다고 가정, 충분히 큰 Upperbound 를 주면 됨
         public static float[] solveNEq(float[] polynorm, int accuracy = 3)
@@ -30,6 +42,7 @@ namespace GCS
             else
                 while (coef.First() == 0)
                     coef.Remove(0);
+            if (coef.Count <= 1) return new float[] { };
             else if (coef.Count == 2) return new float[] { -coef[0] / coef[1] };
             else if (coef.Count == 3) return Solve2Eq(coef[0], coef[1], coef[2]);
             else

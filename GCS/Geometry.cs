@@ -340,10 +340,27 @@ namespace GCS
             Vector2[] intersects2 = GetIntersect(ellipse, (Shape)lin2);
             try
             {
+                // OnLiU: An error is generated when trying to create an ellipse => go to exception "what's this?"
+                Vector2 intersect1 = Vector2.Distance(intersects1[0], point) < Vector2.Distance(intersects1[1], point) ? intersects1[0] : intersects1[1];
+                Vector2 intersect2 = Vector2.Distance(intersects2[0], point) < Vector2.Distance(intersects2[1], point) ? intersects2[0] : intersects2[1];
+
+                Line seg1 = Line.FromTwoDots(Dot.FromCoord(ellipse.Focus1), Dot.FromCoord(intersect2));
+                Line seg2 = Line.FromTwoDots(Dot.FromCoord(ellipse.Focus2), Dot.FromCoord(intersect1));
+                try
+                {
+                    Vector2[] intersects3 = GetIntersect(ellipse, (Shape)Line.FromTwoDots(Dot.FromCoord(GetIntersect(seg1, seg2)[0]), Dot.FromCoord(point)));
+                    Vector2 near = Vector2.Distance(intersects3[0], point) < Vector2.Distance(intersects3[1], point) ? intersects3[0] : intersects3[1];
+                    return near;
+                }
+                catch (NotFiniteNumberException)
+                {
+                    Vector2[] intsc = GetIntersect(ellipse, (Shape)seg1);
+                    return Vector2.Distance(intsc[0], point) < Vector2.Distance(intsc[1], point) ? intsc[0] : intsc[1];
+                }
             }
-            catch (NotFiniteNumberException inf) {
-                Vector2[] intsc = GetIntersect(ellipse, seg1);
-                return Vector2.Distance(intsc[0], point) < Vector2.Distance(intsc[1], point) ? intsc[0] : intsc[1];
+            catch
+            {
+                throw new Exception("what's this?");
             }
             throw new WorkWoorimException("엄밀한 증명 없이 쓴 알고리즘이지만 내가 증명하면 되니까 ㄱㅊ.");
         }
