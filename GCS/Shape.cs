@@ -61,6 +61,14 @@ namespace GCS
                 _comp = GameObject.Find("construct").GetComponent<ConstructComponent>();
         }
 
+        public void InitializeProperties()
+        {
+            Selected = false;
+            Focused = false;
+            UnSelect = false;
+            Disabled = false;
+        }
+
         public virtual bool IsEnoughClose(Vector2 coord)
             => Geometry.GetNearestDistance(this, coord) <= _nearDistance;
 

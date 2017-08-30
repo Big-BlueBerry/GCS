@@ -16,7 +16,7 @@ namespace GCS
         public Vector2 Location { get; set; }
         public Point Size { get; set; } = new Point(10000, 10000);
         public Rectangle Bound => new Rectangle(Location.ToPoint(), Scene.CurrentScene.ScreenBounds);
-        
+
         private DrawState _drawState = DrawState.NONE;
         private DotNaming _dotNamer = new DotNaming();
         private bool _wasDrawing = false;
@@ -74,13 +74,14 @@ namespace GCS
 
         public void DeleteSelected()
         {
+            if (_selectedShapes.Count == 0) return;
             Delete(_selectedShapes);
             _selectedShapes.Clear();
         }
 
         private void Delete(IEnumerable<Shape> target)
         {
-            List<Shape> sh= new List<Shape>();
+            List<Shape> sh = new List<Shape>();
             foreach (var s in target)
             {
                 foreach (var ss in s.Delete())
@@ -101,14 +102,15 @@ namespace GCS
             switch (r.type)
             {
                 case RecodeType.CREATE:
-                    foreach(var s in r.targetshapes)
+                    foreach (var s in r.targetshapes)
                     {
                         _shapes.Remove(s);
                     }
                     break;
 
                 case RecodeType.DELETE:
-                    _shapes.AddRange(r.targetshapes);
+                    foreach (var s in r.targetshapes)
+                        AddShape(s);
                     break;
 
                 case RecodeType.MOVE:
@@ -118,7 +120,7 @@ namespace GCS
                     }
                     break;
             }
-            _recodes.RemoveAt(_recodes.Count -1);
+            _recodes.RemoveAt(_recodes.Count - 1);
         }
 
         public void ChangeState(DrawState state)
@@ -135,10 +137,11 @@ namespace GCS
         private void AddShape(Shape shape)
         {
             if (_shapes.Contains(shape)) return;
-            if (shape is Dot)
+            if (shape is Dot && string.IsNullOrEmpty(shape.Name))
                 shape.Name = _dotNamer.GetCurrent();
+            shape.InitializeProperties();
             _shapes.Add(shape);
-            _recodes.Add(new ConstructRecode(RecodeType.CREATE, new List<Shape>() { shape })); 
+            _recodes.Add(new ConstructRecode(RecodeType.CREATE, new List<Shape>() { shape }));
         }
 
         private void Select(Shape shape)
@@ -364,7 +367,7 @@ namespace GCS
                         _recodes.Last().WriteMoveRecode(samplepoint.Coord - _lastpos);
                         return;
                     }
-    
+
                 }
             }
         }
@@ -564,7 +567,7 @@ namespace GCS
                             _shapes.Add(Line.TangentLine(elp, dot));
                         }
                     }
-                    break;   
+                    break;
                 case ConstructType.Ellipse:
                     {
                         if (_selectedShapes.Count == 3)
