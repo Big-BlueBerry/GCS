@@ -17,8 +17,8 @@ namespace GCS
 
         public void DeleteShape(Shape shape)
         {
-            if (!_shapes.Contains(shape))
-                return;
+            if (!_shapes.Contains(shape)) return;
+
             _shapes.Remove(shape);
         }
 

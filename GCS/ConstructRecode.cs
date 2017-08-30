@@ -15,13 +15,13 @@ namespace GCS
 
         public ConstructRecode(RecodeType Type, List<Shape> Target)
         {
-            this.targetshapes = Target;
-            this.type = Type;
+            targetshapes = Target;
+            type = Type;
         }
         
         public void WriteMoveRecode(Vector2 diff)
         {
-            this.moveRecode = -diff;
+            moveRecode = -diff;
         }
     }
 }

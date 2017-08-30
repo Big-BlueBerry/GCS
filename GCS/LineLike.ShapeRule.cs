@@ -219,7 +219,7 @@ namespace GCS
                     float tempgrad = (parent.Semiminor * parent.Semiminor * (tempcenter.X - tempdot.X))/
                         (parent.Semimajor * parent.Semimajor * (tempdot.Y - tempcenter.Y ) );
                     float grad = (float)((tempgrad + Math.Tan(angle)) / (1 - tempgrad * Math.Tan(angle)));
-                    //tangent 덧셈 정리
+                    // tangent 덧셈 정리
                     line.Point1 = dot;
                     line.Point2 = dot + new Vector2(1, grad);
 
@@ -228,10 +228,11 @@ namespace GCS
                 {
                     var parent = (line.Parents[0] as Circle);
                     float grad = (parent.Center.X - dot.X) / (dot.Y - parent.Center.Y);
-                    //float Weight = (float)Math.Sqrt(parent.Radius/(grad*grad+1));
+                    // float Weight = (float)Math.Sqrt(parent.Radius/(grad*grad+1));
+
                     line.Point1 = dot;
                     line.Point2 = dot + new Vector2(1, grad); // or (Weight, Weight * grad)
-                    //Weight 는 Point1 과 Point2 사이의 거리를 Radius 로 뽑아줄 때 쓰면 됨.
+                    // Weight 는 Point1 과 Point2 사이의 거리를 Radius 로 뽑아줄 때 쓰면 됨.
                 }
 
                 _last = line.Point1;

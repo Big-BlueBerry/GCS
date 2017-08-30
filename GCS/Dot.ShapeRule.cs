@@ -69,13 +69,13 @@ namespace GCS
             {
                 var dot = Shape as Dot;
                 var parent = Shape.Parents[0];
-                //타원이라고 다를 건 없음. 다만 로테이션을 신경써주면 될 뿐
-                if (parent is Circle )
+                // 타원이라고 다를 건 없음. 다만 로테이션을 신경써주면 될 뿐
+                if (parent is Circle)
                 {
                     var circle = parent as Circle;
                     _ratio = (float)Math.Atan2(circle.Center.Y - dot.Coord.Y,
                                                -dot.Coord.X + circle.Center.X) + (float)Math.PI;
-                    //tan(theta + pi) = tan(theta);
+                    // tan(theta + pi) = tan(theta);
                 }
                 else if (parent is Ellipse)
                 {
@@ -123,7 +123,7 @@ namespace GCS
                     
                     float dist = Vector2.Distance(stdpoints[0] , elp.Center);
                     dot.Coord = Geometry.Rotate(new Vector2(elp.Center.X + (float)Math.Cos(-_ratio ) * dist,
-                                            elp.Center.Y + (float)Math.Sin(-_ratio ) * dist), angle);//어케 수정할지 1도 모르겠다
+                                            elp.Center.Y + (float)Math.Sin(-_ratio ) * dist), angle); // 어케 수정할지 1도 모르겠다
                     if (true) { };
                 }
                 else if (parent is LineLike)
@@ -191,13 +191,14 @@ namespace GCS
                 var p2 = Shape.Parents[1];
                 var vs = Geometry.GetIntersect(p1, p2);
 
-                if(_orientation == 0)
+                if (_orientation == 0)
                 {
                     if (p1 is Circle && p2 is Circle)
                     {
                         var c1 = p1 as Circle;
                         var c2 = p2 as Circle;
-                        if (_firstDirection == 0) _firstDirection = c2.Center.X < c1.Center.X ? -1 : 1;
+                        if (_firstDirection == 0)
+                            _firstDirection = (c2.Center.X < c1.Center.X) ? -1 : 1;
                         _orientation = CheckOrient(dot.Coord, Line.FromTwoPoints(c1.Center, c2.Center));
                     }
                     else if (p1 is Circle || p2 is Circle)
@@ -241,16 +242,18 @@ namespace GCS
                         orient = CheckOrient(vs[0], Line.FromTwoPoints(c.Center, Geometry.GetNearest(s, c.Center)));
 
                         if (l.Point1.Y < l.Point2.Y)
-                            result = orient == _orientation ? vs[i1] : vs[i2];
-                        else result = orient == _orientation ? vs[i2] : vs[i1];
+                            result = (orient == _orientation) ? vs[i1] : vs[i2];
+                        else
+                            result = (orient == _orientation) ? vs[i2] : vs[i1];
                     }
                     else if (s is Circle)
                     {
                         orient = CheckOrient(vs[0], Line.FromTwoPoints(c.Center, (s as Circle).Center));
 
-                        if((p2 as Circle).Center.X < (p1 as Circle).Center.X)
-                            result = orient == _orientation ? vs[i1] : vs[i2];
-                        else result = orient == _orientation ? vs[i2] : vs[i1];
+                        if ((p2 as Circle).Center.X < (p1 as Circle).Center.X)
+                            result = (orient == _orientation) ? vs[i1] : vs[i2];
+                        else
+                            result = (orient == _orientation) ? vs[i2] : vs[i1];
                     }
 
                     dot.Coord = result;
@@ -260,8 +263,8 @@ namespace GCS
 
             private static int CheckOrient(Vector2 d, Line l)
             {
-                if (l.Grad * d.X + l.Yint > d.Y) return -1;
-                else return 1;
+                return (l.Grad * d.X + l.Yint > d.Y)
+                    ? -1
             }
         }
 

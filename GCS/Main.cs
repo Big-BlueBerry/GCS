@@ -15,6 +15,12 @@ using Button = Grid.Framework.GUIs.Button;
 using MenuStrip = System.Windows.Forms.MenuStrip;
 using Color = Microsoft.Xna.Framework.Color;
 
+/*
+ * 테스트 컴포넌트를 작성할 때는
+ * 73 줄 false
+ * 78 ~ 83 줄 주석해제
+ */
+
 namespace GCS
 {
     public class Main : Scene
@@ -78,11 +84,11 @@ namespace GCS
             InitGUI();
             MainCamera.AddComponent<Grid.Framework.Components.Movable2DCamera>();
             /*
-            GameObject test = new GameObject("test");
-            test.AddComponent<GeometrytestComponent>();
-            test.Enabled = true;
-            Instantiate(test);*/
-            
+             * GameObject test = new GameObject("test");
+             * test.AddComponent<GeometrytestComponent>();
+             * test.Enabled = true;
+             * Instantiate(test);
+             */
         }
         
         private void InitGUI()
@@ -147,6 +153,3 @@ namespace GCS
         }
     }
 }
-/* 테스트 컴포넌트를 작성할 때는
- 75 줄 false
- 80 ~ 85 줄 주석해제 */

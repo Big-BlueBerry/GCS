@@ -191,7 +191,7 @@ namespace GCS
             if (_isAnyGuiUseMouse) return;
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                if (_drawState != DrawState.NONE)
+                if (_drawState == DrawState.NONE) return;
                 {
                     if (!_wasDrawing)
                     {
@@ -448,10 +448,8 @@ namespace GCS
             {
                 if (nears.Count == 0)
                     return Dot.FromCoord(coord);
-                if (nears.Count == 1)
-                {
+                else if (nears.Count == 1)
                     return OneShapeRuleDot(nearest, coord);
-                }
                 else if (nears.Count == 2)
                 {
                     Vector2[] intersects = Geometry.GetIntersect(nears[0], nears[1]);
@@ -459,15 +457,14 @@ namespace GCS
                     {
                         Vector2 dot = intersects[0];
                         if (intersects.Length == 2)
-                        {
                             dot = Vector2.Distance(coord, intersects[0]) < Vector2.Distance(intersects[1], coord)
-                                ? intersects[0] : intersects[1];
-                        }
+                                ? intersects[0]
+                                : intersects[1];
                         return Dot.FromIntersection(nears[0], nears[1], dot);
                     }
-                    else return OneShapeRuleDot(nearest, coord);
+                    return OneShapeRuleDot(nearest, coord);
                 }
-                else return OneShapeRuleDot(nearest, coord);
+                return OneShapeRuleDot(nearest, coord);
             }
             else if (nearestDot is Dot) return nearestDot as Dot;
             else return Dot.FromCoord(coord);

@@ -15,15 +15,9 @@ namespace GCS
         {
             try
             {
-                if (_current < 26) // 'A' ~ 'Z'
-                {
-                    return I2S(_current + 'A');
-                }
-                else 
-                {
-                    return string.Concat(I2S( _current % 26 + 'A'), Convert.ToString(_labelnum + 1));
-                    if (_current % 26 == 0) _labelnum++;
-                }
+                return (_current < 26)
+                    ? I2S(_current + 'A')
+                    : string.Concat(I2S( _current % 26 + 'A'), Convert.ToString(_labelnum + 1));
             }
             finally
             {
@@ -31,7 +25,6 @@ namespace GCS
             }
         }
 
-        private static string I2S(int i)
-            => ((char)i).ToString();
+        private static string I2S(int i) => ((char)i).ToString();
     }
 }
