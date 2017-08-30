@@ -192,15 +192,13 @@ namespace GCS
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 if (_drawState == DrawState.NONE) return;
+                if (!_wasDrawing)
                 {
-                    if (!_wasDrawing)
-                    {
-                        _lastPoint = GetDot(_pos);
-                        _wasDrawing = true;
-                    }
-                    else if (_drawState == DrawState.DOT || _drawState == DrawState.ELLIPSE)
-                        _lastPoint.MoveTo(_pos);
+                    _lastPoint = GetDot(_pos);
+                    _wasDrawing = true;
                 }
+                else if (_drawState == DrawState.DOT || _drawState == DrawState.ELLIPSE)
+                    _lastPoint.MoveTo(_pos);
             }
             if (_wasDrawing && Mouse.GetState().LeftButton == ButtonState.Released)
             {
@@ -221,31 +219,30 @@ namespace GCS
                     AddShape(p);
                     AddShape(_lastPoint);
                     Shape sp = null;
-                    if (_drawState == DrawState.CIRCLE)
+
+                    switch (_drawState)
                     {
-                        sp = Circle.FromTwoDots(_lastPoint, p);
-                        AddShape(sp);
-                    }
-                    else if (_drawState == DrawState.SEGMENT)
-                    {
-                        sp = Segment.FromTwoDots(_lastPoint, p);
-                        AddShape(sp);
-                    }
-                    else if (_drawState == DrawState.LINE)
-                    {
-                        sp = Line.FromTwoDots(_lastPoint, p);
-                        AddShape(sp);
-                    }
-                    else if (_drawState == DrawState.VECTOR)
-                    {
-                        sp = Vector.FromTwoDots(_lastPoint, p);
-                        AddShape(sp);
-                    }
-                    else if (_drawState == DrawState.ELLIPSE_POINT)
-                    {
-                        AddShape(_ellipseLastPoint);
-                        sp = Ellipse.FromThreeDots(_ellipseLastPoint, _lastPoint, p);
-                        AddShape(sp);
+                        case DrawState.CIRCLE:
+                            sp = Circle.FromTwoDots(_lastPoint, p);
+                            AddShape(sp);
+                            break;
+                        case DrawState.SEGMENT:
+                            sp = Segment.FromTwoDots(_lastPoint, p);
+                            AddShape(sp);
+                            break;
+                        case DrawState.LINE:
+                            sp = Line.FromTwoDots(_lastPoint, p);
+                            AddShape(sp);
+                            break;
+                        case DrawState.VECTOR:
+                            sp = Vector.FromTwoDots(_lastPoint, p);
+                            AddShape(sp);
+                            break;
+                        case DrawState.ELLIPSE_POINT:
+                            AddShape(_ellipseLastPoint);
+                            sp = Ellipse.FromThreeDots(_ellipseLastPoint, _lastPoint, p);
+                            AddShape(sp);
+                            break;
                     }
                 }
                 _wasDrawing = false;
@@ -255,24 +252,16 @@ namespace GCS
 
         private void UpdateAttach()
         {
-            if (_drawState == DrawState.NONE)
-            {
-                if (_selectedShapes.Count == 1)
-                {
-                    if (_selectedShapes[0] is Dot)
-                    {
-                        if (_rightNearShapes?.Count > 0)
-                        {
-                            if (_selectedShapes[0].Parents.Count == 0)
-                            {
-                                var parent = GetDot(_rightPos, _rightNearShapes);
-                                AddShape(parent);
-                                (_selectedShapes[0] as Dot).AttachTo(parent);
-                            }
-                        }
-                    }
-                }
-            }
+            if (_drawState != DrawState.NONE) return;
+            if (_selectedShapes.Count != 1) return;
+            if (!(_selectedShapes[0] is Dot)) return;
+            if (_rightNearShapes?.Count <= 0) return;
+            if (_selectedShapes[0].Parents.Count != 0) return;
+
+            Dot parent = GetDot(_rightPos, _rightNearShapes);
+
+            AddShape(parent);
+            (_selectedShapes[0] as Dot).AttachTo(parent);
         }
 
         private void UpdateSelect()
@@ -303,71 +292,66 @@ namespace GCS
 
                     if (Scene.CurrentScene.IsLeftMouseDown)
                     {
-                        if (!nearest.Selected)
+                        if (nearest.Selected)
+                            nearest.UnSelect = true;
+                        else
                         {
                             _selectedShapes.ForEach(s => s.UnSelect = true);
                             _selectedShapes.Add(nearest);
                             nearest.Selected = true;
                             nearest.UnSelect = false;
                         }
-                        else
-                            nearest.UnSelect = true;
                     }
 
-                    if (Scene.CurrentScene.IsLeftMouseUp)
+                    if (!Scene.CurrentScene.IsLeftMouseUp) return;
+                    if (nearest.Selected && nearest.UnSelect)
                     {
-                        if (nearest.Selected && nearest.UnSelect)
-                        {
-                            _selectedShapes.Remove(nearest);
-                            nearest.Selected = false;
-                        }
+                        _selectedShapes.Remove(nearest);
+                        nearest.Selected = false;
                     }
                 }
-                else
-                {
-                    if (Scene.CurrentScene.IsLeftMouseUp)
-                    {
-                        UnselectAll();
-                    }
-                }
+                else if (Scene.CurrentScene.IsLeftMouseUp)
+                    UnselectAll();
             }
         }
 
         private void UpdateDrag()
         {
-            if (_drawState == DrawState.NONE)
+            if (_drawState != DrawState.NONE) return;
+            if (_selectedShapes.Count == 0) return;
+
+            if (Scene.CurrentScene.IsLeftMouseDown && _selectedShapes.Any(s => s.IsEnoughClose(_pos)))
+                _readyForDrag = true;
+
+            if (_readyForDrag && Scene.CurrentScene.IsMouseMoved)
             {
-                if (_selectedShapes.Count == 0) return;
-                if (Scene.CurrentScene.IsLeftMouseDown && _selectedShapes.Any(s => s.IsEnoughClose(_pos)))
+                _readyForDrag = false;
+                ConstructRecode r = new ConstructRecode(RecodeType.MOVE, _selectedShapes);
+                _recodes.Add(r);
+                _lastpos = samplepoint.Coord;
+
+                if (Scene.CurrentScene.IsLeftMouseClicking)
+                    _isDragging = true;
+            }
+
+            if (_isDragging || Scene.CurrentScene.IsLeftMouseClicking && Scene.CurrentScene.IsMouseMoved)
+            {
+                Point diff = Scene.CurrentScene.MousePosition - Scene.CurrentScene.LastMousePosition;
+
+                if (_isDragging || _selectedShapes.Any(s => s.IsEnoughClose(_pos)))
                 {
-                    _readyForDrag = true;
-                }
-                if (_readyForDrag && Scene.CurrentScene.IsMouseMoved)
-                {
-                    _readyForDrag = false;
-                    ConstructRecode r = new ConstructRecode(RecodeType.MOVE, _selectedShapes);
-                    _recodes.Add(r);
-                    _lastpos = samplepoint.Coord;
-                    if (Scene.CurrentScene.IsLeftMouseClicking)
-                        _isDragging = true;
+                    if (!_isDragging) _isDragging = true;
+
+                    _selectedShapes.ForEach(s => { s.UnSelect = false; s.Move(diff.ToVector2()); });
+                    samplepoint.Move(diff.ToVector2());
                 }
 
-                if (_isDragging || Scene.CurrentScene.IsLeftMouseClicking && Scene.CurrentScene.IsMouseMoved)
+                if (Scene.CurrentScene.IsLeftMouseUp)
                 {
-                    var diff = Scene.CurrentScene.MousePosition - Scene.CurrentScene.LastMousePosition;
-                    if (_isDragging || _selectedShapes.Any(s => s.IsEnoughClose(_pos)))
-                    {
-                        if (!_isDragging) _isDragging = true;
-                        _selectedShapes.ForEach(s => { s.UnSelect = false; s.Move(diff.ToVector2()); });
-                        samplepoint.Move(diff.ToVector2());
-                    }
-                    if (Scene.CurrentScene.IsLeftMouseUp)
-                    {
-                        _isDragging = false;
-                        _recodes.Last().WriteMoveRecode(samplepoint.Coord - _lastpos);
-                        return;
-                    }
+                    _isDragging = false;
+                    _recodes.Last().WriteMoveRecode(samplepoint.Coord - _lastpos);
 
+                    return;
                 }
             }
         }
@@ -482,35 +466,31 @@ namespace GCS
             _pos = Mouse.GetState().Position.ToVector2() + Location;
             if (_wasDrawing || _drawState == DrawState.ELLIPSE_POINT)
             {
-                if (_drawState == DrawState.CIRCLE)
+                switch (_drawState)
                 {
-                    float radius = (_pos - _lastPoint.Coord).Length();
-                    GUI.DrawCircle(sb, _lastPoint.Coord - Location, radius, 2, Color.DarkGray, 100);
-                }
-                else if (_drawState == DrawState.ELLIPSE)
-                {
-                    _lastPoint.Draw(sb);
-                }
-                else if (_drawState == DrawState.ELLIPSE_POINT)
-                {
-                    _ellipseLastPoint.Draw(sb);
-                    Ellipse.FromThreeDots(_ellipseLastPoint, _lastPoint, Dot.FromCoord(_pos)).Draw(sb);
-                }
-                else if (_drawState == DrawState.SEGMENT)
-                {
-                    GUI.DrawLine(sb, _lastPoint.Coord - Location, _pos - Location, 2, Color.DarkGray);
-                }
-                else if (_drawState == DrawState.VECTOR)
-                {
-                    Vector.FromTwoDots(_lastPoint, Dot.FromCoord(_pos)).Draw(sb);
-                }
-                else if (_drawState == DrawState.LINE)
-                {
-                    Line.FromTwoPoints(_lastPoint.Coord, _pos).Draw(sb);
-                }
-                else if (_drawState == DrawState.DOT)
-                {
-                    _lastPoint.Draw(sb);
+                    case DrawState.CIRCLE:
+                        float radius = (_pos - _lastPoint.Coord).Length();
+                        GUI.DrawCircle(sb, _lastPoint.Coord - Location, radius, 2, Color.DarkGray, 100);
+                        break;
+                    case DrawState.ELLIPSE:
+                        _lastPoint.Draw(sb);
+                        break;
+                    case DrawState.ELLIPSE_POINT:
+                        _ellipseLastPoint.Draw(sb);
+                        Ellipse.FromThreeDots(_ellipseLastPoint, _lastPoint, Dot.FromCoord(_pos)).Draw(sb);
+                        break;
+                    case DrawState.SEGMENT:
+                        GUI.DrawLine(sb, _lastPoint.Coord - Location, _pos - Location, 2, Color.DarkGray);
+                        break;
+                    case DrawState.VECTOR:
+                        Vector.FromTwoDots(_lastPoint, Dot.FromCoord(_pos)).Draw(sb);
+                        break;
+                    case DrawState.LINE:
+                        Line.FromTwoPoints(_lastPoint.Coord, _pos).Draw(sb);
+                        break;
+                    case DrawState.DOT:
+                        _lastPoint.Draw(sb);
+                        break;
                 }
             }
 
@@ -523,62 +503,57 @@ namespace GCS
             switch (type)
             {
                 case ConstructType.ParallelLine:
-                    if (_selectedShapes.Count == 2)
+                    if (_selectedShapes.Count != 2) return;
+                
+                    if (_selectedShapes[0] is LineLike && _selectedShapes[1] is Dot
+                    || _selectedShapes[0] is Dot && _selectedShapes[1] is LineLike)
                     {
-                        if (_selectedShapes[0] is LineLike && _selectedShapes[1] is Dot
-                        || _selectedShapes[0] is Dot && _selectedShapes[1] is LineLike)
-                        {
-                            var line = _selectedShapes[0] as LineLike ?? _selectedShapes[1] as LineLike;
-                            var dot = _selectedShapes[0] as Dot ?? _selectedShapes[1] as Dot;
-                            _shapes.Add(Line.ParallelLine(line, dot));
-                        }
+                        LineLike line = (_selectedShapes[0] ?? _selectedShapes[1]) as LineLike;
+                        Dot dot = (_selectedShapes[0] ?? _selectedShapes[1]) as Dot;
+
+                        _shapes.Add(Line.ParallelLine(line, dot));
                     }
                     break;
                 case ConstructType.PerpendicularLine:
-                    if (_selectedShapes.Count == 2)
+                    if (_selectedShapes.Count != 2) return;
+
+                    if (_selectedShapes[0] is LineLike && _selectedShapes[1] is Dot
+                    || _selectedShapes[0] is Dot && _selectedShapes[1] is LineLike)
                     {
-                        if (_selectedShapes[0] is LineLike && _selectedShapes[1] is Dot
-                        || _selectedShapes[0] is Dot && _selectedShapes[1] is LineLike)
-                        {
-                            var line = _selectedShapes[0] as LineLike ?? _selectedShapes[1] as LineLike;
-                            var dot = _selectedShapes[0] as Dot ?? _selectedShapes[1] as Dot;
-                            _shapes.Add(Line.PerpendicularLine(line, dot));
-                        }
+                        LineLike line = (_selectedShapes[0] ?? _selectedShapes[1]) as LineLike;
+                        Dot dot = (_selectedShapes[0] ?? _selectedShapes[1]) as Dot;
+                        _shapes.Add(Line.PerpendicularLine(line, dot));
                     }
                     break;
                 case ConstructType.Tangent:
-                    if (_selectedShapes.Count == 2)
+                    if (_selectedShapes.Count != 2) return;
+
+                    if (_selectedShapes[0] is Circle && _selectedShapes[1] is Dot
+                    || _selectedShapes[0] is Dot && _selectedShapes[1] is Circle)
                     {
-                        if (_selectedShapes[0] is Circle && _selectedShapes[1] is Dot
-                        || _selectedShapes[0] is Dot && _selectedShapes[1] is Circle)
-                        {
-                            var cir = _selectedShapes[0] as Circle ?? _selectedShapes[1] as Circle;
-                            var dot = _selectedShapes[0] as Dot ?? _selectedShapes[1] as Dot;
-                            _shapes.Add(Line.TangentLine(cir, dot));
-                        }
-                        else if (_selectedShapes[0] is Ellipse && _selectedShapes[1] is Dot
-                        || _selectedShapes[0] is Dot && _selectedShapes[1] is Ellipse)
-                        {
-                            var elp = _selectedShapes[0] as Ellipse ?? _selectedShapes[1] as Ellipse;
-                            var dot = _selectedShapes[0] as Dot ?? _selectedShapes[1] as Dot;
-                            _shapes.Add(Line.TangentLine(elp, dot));
-                        }
+                        Circle cir = (_selectedShapes[0] ?? _selectedShapes[1]) as Circle;
+                        Dot dot = (_selectedShapes[0] ?? _selectedShapes[1]) as Dot;
+                        _shapes.Add(Line.TangentLine(cir, dot));
+                    }
+                    else if (_selectedShapes[0] is Ellipse && _selectedShapes[1] is Dot
+                    || _selectedShapes[0] is Dot && _selectedShapes[1] is Ellipse)
+                    {
+                        Ellipse elp = (_selectedShapes[0] ?? _selectedShapes[1]) as Ellipse;
+                        Dot dot = (_selectedShapes[0] ?? _selectedShapes[1]) as Dot;
+                        _shapes.Add(Line.TangentLine(elp, dot));
                     }
                     break;
                 case ConstructType.Ellipse:
-                    {
-                        if (_selectedShapes.Count == 3)
-                        {
-                            var f1 = _selectedShapes[0] as Dot;
-                            var f2 = _selectedShapes[1] as Dot;
-                            var pin = _selectedShapes[2] as Dot;
-                            if (f1 == null) return;
-                            if (f2 == null) return;
-                            if (pin == null) return;
-                            AddShape(Ellipse.FromThreeDots(f1, f2, pin));
-                        }
-                        break;
-                    }
+                    if (_selectedShapes.Count == 3) return;
+
+                    Dot f1 = _selectedShapes[0] as Dot;
+                    Dot f2 = _selectedShapes[1] as Dot;
+                    Dot pin = _selectedShapes[2] as Dot;
+                    if (f1 == null) return;
+                    if (f2 == null) return;
+                    if (pin == null) return;
+                    AddShape(Ellipse.FromThreeDots(f1, f2, pin));
+                    break;
             }
         }
     }

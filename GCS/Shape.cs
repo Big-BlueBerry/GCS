@@ -299,21 +299,16 @@ namespace GCS
             if (Disabled) return;
             base.Draw(sb);
             Vector2 del = Point2 - Point1;
-            Vector2 delta1, delta2;
             float angle = (float)Math.Atan(del.Y/del.X);
             Vector2 Initvector = new Vector2(Point1.X + Vector2.Distance(Point1, Point2), Point1.Y);
-            delta1 = new Vector2((float)(Initvector.X - arrowlength*Math.Cos(arrowAngle)) , (float)(Initvector.Y + arrowlength*Math.Sin(arrowAngle)));
-            delta2 = new Vector2((float)(Initvector.X - arrowlength * Math.Cos(arrowAngle)), (float)(Initvector.Y - arrowlength * Math.Sin(arrowAngle)));
-            if(del.X >0)
-            {
-                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + Geometry.Rotate(delta1 - Point1, angle) + _drawDelta, Border, Color);
-                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + Geometry.Rotate(delta2 - Point1, angle) + _drawDelta, Border, Color);
-            }
-            else
-            {
-                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 - Geometry.Rotate(delta1 - Point1, angle) + _drawDelta, Border, Color);
-                GUI.DrawLine(sb, Point2 + _drawDelta, Point1 - Geometry.Rotate(delta2 - Point1, angle) + _drawDelta, Border, Color);
-            }
+
+            Vector2 delta1 = new Vector2((float)(Initvector.X - arrowlength*Math.Cos(arrowAngle)) , (float)(Initvector.Y + arrowlength*Math.Sin(arrowAngle)));
+            Vector2 delta2 = new Vector2((float)(Initvector.X - arrowlength * Math.Cos(arrowAngle)), (float)(Initvector.Y - arrowlength * Math.Sin(arrowAngle)));
+
+            int direction = (del.X > 0) ? 1 : -1;
+
+            GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + direction * Geometry.Rotate(delta1 - Point1, angle) + _drawDelta, Border, Color);
+            GUI.DrawLine(sb, Point2 + _drawDelta, Point1 + direction * Geometry.Rotate(delta2 - Point1, angle) + _drawDelta, Border, Color);
         }
 
         public new static Vector FromTwoDots(Dot d1, Dot d2)

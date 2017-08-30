@@ -57,11 +57,11 @@ namespace GCS
                         float[] interval = new float[] { extreme_vals[j], extreme_vals[j + 1] };
                         while (Math.Abs(applyPolynormialFunc(coef, interval[0])) > Math.Pow(10, -accuracy))
                         {
-                            if (applyPolynormialFunc(coef, interval[0]) * applyPolynormialFunc(coef, (interval[0] + interval[1]) / 2) < 0)
-                                interval[1] = (interval[1] + interval[0]) / 2;
-                            else
-                                interval[0] = (interval[1] + interval[0]) / 2;
+                            int index = (applyPolynormialFunc(coef, interval[0]) * applyPolynormialFunc(coef, (interval[0] + interval[1]) / 2) < 0)
+                                ? 1
+                                : 0;
 
+                            interval[index] = (interval[1] + interval[0]) / 2;
                         }
 
                         answer.Add(interval[0]);

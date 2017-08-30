@@ -188,7 +188,8 @@ namespace GCS
             {
                 if (Vector2.Distance(intersects[0], line.Point1) < len && Vector2.Distance(intersects[0], line.Point2) < len)
                     return intersects;
-                else return new Vector2[] { };
+                else
+                    return new Vector2[] { };
             }
             else
             {
