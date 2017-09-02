@@ -88,6 +88,7 @@ namespace GCS
                 foreach (var c in child.Delete())
                     yield return c;
         }
+
     }
 
     public partial class Circle : Shape
@@ -131,6 +132,15 @@ namespace GCS
             new CircleOnTwoDotsRule(circle, center, another);
             return circle;
         }
+
+        public static Circle FromReflection(LineLike axis, Circle original)
+        {
+            Circle cir = new Circle();
+            new ReflectedCircleRule(axis, original, cir);
+            return cir;
+        }
+
+
     }
 
     public partial class Ellipse : Shape
@@ -176,6 +186,13 @@ namespace GCS
             new EllipseOnThreeDotsRule(ellipse, f1, f2, pin);
             return ellipse;
         }
+
+        public static Ellipse FromReflection(LineLike axis, Ellipse original)
+        {
+            Ellipse elp = new Ellipse();
+            new ReflectedEllipseRule(axis, original, elp);
+            return elp;
+        }
     }
 
     public abstract partial class LineLike : Shape
@@ -210,6 +227,7 @@ namespace GCS
             var diff = at - Point1;
             Move(diff);
         }
+
     }
 
     public partial class Line : LineLike
@@ -265,6 +283,13 @@ namespace GCS
 
             return line;
         }
+
+        public static Line FromReflection(LineLike axis, Line original )
+        {
+            Line lin = new Line();
+            new ReflectedLineLikeRule(axis, original, lin);
+            return lin;
+        }
     }
 
     public class Segment : LineLike
@@ -284,6 +309,13 @@ namespace GCS
             var rule = new LineLikeOnTwoDotsRule(seg, d1, d2);
 
             return seg;
+        }
+
+        public static Segment FromReflection(LineLike axis, Segment original)
+        {
+            Segment lin = new Segment();
+            new ReflectedLineLikeRule(axis, original, lin);
+            return lin;
         }
     }
     
@@ -322,6 +354,13 @@ namespace GCS
             var rule = new LineLikeOnTwoDotsRule(vec, d1, d2);
 
             return vec;
+        }
+
+        public static Vector FromReflection(LineLike axis, Vector original)
+        {
+            Vector lin = new Vector();
+            new ReflectedLineLikeRule(axis, original, lin);
+            return lin;
         }
     }
  
@@ -409,6 +448,12 @@ namespace GCS
             return dot;
         }
 
+        public static Dot FromReflection(LineLike axis, Dot original )
+        {
+            Dot d = new Dot(Vector2.Zero);
+            new ReflectedDotRule(axis, original, d);
+            return d;
+        }
         public void AttachTo(Dot parent)
         {
             new DotOnDotRule(this, parent);

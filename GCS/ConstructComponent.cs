@@ -327,7 +327,7 @@ namespace GCS
                 {
                     if (Scene.CurrentScene.IsLeftMouseUp)
                     {
-                        UnselectAll();
+                        //UnselectAll();
                     }
                 }
             }
@@ -566,6 +566,25 @@ namespace GCS
                             var dot = _selectedShapes[0] as Dot ?? _selectedShapes[1] as Dot;
                             _shapes.Add(Line.TangentLine(elp, dot));
                         }
+                    }
+                    break;
+
+                case ConstructType.Reflection:// 첫 선택이 대칭축, 두번째 선택이 대칭시킬 도형
+                    if (_selectedShapes.Count == 2 )
+                    {
+                        if (_selectedShapes[0] is LineLike)
+                        {
+                            var axis = _selectedShapes[0] as LineLike;
+
+                            if (_selectedShapes[1] is Ellipse) _shapes.Add(Ellipse.FromReflection(axis, _selectedShapes[1] as Ellipse));
+                            else if (_selectedShapes[1] is Circle) _shapes.Add(Circle.FromReflection(axis, _selectedShapes[1] as Circle));
+                            else if (_selectedShapes[1] is Line) _shapes.Add(Line.FromReflection(axis, _selectedShapes[1] as Line));
+                            else if (_selectedShapes[1] is Vector) _shapes.Add(Vector.FromReflection(axis, _selectedShapes[1] as Vector));
+                            else if (_selectedShapes[1] is Segment) _shapes.Add(Segment.FromReflection(axis, _selectedShapes[1] as Segment));
+                            else _shapes.Add(Dot.FromReflection(axis, _selectedShapes[1] as Dot));
+
+                        }
+
                     }
                     break;
                 case ConstructType.Ellipse:

@@ -47,6 +47,58 @@ namespace GCS
                 line.Point2 = (line.Parents[1] as Dot).Coord;
             }
         }
+
+        public class ReflectedLineLikeRule : ShapeRule
+        {
+            public ReflectedLineLikeRule(LineLike axis, LineLike original, LineLike lin ) : base(lin)
+            {
+                lin.Parents.Add(axis);
+                lin.Parents.Add(original);
+
+                axis.Childs.Add(lin);
+                original.Childs.Add(lin);
+
+                Fix();
+            }
+            public override void OnMoved()
+            {
+                if (IsHandling) return;
+                IsHandling = true;
+
+                var line = Shape as LineLike;
+
+                //Shape.Parents[0].MoveTo(line.Point1);
+                //Shape.Parents[1].MoveTo(line.Point2);
+
+                Fix(); 
+                MoveChilds();
+
+                IsHandling = false;
+            }
+
+            public override void OnParentMoved()
+            {
+                if (IsHandling) return;
+                Fix();
+                MoveChilds();
+            }
+
+            protected override void Fix()
+            {
+                LineLike lin = Shape as LineLike;
+                LineLike axis = lin.Parents[0] as LineLike;
+                LineLike original = lin.Parents[1] as LineLike;
+
+                Vector2 ReflectedPoint1 = Geometry.Reflect(original.Point1, axis);
+                Vector2 ReflectedPoint2 = Geometry.Reflect(original.Point2, axis);
+                lin.Point1 = ReflectedPoint1;
+                lin.Point2 = ReflectedPoint2;
+
+            }
+
+        }
+
+
     }
 
     public partial class Line
