@@ -357,6 +357,16 @@ namespace GCS
         {
             return new Vector2((float)(vec.X * Math.Cos(angle) - vec.Y * Math.Sin(angle)), (float)(vec.X * Math.Sin(angle) + vec.Y * Math.Cos(angle)));
         }
-                
+        
+        public static Vector2 Reflect(Vector2 vec, LineLike axis)
+        {
+
+            Line lin = Line.FromTwoPoints(axis.Point1 - new Vector2(0, axis.Yint), axis.Point2 - new Vector2(0, axis.Yint));
+            Vector2 d = vec - new Vector2(0, axis.Yint);
+            float angle = (float)Math.Atan(lin.Grad);
+            Vector2 ReflectedDot = new Vector2((float)(d.X * Math.Cos(2 * angle) + d.Y * Math.Sin(2 * angle)),
+                (float)(d.X * Math.Sin(2 * angle) - d.Y * Math.Cos(2 * angle)));
+            return ReflectedDot + new Vector2(0, axis.Yint);
+        }
     }
 }
