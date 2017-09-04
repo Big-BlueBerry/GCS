@@ -11,6 +11,61 @@ namespace GCS
     {
         private static readonly float _nearDistance = 5;
 
+        public abstract class BasisDots : IEnumerable<Vector2>
+        {
+            protected Shape _shape;
+            private int _count;
+            private DotEnumerator _enumerator;
+            public BasisDots(Shape shape, int count)
+            {
+                this._shape = shape;
+                this._count = count;
+                _enumerator = new DotEnumerator(this);
+            }
+            public abstract Vector2 this[int i] { get; set; }
+
+            public IEnumerator<Vector2> GetEnumerator()
+            {
+                return _enumerator;
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+                => GetEnumerator();
+
+            public class DotEnumerator : IEnumerator<Vector2>
+            {
+                BasisDots _dots;
+                int _cur;
+                public DotEnumerator(BasisDots dots)
+                {
+                    _dots = dots;
+                    _cur = -1;
+                }
+
+                public bool MoveNext()
+                {
+                    return ++_cur < _dots._count;
+                }
+
+                public void Reset()
+                {
+                    _cur = -1;
+                }
+
+                object System.Collections.IEnumerator.Current
+                    => this.Current;
+
+                public Vector2 Current
+                    => _dots[_cur];
+
+                public void Dispose()
+                {
+                    _dots = null;
+                }
+            }
+        }
+
+        public BasisDots DotList;
         internal List<Shape> Parents { get; private set; }
         internal List<Shape> Childs { get; private set; }
 
@@ -95,6 +150,32 @@ namespace GCS
     {
         public static int Sides = 100;
 
+        public class CircleDots : BasisDots
+        {
+            public CircleDots(Circle circle) : base(circle, 2) { }
+            public override Vector2 this[int i]
+            {
+                get
+                {
+                    switch (i)
+                    {
+                        case 0: return (_shape as Circle).Center;
+                        case 1: return (_shape as Circle).Another;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+                set
+                {
+                    switch (i)
+                    {
+                        case 0: (_shape as Circle).Center = value; return;
+                        case 1: (_shape as Circle).Another = value; return;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+            }
+        }
+
         public Vector2 Center { get; protected set; }
         public Vector2 Another { get; protected set; }
 
@@ -147,6 +228,34 @@ namespace GCS
     {
         public static int Sides = 100;
 
+        public class EllipseDots : BasisDots
+        {
+            public EllipseDots(Ellipse ellipse) : base(ellipse, 3) { }
+            public override Vector2 this[int i]
+            {
+                get
+                {
+                    switch (i)
+                    {
+                        case 0: return (_shape as Ellipse).Focus1;
+                        case 1: return (_shape as Ellipse).Focus2;
+                        case 2: return (_shape as Ellipse).PinPoint;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+                set
+                {
+                    switch (i)
+                    {
+                        case 0: (_shape as Ellipse).Focus1 = value; return;
+                        case 1: (_shape as Ellipse).Focus2 = value; return;
+                        case 2: (_shape as Ellipse).PinPoint = value; return;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+            }
+        }
+
         public Vector2 Focus1 { get; protected set; }
         public Vector2 Focus2 { get; protected set; }
         public Vector2 PinPoint { get; protected set; }
@@ -197,6 +306,31 @@ namespace GCS
 
     public abstract partial class LineLike : Shape
     {
+        public class LineDots : BasisDots
+        {
+            public LineDots(LineLike line) : base(line, 2) { }
+            public override Vector2 this[int i]
+            {
+                get
+                {
+                    switch (i)
+                    {
+                        case 0: return (_shape as LineLike).Point1;
+                        case 1: return (_shape as LineLike).Point2;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+                set
+                {
+                    switch (i)
+                    {
+                        case 0: (_shape as LineLike).Point1 = value; return;
+                        case 1: (_shape as LineLike).Point2 = value; return;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+            }
+        }
         public Vector2 Point1 { get; protected set; }
         public Vector2 Point2 { get; protected set; }
         
@@ -205,6 +339,7 @@ namespace GCS
 
         protected LineLike(Vector2? p1 = null, Vector2? p2 = null)
         {
+            DotList = new LineDots(this);
             Point1 = p1 ?? new Vector2();
             Point2 = p2 ?? new Vector2();
 
@@ -369,11 +504,35 @@ namespace GCS
     {
         private static readonly float _nearDotDistance = 10;
 
+        public class DotDots : BasisDots
+        {
+            public DotDots(Dot dot) : base(dot, 1) { }
+            public override Vector2 this[int i]
+            {
+                get
+                {
+                    switch (i)
+                    {
+                        case 0: return (_shape as Dot).Coord;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+                set
+                {
+                    switch (i)
+                    {
+                        case 0: (_shape as Dot).Coord = value; return;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+            }
+        }
         private Vector2 _coord;
         public Vector2 Coord { get => _coord; set => _coord = value; }
 
         protected Dot(Vector2 coord) : base()
         {
+            DotList = new DotDots(this);
             _coord = coord;
             Color = Color.OrangeRed;
         }
