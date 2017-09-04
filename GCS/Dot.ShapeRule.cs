@@ -264,45 +264,6 @@ namespace GCS
                 else return 1;
             }
         }
-        public class ReflectedDotRule : ShapeRule
-        {
-            public ReflectedDotRule(LineLike axis, Dot original, Dot dot) : base(dot)
-            {
-                dot.Parents.Add(axis);
-                dot.Parents.Add(original);
-                axis.Childs.Add(dot);
-                original.Childs.Add(dot);
-                Fix();
-                //MoveChilds();
-            }
-
-            public override void OnMoved()
-            {
-                if (IsHandling) return;
-                IsHandling = true;
-
-                Fix();
-                MoveChilds();
-
-                IsHandling = false;
-            }
-
-            public override void OnParentMoved()
-            {
-                if (IsHandling) return;
-                Fix();
-                MoveChilds();
-            }
-
-            protected override void Fix()
-            {
-                Dot dot = Shape as Dot;
-                Vector2 original = (Shape.Parents[1] as Dot).Coord;
-                LineLike axis = Shape.Parents[0] as LineLike;
-
-                dot.Coord = Geometry.Reflect(original, axis);
-            }
-        }
 
         public class DotOnDotRule : ShapeRule
         {

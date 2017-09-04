@@ -40,4 +40,62 @@ namespace GCS
                 c._rule.OnParentMoved();
         }
     }
+
+    public class ReflectedShapeRule : ShapeRule
+    {
+        public ReflectedShapeRule(LineLike axis, Shape original, Shape shape) : base(shape)
+        {
+            shape.Parents.Add(axis);
+            shape.Parents.Add(original);
+
+            axis.Childs.Add(shape);
+            original.Childs.Add(shape);
+
+            Fix();
+        }
+
+        public override void OnMoved()
+        {
+            if (IsHandling) return;
+            IsHandling = true;
+
+            FixParent();
+            MoveChilds();
+
+            IsHandling = false;
+        }
+
+        public override void OnParentMoved()
+        {
+            if (IsHandling) return;
+            Fix();
+            MoveChilds();
+        }
+
+        protected void FixParent()
+        {
+            var axis = Shape.Parents[0] as LineLike;
+            var original = Shape.Parents[1];
+
+            int i = 0;
+            foreach (var dot in Shape.DotList)
+            {
+                original.DotList[i] = Geometry.Reflect(dot, axis);
+                i++;
+            }
+        }
+
+        protected override void Fix()
+        {
+            var axis = Shape.Parents[0] as LineLike;
+            var original = Shape.Parents[1];
+
+            int i = 0;
+            foreach (var dot in original.DotList)
+            {
+                Shape.DotList[i] = Geometry.Reflect(dot, axis);
+                i++;
+            }
+        }
+    }
 }

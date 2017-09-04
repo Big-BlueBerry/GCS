@@ -15,18 +15,16 @@ namespace GCS
         {
             protected Shape _shape;
             private int _count;
-            private DotEnumerator _enumerator;
             public BasisDots(Shape shape, int count)
             {
                 this._shape = shape;
                 this._count = count;
-                _enumerator = new DotEnumerator(this);
             }
             public abstract Vector2 this[int i] { get; set; }
 
             public IEnumerator<Vector2> GetEnumerator()
             {
-                return _enumerator;
+                return new DotEnumerator(this);
             }
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -58,10 +56,7 @@ namespace GCS
                 public Vector2 Current
                     => _dots[_cur];
 
-                public void Dispose()
-                {
-                    _dots = null;
-                }
+                public void Dispose() { }
             }
         }
 
@@ -143,7 +138,6 @@ namespace GCS
                 foreach (var c in child.Delete())
                     yield return c;
         }
-
     }
 
     public partial class Circle : Shape
@@ -168,8 +162,8 @@ namespace GCS
                 {
                     switch (i)
                     {
-                        case 0: (_shape as Circle).Center = value; return;
-                        case 1: (_shape as Circle).Another = value; return;
+                        case 0: (_shape as Circle).Center = value; break;
+                        case 1: (_shape as Circle).Another = value;  break;
                         default: throw new IndexOutOfRangeException();
                     }
                 }
@@ -185,7 +179,10 @@ namespace GCS
             set => throw new NotSupportedException();
         }
 
-        protected Circle() : base() { }
+        protected Circle() : base()
+        {
+            DotList = new CircleDots(this);
+        }
 
         public override void Draw(SpriteBatch sb)
         {
@@ -217,11 +214,9 @@ namespace GCS
         public static Circle FromReflection(LineLike axis, Circle original)
         {
             Circle cir = new Circle();
-            new ReflectedCircleRule(axis, original, cir);
+            new ReflectedShapeRule(axis, original, cir);
             return cir;
         }
-
-
     }
 
     public partial class Ellipse : Shape
@@ -247,9 +242,9 @@ namespace GCS
                 {
                     switch (i)
                     {
-                        case 0: (_shape as Ellipse).Focus1 = value; return;
-                        case 1: (_shape as Ellipse).Focus2 = value; return;
-                        case 2: (_shape as Ellipse).PinPoint = value; return;
+                        case 0: (_shape as Ellipse).Focus1 = value; break;
+                        case 1: (_shape as Ellipse).Focus2 = value; break;
+                        case 2: (_shape as Ellipse).PinPoint = value; break;
                         default: throw new IndexOutOfRangeException();
                     }
                 }
@@ -264,9 +259,12 @@ namespace GCS
         public float Sublength => Vector2.Distance(Focus1, Focus2) / 2;//c 
         public float Semimajor => (Vector2.Distance(Focus1, PinPoint) + Vector2.Distance(Focus2, PinPoint)) / 2;//a
         public float Semiminor => (float)Math.Sqrt(Semimajor * Semimajor - Sublength * Sublength);//b
-        
 
-        protected Ellipse() : base() { }
+
+        protected Ellipse() : base()
+        {
+            DotList = new EllipseDots(this);
+        }
 
         public override void Draw(SpriteBatch sb)
         {
@@ -299,7 +297,7 @@ namespace GCS
         public static Ellipse FromReflection(LineLike axis, Ellipse original)
         {
             Ellipse elp = new Ellipse();
-            new ReflectedEllipseRule(axis, original, elp);
+            new ReflectedShapeRule(axis, original, elp);
             return elp;
         }
     }
@@ -324,8 +322,8 @@ namespace GCS
                 {
                     switch (i)
                     {
-                        case 0: (_shape as LineLike).Point1 = value; return;
-                        case 1: (_shape as LineLike).Point2 = value; return;
+                        case 0: (_shape as LineLike).Point1 = value; break;
+                        case 1: (_shape as LineLike).Point2 = value; break;
                         default: throw new IndexOutOfRangeException();
                     }
                 }
@@ -422,7 +420,7 @@ namespace GCS
         public static Line FromReflection(LineLike axis, Line original )
         {
             Line lin = new Line();
-            new ReflectedLineLikeRule(axis, original, lin);
+            new ReflectedShapeRule(axis, original, lin);
             return lin;
         }
     }
@@ -449,7 +447,7 @@ namespace GCS
         public static Segment FromReflection(LineLike axis, Segment original)
         {
             Segment lin = new Segment();
-            new ReflectedLineLikeRule(axis, original, lin);
+            new ReflectedShapeRule(axis, original, lin);
             return lin;
         }
     }
@@ -494,7 +492,7 @@ namespace GCS
         public static Vector FromReflection(LineLike axis, Vector original)
         {
             Vector lin = new Vector();
-            new ReflectedLineLikeRule(axis, original, lin);
+            new ReflectedShapeRule(axis, original, lin);
             return lin;
         }
     }
@@ -521,7 +519,7 @@ namespace GCS
                 {
                     switch (i)
                     {
-                        case 0: (_shape as Dot).Coord = value; return;
+                        case 0: (_shape as Dot).Coord = value; break;
                         default: throw new IndexOutOfRangeException();
                     }
                 }
@@ -610,7 +608,7 @@ namespace GCS
         public static Dot FromReflection(LineLike axis, Dot original )
         {
             Dot d = new Dot(Vector2.Zero);
-            new ReflectedDotRule(axis, original, d);
+            new ReflectedShapeRule(axis, original, d);
             return d;
         }
         public void AttachTo(Dot parent)
