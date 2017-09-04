@@ -121,11 +121,13 @@ namespace GCS
             con.DropDownItems.Add("평행선(&E)");
             con.DropDownItems.Add("수선(&P)");
             con.DropDownItems.Add("접선(&T)");
+            con.DropDownItems.Add("대칭이동(&R)");
             con.DropDownItems.Add("타원(&L)");
             con.DropDownItems[0].Click += (s, e) => _construct.SelectConstruct(ConstructType.ParallelLine);
             con.DropDownItems[1].Click += (s, e) => _construct.SelectConstruct(ConstructType.PerpendicularLine);
             con.DropDownItems[2].Click += (s, e) => _construct.SelectConstruct(ConstructType.Tangent);
-            con.DropDownItems[3].Click += (s, e) => _construct.SelectConstruct(ConstructType.Ellipse);
+            con.DropDownItems[3].Click += (s, e) => _construct.SelectConstruct(ConstructType.Reflection);
+            con.DropDownItems[4].Click += (s, e) => _construct.SelectConstruct(ConstructType.Ellipse);
             menu.Items.Add(con);
 
             var control = Control.FromHandle(Window.Handle);

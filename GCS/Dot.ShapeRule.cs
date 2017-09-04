@@ -179,9 +179,9 @@ namespace GCS
             {
                 if (IsHandling) return;
                 Fix();
-
-                foreach (var c in Shape.Childs)
-                    c._rule.OnParentMoved();
+                MoveChilds();
+                //foreach (var c in Shape.Childs)
+               //     c._rule.OnParentMoved();
             }
 
             protected override void Fix()

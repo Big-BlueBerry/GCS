@@ -12,6 +12,7 @@ namespace GCS
         ParallelLine,
         PerpendicularLine,
         Tangent,
+        Reflection,
         Ellipse
     }
 }

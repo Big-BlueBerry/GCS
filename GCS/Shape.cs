@@ -11,6 +11,56 @@ namespace GCS
     {
         private static readonly float _nearDistance = 5;
 
+        public abstract class BasisDots : IEnumerable<Vector2>
+        {
+            protected Shape _shape;
+            private int _count;
+            public BasisDots(Shape shape, int count)
+            {
+                this._shape = shape;
+                this._count = count;
+            }
+            public abstract Vector2 this[int i] { get; set; }
+
+            public IEnumerator<Vector2> GetEnumerator()
+            {
+                return new DotEnumerator(this);
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+                => GetEnumerator();
+
+            public class DotEnumerator : IEnumerator<Vector2>
+            {
+                BasisDots _dots;
+                int _cur;
+                public DotEnumerator(BasisDots dots)
+                {
+                    _dots = dots;
+                    _cur = -1;
+                }
+
+                public bool MoveNext()
+                {
+                    return ++_cur < _dots._count;
+                }
+
+                public void Reset()
+                {
+                    _cur = -1;
+                }
+
+                object System.Collections.IEnumerator.Current
+                    => this.Current;
+
+                public Vector2 Current
+                    => _dots[_cur];
+
+                public void Dispose() { }
+            }
+        }
+
+        public BasisDots DotList;
         internal List<Shape> Parents { get; private set; }
         internal List<Shape> Childs { get; private set; }
 
@@ -94,6 +144,32 @@ namespace GCS
     {
         public static int Sides = 100;
 
+        public class CircleDots : BasisDots
+        {
+            public CircleDots(Circle circle) : base(circle, 2) { }
+            public override Vector2 this[int i]
+            {
+                get
+                {
+                    switch (i)
+                    {
+                        case 0: return (_shape as Circle).Center;
+                        case 1: return (_shape as Circle).Another;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+                set
+                {
+                    switch (i)
+                    {
+                        case 0: (_shape as Circle).Center = value; break;
+                        case 1: (_shape as Circle).Another = value;  break;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+            }
+        }
+
         public Vector2 Center { get; protected set; }
         public Vector2 Another { get; protected set; }
 
@@ -103,7 +179,10 @@ namespace GCS
             set => throw new NotSupportedException();
         }
 
-        protected Circle() : base() { }
+        protected Circle() : base()
+        {
+            DotList = new CircleDots(this);
+        }
 
         public override void Draw(SpriteBatch sb)
         {
@@ -131,11 +210,46 @@ namespace GCS
             new CircleOnTwoDotsRule(circle, center, another);
             return circle;
         }
+
+        public static Circle FromReflection(LineLike axis, Circle original)
+        {
+            Circle cir = new Circle();
+            new ReflectedShapeRule(axis, original, cir);
+            return cir;
+        }
     }
 
     public partial class Ellipse : Shape
     {
         public static int Sides = 100;
+
+        public class EllipseDots : BasisDots
+        {
+            public EllipseDots(Ellipse ellipse) : base(ellipse, 3) { }
+            public override Vector2 this[int i]
+            {
+                get
+                {
+                    switch (i)
+                    {
+                        case 0: return (_shape as Ellipse).Focus1;
+                        case 1: return (_shape as Ellipse).Focus2;
+                        case 2: return (_shape as Ellipse).PinPoint;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+                set
+                {
+                    switch (i)
+                    {
+                        case 0: (_shape as Ellipse).Focus1 = value; break;
+                        case 1: (_shape as Ellipse).Focus2 = value; break;
+                        case 2: (_shape as Ellipse).PinPoint = value; break;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+            }
+        }
 
         public Vector2 Focus1 { get; protected set; }
         public Vector2 Focus2 { get; protected set; }
@@ -145,9 +259,12 @@ namespace GCS
         public float Sublength => Vector2.Distance(Focus1, Focus2) / 2;//c 
         public float Semimajor => (Vector2.Distance(Focus1, PinPoint) + Vector2.Distance(Focus2, PinPoint)) / 2;//a
         public float Semiminor => (float)Math.Sqrt(Semimajor * Semimajor - Sublength * Sublength);//b
-        
 
-        protected Ellipse() : base() { }
+
+        protected Ellipse() : base()
+        {
+            DotList = new EllipseDots(this);
+        }
 
         public override void Draw(SpriteBatch sb)
         {
@@ -176,10 +293,42 @@ namespace GCS
             new EllipseOnThreeDotsRule(ellipse, f1, f2, pin);
             return ellipse;
         }
+
+        public static Ellipse FromReflection(LineLike axis, Ellipse original)
+        {
+            Ellipse elp = new Ellipse();
+            new ReflectedShapeRule(axis, original, elp);
+            return elp;
+        }
     }
 
     public abstract partial class LineLike : Shape
     {
+        public class LineDots : BasisDots
+        {
+            public LineDots(LineLike line) : base(line, 2) { }
+            public override Vector2 this[int i]
+            {
+                get
+                {
+                    switch (i)
+                    {
+                        case 0: return (_shape as LineLike).Point1;
+                        case 1: return (_shape as LineLike).Point2;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+                set
+                {
+                    switch (i)
+                    {
+                        case 0: (_shape as LineLike).Point1 = value; break;
+                        case 1: (_shape as LineLike).Point2 = value; break;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+            }
+        }
         public Vector2 Point1 { get; protected set; }
         public Vector2 Point2 { get; protected set; }
         
@@ -188,6 +337,7 @@ namespace GCS
 
         protected LineLike(Vector2? p1 = null, Vector2? p2 = null)
         {
+            DotList = new LineDots(this);
             Point1 = p1 ?? new Vector2();
             Point2 = p2 ?? new Vector2();
 
@@ -210,6 +360,7 @@ namespace GCS
             var diff = at - Point1;
             Move(diff);
         }
+
     }
 
     public partial class Line : LineLike
@@ -265,6 +416,13 @@ namespace GCS
 
             return line;
         }
+
+        public static Line FromReflection(LineLike axis, Line original )
+        {
+            Line lin = new Line();
+            new ReflectedShapeRule(axis, original, lin);
+            return lin;
+        }
     }
 
     public class Segment : LineLike
@@ -284,6 +442,13 @@ namespace GCS
             var rule = new LineLikeOnTwoDotsRule(seg, d1, d2);
 
             return seg;
+        }
+
+        public static Segment FromReflection(LineLike axis, Segment original)
+        {
+            Segment lin = new Segment();
+            new ReflectedShapeRule(axis, original, lin);
+            return lin;
         }
     }
     
@@ -323,6 +488,13 @@ namespace GCS
 
             return vec;
         }
+
+        public static Vector FromReflection(LineLike axis, Vector original)
+        {
+            Vector lin = new Vector();
+            new ReflectedShapeRule(axis, original, lin);
+            return lin;
+        }
     }
  
 
@@ -330,11 +502,35 @@ namespace GCS
     {
         private static readonly float _nearDotDistance = 10;
 
+        public class DotDots : BasisDots
+        {
+            public DotDots(Dot dot) : base(dot, 1) { }
+            public override Vector2 this[int i]
+            {
+                get
+                {
+                    switch (i)
+                    {
+                        case 0: return (_shape as Dot).Coord;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+                set
+                {
+                    switch (i)
+                    {
+                        case 0: (_shape as Dot).Coord = value; break;
+                        default: throw new IndexOutOfRangeException();
+                    }
+                }
+            }
+        }
         private Vector2 _coord;
         public Vector2 Coord { get => _coord; set => _coord = value; }
 
         protected Dot(Vector2 coord) : base()
         {
+            DotList = new DotDots(this);
             _coord = coord;
             Color = Color.OrangeRed;
         }
@@ -409,6 +605,12 @@ namespace GCS
             return dot;
         }
 
+        public static Dot FromReflection(LineLike axis, Dot original )
+        {
+            Dot d = new Dot(Vector2.Zero);
+            new ReflectedShapeRule(axis, original, d);
+            return d;
+        }
         public void AttachTo(Dot parent)
         {
             new DotOnDotRule(this, parent);
