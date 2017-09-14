@@ -75,8 +75,8 @@ namespace GCS
                 var dot = line.Parents[1] as Dot;
                 dot.Move(delta);
 
-                MoveChilds();
                 Fix();
+                MoveChilds();
                 IsHandling = false;
             }
 
@@ -127,8 +127,8 @@ namespace GCS
                 var dot = line.Parents[1] as Dot;
                 dot.Move(delta);
 
-                MoveChilds();
                 Fix();
+                MoveChilds();
                 IsHandling = false;
             }
 
